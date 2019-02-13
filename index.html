@@ -42,12 +42,12 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.26.1/ramda.min.js"></script>
         <!-- composer.json and composer.lock example file to see different use cases -->
-        <script type="text/javascript" src="example-composer/json-1.js"></script> <!-- Expose compooser1 property -->
-        <script type="text/javascript" src="example-composer/lock-1.js"></script> <!-- Expose compooserLock1 property -->
-        <script type="text/javascript" src="example-composer/json-2.js"></script> <!-- Expose compooser2 property -->
-        <script type="text/javascript" src="example-composer/lock-2.js"></script> <!-- Expose compooserLock2 property -->
-        <script type="text/javascript" src="example-composer/json-3.js"></script> <!-- Expose compooser3 property -->
-        <script type="text/javascript" src="example-composer/lock-3.js"></script> <!-- Expose compooserLock3 property -->
+        <script type="text/javascript" src="example-composer/json-1.js"></script> <!-- Expose composer1 property -->
+        <script type="text/javascript" src="example-composer/lock-1.js"></script> <!-- Expose composerLock1 property -->
+        <script type="text/javascript" src="example-composer/json-2.js"></script> <!-- Expose composer2 property -->
+        <script type="text/javascript" src="example-composer/lock-2.js"></script> <!-- Expose composerLock2 property -->
+        <script type="text/javascript" src="example-composer/json-3.js"></script> <!-- Expose composer3 property -->
+        <script type="text/javascript" src="example-composer/lock-3.js"></script> <!-- Expose composerLock3 property -->
         <!-- Load your composer.json and composer.lock files -->
         <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
         <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
@@ -57,10 +57,11 @@
         <!-- Where the magic happen -->
         <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
         <script type="text/javascript">
-            // Analize migrations needed for spryker-feature packages
-            analyseMigrationToNextProductReleases('listOfProductReleases', composer3, composerLock3, releaseFeatures, releaseModules);
-            // Analize migrations needed for spryker packages
-            analyseMigrationToNextModulesMajors('listOfModules', composer3, composerLock3, releaseModules);
+            // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
+            //analyseMigrationToNextProductReleases('listOfProductReleases', myComposerJSON, myComposerLOCK, releaseFeatures, releaseModules);
+
+            // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
+            //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
 
         </script>
     </body>
