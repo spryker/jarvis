@@ -31,7 +31,7 @@ You will see 3 parts for each Product Releases:
 
 ![All migrations for all the modules that are part of the Product Release](assets/product-release-migration-guides.png)
 
-2. For each `spryker-feature` you will see the diff with the previous Product Release
+2. For each `spryker-feature` you will see a link to compare the diff between your version and the new version
 
 ![Diff for each spryker-feature](assets/product-release-diff-features.png)
 

@@ -244,7 +244,7 @@ function contentForTabs(composerLock, currentModules, content) {
                                         </div>
                                         <h5 class="section-in-release">Diff for each feature inside this Product Release</h5>
                                         <div class="row">
-                                            ${groupModulesByFeature(cur)}
+                                            ${groupModulesByFeature(composerLock, cur)}
                                         </div>
                                     </div>`)
     )(content);
@@ -309,7 +309,7 @@ function templateForModulesThatNeedMigration(listOfModules) {
             </div>`;
 }
 
-function groupModulesByFeature(productRelease) {
+function groupModulesByFeature(currentComposerLock, productRelease) {
     function leftPills(productRelease) {
         const lengthForFeature = R.compose(
             R.length,
@@ -332,12 +332,13 @@ function groupModulesByFeature(productRelease) {
                 </a>`, R.prop('featuresToMigrate', productRelease)));
     }
 
-    function listGroupForFeature(featureVersions) {
+    function listGroupForFeature(currentComposerLock, featureVersions) {
         return R.compose(
-            () => `<li class="list-group-item d-flex justify-content-between align-items-center">
-                            We will display here the code diff between versions.
-                        </li>`,
-            R.find(R.propEq('name', R.prop('name', productRelease)))
+            cur => `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="https://github.com/${R.path(['data', 'composer', 'name'], cur)}/compare/${R.prop('installedVersion', cur)}%E2%80%A6${R.prop('name', cur)}" target="_blank">Check the diff between both versions</a>
+                    </li>`,
+            cur => R.assoc('installedVersion', findInstalledFeatureByName(currentComposerLock, R.path(['data', 'composer', 'name'], cur)), cur),
+            R.find(R.propEq('name', R.prop('name', productRelease))),
         )(featureVersions);
     }
 
@@ -345,7 +346,7 @@ function groupModulesByFeature(productRelease) {
         return R.join('', mapIndexed((cur, index) =>
             `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'module', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'module', cur)}-tab">
                     <ul class="list-group">
-                        ${listGroupForFeature(R.path(['package', 'feature_versions'], cur))}
+                        ${listGroupForFeature(currentComposerLock, R.path(['package', 'feature_versions'], cur))}
                     </ul>
                 </div>`, R.prop('featuresToMigrate', productRelease)));
     }
@@ -360,6 +361,10 @@ function groupModulesByFeature(productRelease) {
                     ${rightPills(productRelease)}
                 </div>
             </div>`;
+}
+
+function findInstalledFeatureByName(currentComposerLock, featureName) {
+    return R.prop('version', R.find(R.propEq('name', featureName), R.prop('packages', currentComposerLock)));
 }
 
 
