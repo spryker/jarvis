@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Migration analyser</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <style type="text/css">
+            .card {
+                margin-bottom: 1rem;
+            }
+
+            .section-in-release {
+                margin: 2rem 0rem;
+            }
+
+            .features-not-used {
+                margin-top: 1rem;
+            }
+
+        </style>
+    </head>
+
+    <body class="container">
+        <section>
+            <h1>Spryker Migration Analyser</h1>
+            <p>You will find below all your installed features and modules and how to upgrade them safely to the next major.</p>
+        </section>
+        <hr>
+        <section>
+            <h2>Product Releases</h2>
+            <div id="listOfProductReleases"></div>
+            <hr>
+            <h2>Modules</h2>
+            <div id="listOfModules"></div>
+        </section>
+        <!-- Libraries -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.26.1/ramda.min.js"></script>
+        <!-- composer.json and composer.lock example file to see different use cases -->
+        <script type="text/javascript" src="example-composer/json-1.js"></script> <!-- Expose compooser1 property -->
+        <script type="text/javascript" src="example-composer/lock-1.js"></script> <!-- Expose compooserLock1 property -->
+        <script type="text/javascript" src="example-composer/json-2.js"></script> <!-- Expose compooser2 property -->
+        <script type="text/javascript" src="example-composer/lock-2.js"></script> <!-- Expose compooserLock2 property -->
+        <script type="text/javascript" src="example-composer/json-3.js"></script> <!-- Expose compooser3 property -->
+        <script type="text/javascript" src="example-composer/lock-3.js"></script> <!-- Expose compooserLock3 property -->
+        <!-- Load your composer.json and composer.lock files -->
+        <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
+        <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
+        <!-- Data from the release app -->
+        <script type="text/javascript" src="release-app-data/release-module.js"></script> <!-- Expose releaseModules property -->
+        <script type="text/javascript" src="release-app-data/release-feature.js"></script> <!-- Expose releaseFeatures property -->
+        <!-- Where the magic happen -->
+        <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
+        <script type="text/javascript">
+            // Analize migrations needed for spryker-feature packages
+            analyseMigrationToNextProductReleases('listOfProductReleases', composer3, composerLock3, releaseFeatures, releaseModules);
+            // Analize migrations needed for spryker packages
+            analyseMigrationToNextModulesMajors('listOfModules', composer3, composerLock3, releaseModules);
+
+        </script>
+    </body>
+
+</html>

@@ -2120,7 +2120,7 @@ const composerLock3 = {
         },
         {
             "name": "spryker-eco/loggly",
-            "version": "dev-master",
+            "version": "2018.08.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-eco/loggly.git",

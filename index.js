@@ -1,11 +1,25 @@
 /* jshint esversion:6 */
 
+////////////////////////////////////////////////////
+// Functions to work with the Migration Analyzer //
+//////////////////////////////////////////////////
+
+// analyseMigrationToNextProductReleases :: (String, Object, Object, [Object], [Object]) -> HTML
+function analyseMigrationToNextProductReleases(el, currentComposer, currentComposerLock, currentFeatures, currentModules) {
+    return render(el, migrateToNextProductReleases(currentComposer, currentComposerLock, currentFeatures, currentModules));
+}
+
+// analyseMigrationToNextProductReleases :: (String, Object, Object, [Object]) -> HTML
+function analyseMigrationToNextModulesMajors(el, currentComposer, currentComposerLock, currentModules) {
+    return render(el, migrateModuleToNextMajor(currentComposer, currentComposerLock, currentModules));
+}
+
 
 ////////////
 // Utils //
 //////////
 
-
+// log :: a -> a
 function log(content) {
     console.log(content);
     return content;
@@ -13,14 +27,18 @@ function log(content) {
 
 const converter = new showdown.Converter();
 
+// r :: Number
 function r() {
-    return Math.random().toString(36).substring(7);
+    return Math.random()
+        .toString(36)
+        .substring(7);
 }
 
 const isNotNil = R.complement(R.isNil);
 const nextMajor = version => R.concat(R.head(R.split('.', version)), '.0.0');
 const nextMajorLink = version => R.concat(R.head(R.split('.', version)), '-0-0');
 
+// cleanDescription :: String -> String
 const cleanDescription = description => R.compose(
     R.join('.<br>'),
     R.split('.'),
@@ -43,8 +61,6 @@ function majorAvailableForModule(mod) {
     return lastVersionAvailableMajor > installedVersionMajor ? true : false;
 }
 
-const modulesForOrgs = ['spryker', 'spryker-feature', 'spryker-shop', 'spryker-eco'];
-
 const mapIndexed = R.addIndex(R.map);
 const isActive = index => index === 0 ? 'active' : '';
 const isShow = index => index === 0 ? 'show' : '';
@@ -52,32 +68,42 @@ const semVerMajor = version => R.nth(0, R.split('.', version));
 
 const templateUpToDate = content => [`<div class="alert alert-primary" role="alert">${content}</div>`];
 
-const properName = name => R.join(`${R.prop('identifier', name)}`, R.split('.', R.prop('name', name)));
+const properName = name => R.join(`${R.prop('identifier', name)}`, R.split('.', R.or(R.prop('name', name), R.prop('module', name))));
 
-const navigationForTabs = listOfVersions => R.compose(
-    R.join(''),
-    mapIndexed((cur, index) => `<a
-                                    class="nav-item nav-link ${isActive(index)}"
-                                    id="nav-${properName(cur)}-tab"
-                                    data-toggle="tab" href="#nav-${properName(cur)}"
-                                    role="tab" aria-controls="nav-home"
-                                    aria-selected="true">${R.prop('name', cur)}
-                                </a>`)
-)(listOfVersions);
+function navigationForTabs(listOfVersions) {
+    return R.compose(
+        R.join(''),
+        mapIndexed((cur, index) => `<a
+                                        class="nav-item nav-link ${isActive(index)}"
+                                        id="nav-${properName(cur)}-tab"
+                                        data-toggle="tab" href="#nav-${properName(cur)}"
+                                        role="tab" aria-controls="nav-home"
+                                        aria-selected="true">${R.prop('name', cur)}
+                                    </a>`)
+    )(listOfVersions);
+}
 
-const render = (selector, content) => document.getElementById(selector).innerHTML = content;
+function render(selector, content) {
+    document.getElementById(selector)
+        .innerHTML = content;
 
+    return selector;
+}
 
-const keepOnlyModulesFromOrgs = modulesForOrgs => R.compose(
-    R.sortBy(R.prop(0)),
-    R.filter(cur => R.contains(R.compose(
-        R.head,
-        R.split('/'),
-        R.nth(0)
-    )(cur), modulesForOrgs) ? true : false),
-    R.toPairs,
-    R.prop('require')
-);
+function keepOnlyModulesFromOrgs(composer) {
+    const modulesForOrgs = ['spryker', 'spryker-feature', 'spryker-shop', 'spryker-eco'];
+
+    return R.compose(
+        R.sortBy(R.prop(0)),
+        R.filter(cur => R.contains(R.compose(
+            R.head,
+            R.split('/'),
+            R.nth(0)
+        )(cur), modulesForOrgs) ? true : false),
+        R.toPairs,
+        R.prop('require')
+    )(composer);
+}
 
 const getNameAndVersionFromInstalledModules = R.compose(
     R.map(R.pick(['name', 'version'])),
@@ -90,7 +116,7 @@ const getModuleOrg = R.compose(
     R.head
 );
 
-const specificTypeOfModules = type => moduleList => R.filter(cur => R.equals(type, getModuleOrg(cur)), moduleList);
+const specificTypeOfModules = types => moduleList => R.filter(cur => R.includes(getModuleOrg(cur), types), moduleList);
 
 const findPackageForModule = currentList => mod => R.find(R.propEq('package', R.prop('module', mod)), currentList);
 const findModuleForModule = currentList => mod => R.find(R.propEq('package', R.prop('name', mod)), currentList);
@@ -108,215 +134,13 @@ const findInstalledVersion = composerLock => moduleList => R.map(
 ///////////////////////////////////////////
 
 
-function analyseMigrationToNextProductReleases(el, currentComposer, currentComposerLock, currentFeatures, currentModules) {
-    return render(el, migrateToNextProductReleases(currentComposer, currentComposerLock, currentFeatures, currentModules));
-}
-
 function migrateToNextProductReleases(currentComposer, currentComposerLock, currentFeatures, currentModules) {
-    function templateForModulesThatNeedMigration(listOfModules) {
-        const properName = mod => R.join(`${R.prop('identifier', name)}`, R.split('/', R.prop('name', mod)));
-
-        function leftPills(listOfMod) {
-            const lengthForFeature = R.compose(
-                R.length,
-                R.toPairs,
-                R.path(['data', 'composer', 'require']),
-                R.find(R.propEq('name', R.prop('name', listOfModules))),
-                R.path(['package', 'feature_versions'])
-            );
-
-            return R.join('', mapIndexed((cur, index) => {
-                const pp = R.prop(R.__, cur);
-                const ph = R.path(R.__, cur);
-                return `<a
-                            class="nav-link ${isActive(index)}
-                            id="v-pills-${properName(cur)}-tab"
-                            data-toggle="pill"
-                            href="#v-pills-${properName(cur)}"
-                            role="tab"
-                            aria-controls="v-pills-${properName(cur)}"
-                            aria-selected="true">${pp('name')}
-                            <span class="badge badge-pill float-right badge-light">${pp('version')} -> ${nextMajor(ph(['package', 'version']))}</span>
-                        </a>`;
-            }, listOfMod));
-        }
-
-        function rightPills(features) {
-            return R.join('', mapIndexed((cur, index) =>
-                `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName(cur)}" role="tabpanel" aria-labelledby="v-pills-${properName(cur)}-tab">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <a href="${migrationLinkForModule(R.prop('name',cur), R.path(['package', 'version'], cur))}" target="_blank">Migration guide for module ${R.prop('name', cur)}</a>
-                        </li>
-                    </ul>
-                </div>`, listOfModules));
-        }
-
-        return `<div class="col-6">
-                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        ${leftPills(listOfModules)}
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="tab-content" id="v-pills-tabContent">
-                        ${rightPills(listOfModules)}
-                    </div>
-                </div>`;
-    }
-
-    function templateForProductRelease(productRelease) {
-        return `<p class="card-text">How to migrate to newer version?</p>
-                <nav>
-                    <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
-                        ${navigationForTabs(productRelease)}
-                    </div>
-                </nav>
-                <div class="tab-content" id="nav-tabContent">
-                    ${contentForTabs(currentComposerLock, productRelease)}
-                </div>
-                <div class="features-not-used">
-                    <h5>Spryker features you might be interested in</h5>
-                    ${missingSprykerFeatures(currentFeatures, currentComposer)}
-                </div>`;
-    }
-
-    function templateForMissingFeatures(feature) {
-        const p = R.prop(R.__, feature);
-        return `<dt><a href="https://github.com/${p('package')}" target="_blank">${p('name')}</a></dt>
-                <dd>${p('description')}</dd>`;
-    }
-
-    function missingSprykerFeatures(currentFeatures, currentComposer) {
-        const diff = (x, y) => R.prop('package', x) === R.prop('feature', y);
-
-        return R.compose(
-            R.ifElse(
-                R.isEmpty,
-                cur => '<div class="alert alert-success" role="alert">Congrats you currently use all Spryker features available!</div>',
-                R.compose(
-                    R.concat('<dl>'),
-                    cur => R.concat(cur, '</dl>'),
-                    R.join(''),
-                    R.map(templateForMissingFeatures),
-                    R.sortBy(R.prop('name'))
-                )
-            ),
-            R.differenceWith(diff, currentFeatures),
-            R.map(reconstruct(['feature', 'requiredVersion'])),
-            specificTypeOfModules('spryker-feature'),
-            keepOnlyModulesFromOrgs(modulesForOrgs)
-        )(currentComposer);
-    }
-
-    function modulesThatNeedMigration(currentComposerLock, productRelease) {
-        return R.compose(
-            R.ifElse(
-                R.isEmpty,
-                cur => '<div class="alert alert-primary" role="alert">No module migrations needed for this Product Release.</div>',
-                templateForModulesThatNeedMigration
-            ),
-            R.filter(cur => R.prop('upToDate', cur) === false && majorAvailableForModule(cur)),
-            R.filter(cur => isNotNil(R.prop('package', cur))),
-            list => R.filter(cur => isNotNil(R.prop('package', cur)), list),
-            R.map(R.compose(
-                cur => R.assoc('upToDate', R.equals(R.prop('version', cur), R.path(['package', 'version'], cur)), cur),
-                cur => R.assoc('package', findModuleForModule(currentModules)(cur), cur),
-                cur => R.assoc('identifier', r(), cur)
-            )),
-            R.prop('packages')
-        )(currentComposerLock);
-    }
-
-    function groupByRelease(listOfFeatures) {
-        return R.compose(
-            R.map(R.compose(
-                cur => R.assoc('featuresToMigrate', R.filter(feature => R.any(version => R.equals(R.prop('name', version), R.prop('name', cur)), R.path(['package', 'feature_versions'], feature)), listOfFeatures), cur),
-                cur => ({ name: cur, featuresToMigrate: [], identifier: r() })
-            )),
-            R.uniq,
-            R.reduce((prev, cur) => {
-                return R.concat(prev, R.map(R.prop('name'), R.path(['package', 'feature_versions'], cur)));
-            }, [])
-        )(listOfFeatures);
-    }
-
-    function contentForTabs(composerLock, content) {
-        return R.compose(
-            R.join(''),
-            mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName(cur)}" role="tabpanel" aria-labelledby="nav-${properName(cur)}-tab">
-                                            <h5 class="section-in-release">Modules that need a migration inside this Product Release</h5>
-                                            <div class="row">
-                                                ${modulesThatNeedMigration(composerLock, cur)}
-                                            </div>
-                                            <h5 class="section-in-release">Diff for each feature inside this Product Release</h5>
-                                            <div class="row">
-                                                ${groupModulesByFeature(cur)}
-                                            </div>
-                                        </div>`)
-        )(content);
-    }
-
-    function groupModulesByFeature(productRelease) {
-        const properName = feature => R.join(`${R.prop('identifier', name)}`, R.split('/', R.prop('module', feature)));
-
-        function leftPills(features) {
-            const lengthForFeature = R.compose(
-                R.length,
-                R.toPairs,
-                R.path(['data', 'composer', 'require']),
-                R.find(R.propEq('name', R.prop('name', productRelease))),
-                R.path(['package', 'feature_versions'])
-            );
-
-            return R.join('', mapIndexed((cur, index) =>
-                `<a
-                    class="nav-link ${isActive(index)}
-                    id="v-pills-${properName(cur)}-tab"
-                    data-toggle="pill"
-                    href="#v-pills-${properName(cur)}"
-                    role="tab"
-                    aria-controls="v-pills-${properName(cur)}"
-                    aria-selected="true">${R.prop('module', cur)}
-                    <span class="badge badge-pill float-right badge-light">${lengthForFeature(cur)}</span>
-                </a>`, features));
-        }
-
-        function listGroupForFeature(featureVersions) {
-            return R.compose(
-                mod => `<li class="list-group-item d-flex justify-content-between align-items-center">
-                            We will display here the code diff between versions.
-                        </li>`,
-                R.find(R.propEq('name', R.prop('name', productRelease)))
-            )(featureVersions);
-        }
-
-        function rightPills(features) {
-            return R.join('', mapIndexed((cur, index) =>
-                `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName(cur)}" role="tabpanel" aria-labelledby="v-pills-${properName(cur)}-tab">
-                    <ul class="list-group">
-                        ${listGroupForFeature(R.path(['package', 'feature_versions'], cur))}
-                    </ul>
-                </div>`, R.prop('featuresToMigrate', productRelease)));
-        }
-
-        return `<div class="col-6">
-                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        ${leftPills(R.prop('featuresToMigrate', productRelease))}
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="tab-content" id="v-pills-tabContent">
-                        ${rightPills(R.prop('featuresToMigrate', productRelease))}
-                    </div>
-                </div>`;
-    }
-
     return R.compose(
         R.ifElse(
             R.isEmpty,
             cur => templateUpToDate('All your Spryker features are up to date or you do not use any!'),
             R.compose(
-                templateForProductRelease,
+                templateForProductRelease(currentComposerLock, currentModules),
                 R.sortBy(R.prop('name')),
                 groupByRelease
             )
@@ -328,9 +152,205 @@ function migrateToNextProductReleases(currentComposer, currentComposerLock, curr
             cur => R.assoc('package', findPackageForModule(currentFeatures)(cur), cur),
             reconstruct(['module', 'requiredVersion', 'installedVersion']))),
         findInstalledVersion(currentComposerLock),
-        specificTypeOfModules('spryker-feature'),
-        keepOnlyModulesFromOrgs(modulesForOrgs)
+        specificTypeOfModules(['spryker-feature']),
+        keepOnlyModulesFromOrgs
     )(currentComposer);
+}
+
+function templateForProductRelease(currentComposerLock, currentModules) {
+    return function(productRelease) {
+        return `<p class="card-text">How to migrate to newer version?</p>
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
+                        ${navigationForTabs(productRelease)}
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    ${contentForTabs(currentComposerLock, currentModules, productRelease)}
+                </div>
+                <div class="features-not-used">
+                    <h5>Spryker features you might be interested in</h5>
+                    ${missingSprykerFeatures(currentFeatures, currentComposer)}
+                </div>`;
+    }
+}
+
+function missingSprykerFeatures(currentFeatures, currentComposer) {
+    const diff = (x, y) => R.prop('package', x) === R.prop('feature', y);
+
+    return R.compose(
+        R.ifElse(
+            R.isEmpty,
+            cur => '<div class="alert alert-success" role="alert">Congrats you currently use all Spryker features available!</div>',
+            R.compose(
+                R.concat('<dl>'),
+                cur => R.concat(cur, '</dl>'),
+                R.join(''),
+                R.map(templateForMissingFeatures),
+                R.sortBy(R.prop('name'))
+            )
+        ),
+        R.differenceWith(diff, currentFeatures),
+        R.map(reconstruct(['feature', 'requiredVersion'])),
+        specificTypeOfModules(['spryker-feature']),
+        keepOnlyModulesFromOrgs
+    )(currentComposer);
+}
+
+function templateForMissingFeatures(feature) {
+    const p = R.prop(R.__, feature);
+    return `<dt><a href="https://github.com/${p('package')}" target="_blank">${p('name')}</a></dt>
+            <dd>${p('description')}</dd>`;
+}
+
+function groupByRelease(listOfFeatures) {
+    return R.compose(
+        R.map(R.compose(
+            cur => R.assoc('featuresToMigrate', R.filter(feature => R.any(version => R.equals(R.prop('name', version), R.prop('name', cur)), R.path(['package', 'feature_versions'], feature)), listOfFeatures), cur),
+            cur => ({ name: cur, featuresToMigrate: [], identifier: r() })
+        )),
+        R.uniq,
+        R.reduce((prev, cur) => {
+            return R.concat(prev, R.map(R.prop('name'), R.path(['package', 'feature_versions'], cur)));
+        }, [])
+    )(listOfFeatures);
+}
+
+function contentForTabs(composerLock, currentModules, content) {
+    return R.compose(
+        R.join(''),
+        mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName(cur)}" role="tabpanel" aria-labelledby="nav-${properName(cur)}-tab">
+                                        <h5 class="section-in-release">Modules that need a migration inside this Product Release</h5>
+                                        <div class="row">
+                                            ${modulesThatNeedMigration(composerLock, currentModules, cur)}
+                                        </div>
+                                        <h5 class="section-in-release">Diff for each feature inside this Product Release</h5>
+                                        <div class="row">
+                                            ${groupModulesByFeature(cur)}
+                                        </div>
+                                    </div>`)
+    )(content);
+}
+
+function modulesThatNeedMigration(currentComposerLock, currentModules, productRelease) {
+    return R.compose(
+        R.ifElse(
+            R.isEmpty,
+            cur => '<div class="alert alert-primary" role="alert">No module migrations needed for this Product Release.</div>',
+            templateForModulesThatNeedMigration
+        ),
+        R.filter(cur => R.prop('upToDate', cur) === false && majorAvailableForModule(cur)),
+        R.filter(cur => isNotNil(R.prop('package', cur))),
+        list => R.filter(cur => isNotNil(R.prop('package', cur)), list),
+        R.map(R.compose(
+            cur => R.assoc('upToDate', R.equals(R.prop('version', cur), R.path(['package', 'version'], cur)), cur),
+            cur => R.assoc('package', findModuleForModule(currentModules)(cur), cur),
+            cur => R.assoc('identifier', r(), cur)
+        )),
+        R.prop('packages')
+    )(currentComposerLock);
+}
+
+function templateForModulesThatNeedMigration(listOfModules) {
+    function leftPills(listOfMod) {
+        const lengthForFeature = R.compose(
+            R.length,
+            R.toPairs,
+            R.path(['data', 'composer', 'require']),
+            R.find(R.propEq('name', R.prop('name', listOfModules))),
+            R.path(['package', 'feature_versions'])
+        );
+
+        return R.join('', mapIndexed((cur, index) => {
+            const pp = R.prop(R.__, cur);
+            const ph = R.path(R.__, cur);
+            return `<a
+                            class="nav-link ${isActive(index)}
+                            id="v-pills-${properName(cur)}-tab"
+                            data-toggle="pill"
+                            href="#v-pills-${properName(cur)}"
+                            role="tab"
+                            aria-controls="v-pills-${properName(cur)}"
+                            aria-selected="true">${pp('name')}
+                            <span class="badge badge-pill float-right badge-light">${pp('version')} -> ${nextMajor(ph(['package', 'version']))}</span>
+                        </a>`;
+        }, listOfMod));
+    }
+
+    function rightPills(features) {
+        return R.join('', mapIndexed((cur, index) =>
+            `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName(cur)}" role="tabpanel" aria-labelledby="v-pills-${properName(cur)}-tab">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="${migrationLinkForModule(R.prop('name',cur), R.path(['package', 'version'], cur))}" target="_blank">Migration guide for module ${R.prop('name', cur)}</a>
+                        </li>
+                    </ul>
+                </div>`, listOfModules));
+    }
+
+    return `<div class="col-6">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    ${leftPills(listOfModules)}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="tab-content" id="v-pills-tabContent">
+                    ${rightPills(listOfModules)}
+                </div>
+            </div>`;
+}
+
+function groupModulesByFeature(productRelease) {
+    function leftPills(productRelease) {
+        const lengthForFeature = R.compose(
+            R.length,
+            R.toPairs,
+            R.path(['data', 'composer', 'require']),
+            R.find(R.propEq('name', R.prop('name', productRelease))),
+            R.path(['package', 'feature_versions'])
+        );
+
+        return R.join('', mapIndexed((cur, index) =>
+            `<a
+                    class="nav-link ${isActive(index)}
+                    id="v-pills-${properName(cur)}-tab"
+                    data-toggle="pill"
+                    href="#v-pills-${properName(cur)}"
+                    role="tab"
+                    aria-controls="v-pills-${properName(cur)}"
+                    aria-selected="true">${R.prop('module', cur)}
+                    <span class="badge badge-pill float-right badge-light">${lengthForFeature(cur)}</span>
+                </a>`, R.prop('featuresToMigrate', productRelease)));
+    }
+
+    function listGroupForFeature(featureVersions) {
+        return R.compose(
+            mod => `<li class="list-group-item d-flex justify-content-between align-items-center">
+                            We will display here the code diff between versions.
+                        </li>`,
+            R.find(R.propEq('name', R.prop('name', productRelease)))
+        )(featureVersions);
+    }
+
+    function rightPills(productRelease) {
+        return R.join('', mapIndexed((cur, index) =>
+            `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName(cur)}" role="tabpanel" aria-labelledby="v-pills-${properName(cur)}-tab">
+                    <ul class="list-group">
+                        ${listGroupForFeature(R.path(['package', 'feature_versions'], cur))}
+                    </ul>
+                </div>`, R.prop('featuresToMigrate', productRelease)));
+    }
+
+    return `<div class="col-6">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    ${leftPills(productRelease)}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="tab-content" id="v-pills-tabContent">
+                    ${rightPills(productRelease)}
+                </div>
+            </div>`;
 }
 
 
@@ -338,10 +358,6 @@ function migrateToNextProductReleases(currentComposer, currentComposerLock, curr
 // Migration Analysis for Modules outside Spryker Features //
 ////////////////////////////////////////////////////////////
 
-
-function analyseMigrationToNextModulesMajors(el, currentComposer, currentComposerLock, currentModules) {
-    return render(el, migrateModuleToNextMajor(currentComposer, currentComposerLock, currentModules));
-}
 
 function migrateModuleToNextMajor(currentComposer, currentComposerLock, currentModules) {
     return R.compose(
@@ -351,17 +367,16 @@ function migrateModuleToNextMajor(currentComposer, currentComposerLock, currentM
             cur => templateUpToDate('All your Spryker modules are up to date or you do not use any outside of the Spryker features!'),
             R.map(templateForPackage(currentComposerLock))
         ),
-        log,
-        R.filter(cur => R.prop('upToDate', cur) === false && majorAvailable(cur)),
-        R.filter(cur => R.prop('requiredVersion', cur) !== '*'),
+        // "spryker-eco/loggly" is the only module that is not part of the release app
+        R.filter(cur => R.prop('module', cur) !== 'spryker-eco/loggly' && R.prop('upToDate', cur) === false && majorAvailable(cur) && R.prop('requiredVersion', cur) !== '*'),
         R.map(R.compose(
             R.assoc('identifier', r()),
             cur => R.assoc('upToDate', R.equals(R.prop('installedVersion', cur), R.path(['package', 'version'], cur)), cur),
             cur => R.assoc('package', findPackageForModule(currentModules)(cur), cur),
             reconstruct(['module', 'requiredVersion', 'installedVersion']))),
         findInstalledVersion(currentComposerLock),
-        specificTypeOfModules('spryker'),
-        keepOnlyModulesFromOrgs(modulesForOrgs)
+        specificTypeOfModules(['spryker', 'spryker-eco', 'spryker-shop']),
+        keepOnlyModulesFromOrgs
     )(currentComposer);
 }
 
@@ -433,7 +448,6 @@ function templateMajorAvailable(moduleName, currentVersion, allVersions) {
                                             <dt>This new version brings</dt>
                                             <dd>${converter.makeHtml(R.prop('description', cur))}</dd>
                                         </div>`),
-            log,
             R.map(cur => R.assoc('identifier', r(), cur))
         )(majorsAvailable);
     }
