@@ -1,4 +1,6 @@
-# Spryker Migration Analyser
+# Spryker Migration Analyzer
+
+Beta version
 
 ## Installation & Usage
 
