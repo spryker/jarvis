@@ -1,8 +1,12 @@
-/* jshint esversion:6 */
+/* jshint esversion:6, unused:true, undef:true  */
+/* globals console:false, showdown:false, R:false, document:false */
+/* exported analyseMigrationToNextProductReleases, analyseMigrationToNextModulesMajors, log */
+
 
 ////////////////////////////////////////////////////
 // Functions to work with the Migration Analyzer //
 //////////////////////////////////////////////////
+
 
 // analyseMigrationToNextProductReleases :: (String, Object, Object, [Object], [Object]) -> HTML
 function analyseMigrationToNextProductReleases(el, currentComposer, currentComposerLock, currentFeatures, currentModules) {
@@ -19,14 +23,29 @@ function analyseMigrationToNextModulesMajors(el, currentComposer, currentCompose
 // Utils //
 //////////
 
+
 // log :: a -> a
 function log(content) {
     console.log(content);
     return content;
 }
 
+// Write the migration analysis in the DOM
+function render(selector, content) {
+    document.getElementById(selector)
+        .innerHTML = content;
+
+    return selector;
+}
+
+// Used to parse Module markdown and proce HTML
 const converter = new showdown.Converter();
 
+function isNextMajor(last, newVersion) {
+    return semVerMajor(newVersion) > semVerMajor(last) ? true : false;
+}
+
+// Used to generate random DOM id
 // r :: Number
 function r() {
     return Math.random()
@@ -35,7 +54,9 @@ function r() {
 }
 
 const isNotNil = R.complement(R.isNil);
+
 const nextMajor = version => R.concat(R.head(R.split('.', version)), '.0.0');
+
 const nextMajorLink = version => R.concat(R.head(R.split('.', version)), '-0-0');
 
 // cleanDescription :: String -> String
@@ -62,8 +83,11 @@ function majorAvailableForModule(mod) {
 }
 
 const mapIndexed = R.addIndex(R.map);
+
 const isActive = index => index === 0 ? 'active' : '';
+
 const isShow = index => index === 0 ? 'show' : '';
+
 const semVerMajor = version => R.nth(0, R.split('.', version));
 
 const templateUpToDate = content => [`<div class="alert alert-primary" role="alert">${content}</div>`];
@@ -81,13 +105,6 @@ function navigationForTabs(listOfVersions) {
                                         aria-selected="true">${R.prop('name', cur)}
                                     </a>`)
     )(listOfVersions);
-}
-
-function render(selector, content) {
-    document.getElementById(selector)
-        .innerHTML = content;
-
-    return selector;
 }
 
 function keepOnlyModulesFromOrgs(composer) {
@@ -119,6 +136,7 @@ const getModuleOrg = R.compose(
 const specificTypeOfModules = types => moduleList => R.filter(cur => R.includes(getModuleOrg(cur), types), moduleList);
 
 const findPackageForModule = currentList => mod => R.find(R.propEq('package', R.prop('module', mod)), currentList);
+
 const findModuleForModule = currentList => mod => R.find(R.propEq('package', R.prop('name', mod)), currentList);
 
 const reconstruct = keys => values => R.zipObj(keys, values);
@@ -138,7 +156,7 @@ function migrateToNextProductReleases(currentComposer, currentComposerLock, curr
     return R.compose(
         R.ifElse(
             R.isEmpty,
-            cur => templateUpToDate('All your Spryker features are up to date or you do not use any!'),
+            () => templateUpToDate('All your Spryker features are up to date or you do not use any!'),
             R.compose(
                 templateForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures),
                 R.sortBy(R.prop('name')),
@@ -172,7 +190,7 @@ function templateForProductRelease(currentComposer, currentComposerLock, current
                     <h5>Spryker features you might be interested in</h5>
                     ${missingSprykerFeatures(currentFeatures, currentComposer)}
                 </div>`;
-    }
+    };
 }
 
 function missingSprykerFeatures(currentFeatures, currentComposer) {
@@ -181,7 +199,7 @@ function missingSprykerFeatures(currentFeatures, currentComposer) {
     return R.compose(
         R.ifElse(
             R.isEmpty,
-            cur => '<div class="alert alert-success" role="alert">Congrats you currently use all Spryker features available!</div>',
+            () => '<div class="alert alert-success" role="alert">Congrats you currently use all Spryker features available!</div>',
             R.compose(
                 R.concat('<dl>'),
                 cur => R.concat(cur, '</dl>'),
@@ -222,7 +240,7 @@ function contentForTabs(composerLock, currentModules, content) {
         mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
                                         <h5 class="section-in-release">Modules that need a migration inside this Product Release</h5>
                                         <div class="row">
-                                            ${modulesThatNeedMigration(composerLock, currentModules, cur)}
+                                            ${modulesThatNeedMigration(composerLock, currentModules)}
                                         </div>
                                         <h5 class="section-in-release">Diff for each feature inside this Product Release</h5>
                                         <div class="row">
@@ -232,11 +250,11 @@ function contentForTabs(composerLock, currentModules, content) {
     )(content);
 }
 
-function modulesThatNeedMigration(currentComposerLock, currentModules, productRelease) {
+function modulesThatNeedMigration(currentComposerLock, currentModules) {
     return R.compose(
         R.ifElse(
             R.isEmpty,
-            cur => '<div class="alert alert-primary" role="alert">No module migrations needed for this Product Release.</div>',
+            () => '<div class="alert alert-primary" role="alert">No module migrations needed for this Product Release.</div>',
             templateForModulesThatNeedMigration
         ),
         R.filter(cur => R.prop('upToDate', cur) === false && majorAvailableForModule(cur)),
@@ -253,14 +271,6 @@ function modulesThatNeedMigration(currentComposerLock, currentModules, productRe
 
 function templateForModulesThatNeedMigration(listOfModules) {
     function leftPills(listOfMod) {
-        const lengthForFeature = R.compose(
-            R.length,
-            R.toPairs,
-            R.path(['data', 'composer', 'require']),
-            R.find(R.propEq('name', R.prop('name', listOfModules))),
-            R.path(['package', 'feature_versions'])
-        );
-
         return R.join('', mapIndexed((cur, index) => {
             const pp = R.prop(R.__, cur);
             const ph = R.path(R.__, cur);
@@ -277,14 +287,14 @@ function templateForModulesThatNeedMigration(listOfModules) {
         }, listOfMod));
     }
 
-    function rightPills(features) {
+    function rightPills(listOfMod) {
         return R.join('', mapIndexed((cur, index) => `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'name', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'name', cur)}-tab">
                                                         <ul class="list-group">
                                                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                                                 <a href="${migrationLinkForModule(R.prop('name',cur), R.path(['package', 'version'], cur))}" target="_blank">Migration guide for module ${R.prop('name', cur)}</a>
                                                             </li>
                                                         </ul>
-                                                    </div>`, listOfModules));
+                                                    </div>`, listOfMod));
     }
 
     return `<div class="col-6">
@@ -324,7 +334,7 @@ function groupModulesByFeature(productRelease) {
 
     function listGroupForFeature(featureVersions) {
         return R.compose(
-            mod => `<li class="list-group-item d-flex justify-content-between align-items-center">
+            () => `<li class="list-group-item d-flex justify-content-between align-items-center">
                             We will display here the code diff between versions.
                         </li>`,
             R.find(R.propEq('name', R.prop('name', productRelease)))
@@ -363,8 +373,8 @@ function migrateModuleToNextMajor(currentComposer, currentComposerLock, currentM
         R.join(''),
         R.ifElse(
             R.isEmpty,
-            cur => templateUpToDate('All your Spryker modules are up to date or you do not use any outside of the Spryker features!'),
-            R.map(templateForPackage(currentComposerLock))
+            () => templateUpToDate('All your Spryker modules are up to date or you do not use any outside of the Spryker features!'),
+            R.map(templateForPackage)
         ),
         // "spryker-eco/loggly" is the only module that is not part of the release app
         R.filter(cur => R.prop('module', cur) !== 'spryker-eco/loggly' && R.prop('upToDate', cur) === false && majorAvailable(cur) && R.prop('requiredVersion', cur) !== '*'),
@@ -377,55 +387,6 @@ function migrateModuleToNextMajor(currentComposer, currentComposerLock, currentM
         specificTypeOfModules(['spryker', 'spryker-eco', 'spryker-shop']),
         keepOnlyModulesFromOrgs
     )(currentComposer);
-}
-
-function assignRightFunctionalType(dependency) {
-    const result = R.head(R.split('/', R.prop('module', cur)));
-    return 'spryker-feature';
-}
-
-function groupModulesByFunctionalType(objectWithModules) {
-    const listOfModules = R.compose(
-        R.map(cur => R.append(r(), cur)),
-        R.toPairs,
-        R.groupBy(R.prop('type')),
-        R.filter(cur => R.prop('type', cur) !== 'Other'),
-        R.map(R.compose(
-            R.cond([
-                [cur => R.equals('spryker-feature', R.head(R.split('/', R.prop('module', cur)))), R.assoc('type', 'Features')],
-                [cur => R.equals('spryker-eco', R.head(R.split('/', R.prop('module', cur)))), R.assoc('type', 'Eco')],
-                [cur => R.equals('spryker-shop', R.head(R.split('/', R.prop('module', cur)))), R.assoc('type', 'Shop elements')],
-                [cur => R.equals('spryker', R.head(R.split('/', R.prop('module', cur)))), R.assoc('type', 'Modules')],
-                [R.T, R.assoc('type', 'Other')]
-            ]),
-            cur => R.assoc('type', R.prop('functional_type_string', R.find(R.propEq('package', R.prop('module', cur)), currentModules)), cur),
-            reconstruct(['module', 'requiredVersion']))),
-        R.toPairs
-    )(objectWithModules);
-
-    return `<div class="col-3">
-                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        ${R.join('', mapIndexed((cur, index) => `<a class="nav-link ${isActive(index)} id="v-pills-${R.nth(2,cur)}-tab" data-toggle="pill" href="#v-pills-${R.nth(2,cur)}" role="tab" aria-controls="v-pills-${R.nth(2,cur)}" aria-selected="true">${R.nth(0,cur)}
-                            <span class="badge badge-pill float-right badge-light">${R.length(R.nth(1,cur))}</span>
-                        </a>`, listOfModules))}
-                    </div>
-                </div>
-                <div class="col-9">
-                    <div class="tab-content" id="v-pills-tabContent">
-                        ${R.join('', mapIndexed((cur, index) => `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${R.nth(2,cur)}" role="tabpanel" aria-labelledby="v-pills-${R.nth(2,cur)}-tab">
-                            <ul class="list-group">
-                                ${R.join('',R.map(mod => `<li class="list-group-item d-flex justify-content-between align-items-center">
-                                    ${R.prop('module', mod)}
-                                    <span class="badge badge-primary badge-pill">${R.prop('requiredVersion', mod)}</span>
-                                </li>`, R.nth(1,cur)))}
-                            </ul>
-                        </div>`, listOfModules))}
-                    </div>
-                </div>`;
-}
-
-function isNextMajor(last, newVersion) {
-    return semVerMajor(newVersion) > semVerMajor(last) ? true : false;
 }
 
 function templateMajorAvailable(moduleName, currentVersion, allVersions) {
@@ -462,8 +423,7 @@ function templateMajorAvailable(moduleName, currentVersion, allVersions) {
             </div>`;
 }
 
-
-const templateForPackage = composerLock => package => {
+function templateForPackage(package) {
     const pp = R.prop(R.__, package);
     const ph = R.path(R.__, package);
 
