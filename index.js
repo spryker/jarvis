@@ -68,15 +68,15 @@ const semVerMajor = version => R.nth(0, R.split('.', version));
 
 const templateUpToDate = content => [`<div class="alert alert-primary" role="alert">${content}</div>`];
 
-const properName = name => R.join(`${R.prop('identifier', name)}`, R.split('.', R.or(R.prop('name', name), R.prop('module', name))));
+const properName = (sep, prop, name) => R.join(`${R.prop('identifier', name)}`, R.split(sep, R.prop(prop, name)));
 
 function navigationForTabs(listOfVersions) {
     return R.compose(
         R.join(''),
         mapIndexed((cur, index) => `<a
                                         class="nav-item nav-link ${isActive(index)}"
-                                        id="nav-${properName(cur)}-tab"
-                                        data-toggle="tab" href="#nav-${properName(cur)}"
+                                        id="nav-${properName('.', 'name', cur)}-tab"
+                                        data-toggle="tab" href="#nav-${properName('.', 'name', cur)}"
                                         role="tab" aria-controls="nav-home"
                                         aria-selected="true">${R.prop('name', cur)}
                                     </a>`)
@@ -219,7 +219,7 @@ function groupByRelease(listOfFeatures) {
 function contentForTabs(composerLock, currentModules, content) {
     return R.compose(
         R.join(''),
-        mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName(cur)}" role="tabpanel" aria-labelledby="nav-${properName(cur)}-tab">
+        mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
                                         <h5 class="section-in-release">Modules that need a migration inside this Product Release</h5>
                                         <div class="row">
                                             ${modulesThatNeedMigration(composerLock, currentModules, cur)}
@@ -266,11 +266,11 @@ function templateForModulesThatNeedMigration(listOfModules) {
             const ph = R.path(R.__, cur);
             return `<a
                             class="nav-link ${isActive(index)}
-                            id="v-pills-${properName(cur)}-tab"
+                            id="v-pills-${properName('/', 'name', cur)}-tab"
                             data-toggle="pill"
-                            href="#v-pills-${properName(cur)}"
+                            href="#v-pills-${properName('/', 'name', cur)}"
                             role="tab"
-                            aria-controls="v-pills-${properName(cur)}"
+                            aria-controls="v-pills-${properName('/', 'name', cur)}"
                             aria-selected="true">${pp('name')}
                             <span class="badge badge-pill float-right badge-light">${pp('version')} -> ${nextMajor(ph(['package', 'version']))}</span>
                         </a>`;
@@ -278,14 +278,13 @@ function templateForModulesThatNeedMigration(listOfModules) {
     }
 
     function rightPills(features) {
-        return R.join('', mapIndexed((cur, index) =>
-            `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName(cur)}" role="tabpanel" aria-labelledby="v-pills-${properName(cur)}-tab">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <a href="${migrationLinkForModule(R.prop('name',cur), R.path(['package', 'version'], cur))}" target="_blank">Migration guide for module ${R.prop('name', cur)}</a>
-                        </li>
-                    </ul>
-                </div>`, listOfModules));
+        return R.join('', mapIndexed((cur, index) => `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'name', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'name', cur)}-tab">
+                                                        <ul class="list-group">
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                <a href="${migrationLinkForModule(R.prop('name',cur), R.path(['package', 'version'], cur))}" target="_blank">Migration guide for module ${R.prop('name', cur)}</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>`, listOfModules));
     }
 
     return `<div class="col-6">
@@ -313,11 +312,11 @@ function groupModulesByFeature(productRelease) {
         return R.join('', mapIndexed((cur, index) =>
             `<a
                     class="nav-link ${isActive(index)}
-                    id="v-pills-${properName(cur)}-tab"
+                    id="v-pills-${properName('/', 'module', cur)}-tab"
                     data-toggle="pill"
-                    href="#v-pills-${properName(cur)}"
+                    href="#v-pills-${properName('/', 'module', cur)}"
                     role="tab"
-                    aria-controls="v-pills-${properName(cur)}"
+                    aria-controls="v-pills-${properName('/', 'module', cur)}"
                     aria-selected="true">${R.prop('module', cur)}
                     <span class="badge badge-pill float-right badge-light">${lengthForFeature(cur)}</span>
                 </a>`, R.prop('featuresToMigrate', productRelease)));
@@ -334,7 +333,7 @@ function groupModulesByFeature(productRelease) {
 
     function rightPills(productRelease) {
         return R.join('', mapIndexed((cur, index) =>
-            `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName(cur)}" role="tabpanel" aria-labelledby="v-pills-${properName(cur)}-tab">
+            `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'module', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'module', cur)}-tab">
                     <ul class="list-group">
                         ${listGroupForFeature(R.path(['package', 'feature_versions'], cur))}
                     </ul>
@@ -442,7 +441,7 @@ function templateMajorAvailable(moduleName, currentVersion, allVersions) {
     function tabsForModule(majorsAvailable) {
         return R.compose(
             R.join(''),
-            mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName(cur)}" role="tabpanel" aria-labelledby="nav-${properName(cur)}-tab">
+            mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
                                             <dt>Migration guide</dt>
                                             <dd><a href="https://github.com/spryker/${moduleName}/releases/tag/${R.prop('name',cur)}" target="_blank">Read it on our documentation space</a></dd>
                                             <dt>This new version brings</dt>
