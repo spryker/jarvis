@@ -140,7 +140,7 @@ function migrateToNextProductReleases(currentComposer, currentComposerLock, curr
             R.isEmpty,
             cur => templateUpToDate('All your Spryker features are up to date or you do not use any!'),
             R.compose(
-                templateForProductRelease(currentComposerLock, currentModules),
+                templateForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures),
                 R.sortBy(R.prop('name')),
                 groupByRelease
             )
@@ -157,7 +157,7 @@ function migrateToNextProductReleases(currentComposer, currentComposerLock, curr
     )(currentComposer);
 }
 
-function templateForProductRelease(currentComposerLock, currentModules) {
+function templateForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures) {
     return function(productRelease) {
         return `<p class="card-text">How to migrate to newer version?</p>
                 <nav>
