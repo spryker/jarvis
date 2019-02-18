@@ -1,6 +1,6 @@
 # Spryker Migration Analyzer
 
-Alpha version - Spryker internal!
+:warning: :rotating_light: Alpha version - Spryker internal! :rotating_light: :warning:
 
 ## Installation & Usage
 
