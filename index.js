@@ -328,7 +328,6 @@ function groupModulesByFeature(currentComposerLock, productRelease) {
                     role="tab"
                     aria-controls="v-pills-${properName('/', 'module', cur)}"
                     aria-selected="true">${R.prop('module', cur)}
-                    <span class="badge badge-pill float-right badge-light">${lengthForFeature(cur)}</span>
                 </a>`, R.prop('featuresToMigrate', productRelease)));
     }
 
