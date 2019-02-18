@@ -1,6 +1,6 @@
 # Spryker Migration Analyzer
 
-Beta version
+Alpha version - Spryker internal!
 
 ## Installation & Usage
 
