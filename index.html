@@ -54,6 +54,10 @@
         <!-- composer.json and composer.lock example file to see different use cases -->
         <script type="text/javascript" src="example-composer/all-up-to-date.js"></script> <!-- Expose allUpToDate property -->
         <script type="text/javascript" src="example-composer/all-up-to-date-lock.js"></script> <!-- Expose allUpToDateLock property -->
+        <script type="text/javascript" src="example-composer/old-demoshop.js"></script> <!-- Expose oldDemoshop property -->
+        <script type="text/javascript" src="example-composer/old-demoshop-lock.js"></script> <!-- Expose olDemoshopLock property -->
+        <script type="text/javascript" src="example-composer/sourcability.js"></script> <!-- Expose sourcability property -->
+        <script type="text/javascript" src="example-composer/sourcability-lock.js"></script> <!-- Expose sourcabilityLock property -->
         <script type="text/javascript" src="example-composer/ekz.js"></script> <!-- Expose ekz property -->
         <script type="text/javascript" src="example-composer/ekz-lock.js"></script> <!-- Expose ekzLock property -->
         <script type="text/javascript" src="example-composer/gourmondo.js"></script> <!-- Expose gourmondo property -->
@@ -72,10 +76,10 @@
         <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
         <script type="text/javascript">
         // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-        //analyseMigrationToNextProductReleases('listOfProductReleases', myComposerJSON, myComposerLOCK, releaseFeatures, releaseModules);
+        analyseMigrationToNextProductReleases('listOfProductReleases', sourcability, sourcabilityLock, releaseFeatures, releaseModules);
 
         // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-        //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
+        analyseMigrationToNextModulesMajors('listOfModules', sourcability, sourcabilityLock, releaseModules);
 
         </script>
     </body>
