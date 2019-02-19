@@ -112,7 +112,7 @@ function navigationForTabs(listOfVersions) {
                                         id="nav-${properName('.', 'name', cur)}-tab"
                                         data-toggle="tab" href="#nav-${properName('.', 'name', cur)}"
                                         role="tab" aria-controls="nav-home"
-                                        aria-selected="true">${R.prop('name', cur)}
+                                        aria-selected="true">Version: ${R.prop('name', cur)}
                                     </a>`)
     )(listOfVersions);
 }
@@ -187,8 +187,7 @@ function migrateToNextProductReleases(currentComposer, currentComposerLock, curr
 
 function templateForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures) {
     return function(productRelease) {
-        return `<p class="card-text">How to migrate to newer version?</p>
-                <nav>
+        return `<nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
                         ${navigationForTabs(productRelease)}
                     </div>
@@ -448,8 +447,7 @@ function templateMajorAvailable(moduleName, currentVersion, allVersions) {
         )(objectWithModules);
     }
 
-    return `<p class="card-text">How to migrate to newer version?</p>
-            <nav>
+    return `<nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
                     ${navigationForTabs(onlyRelevantMajorVersion)}
                 </div>
