@@ -428,9 +428,24 @@ function templateMajorAvailable(moduleName, currentVersion, allVersions) {
                                             <dd><a href="https://github.com/spryker/${moduleName}/releases/tag/${R.prop('name',cur)}" target="_blank">Read it on our documentation space</a></dd>
                                             <dt>This new version brings</dt>
                                             <dd>${converter.makeHtml(R.prop('description', cur))}</dd>
+                                            ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
                                         </div>`),
             R.map(cur => R.assoc('identifier', r(), cur))
         )(majorsAvailable);
+    }
+
+    function isThereSuggestedModules(objectWithModules) {
+        return R.ifElse(
+            o => R.gt(R.length(R.toPairs(o)), 0),
+            o => R.compose(
+                s => R.concat(s, '<ul></dd>'),
+                s => R.concat('<dt>You might also be interested in the following modules</dt><dd><ul>', s),
+                R.join(''),
+                R.map(mod => `<li><a href="https://github.com/${R.head(mod)}}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
+                R.toPairs
+            )(o),
+            () => ''
+        )(objectWithModules);
     }
 
     return `<p class="card-text">How to migrate to newer version?</p>
