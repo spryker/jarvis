@@ -413,7 +413,7 @@ function onlyLastVersionInAMajor(listOfPreviousVersions, newVersion) {
     ])(newVersion);
 }
 
-function templateMajorAvailable(moduleName, currentVersion, allVersions) {
+function templateMajorAvailable(packageName, moduleName, currentVersion, allVersions) {
     const onlyRelevantMajorVersion = R.compose(
         R.tail,
         R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
@@ -424,7 +424,7 @@ function templateMajorAvailable(moduleName, currentVersion, allVersions) {
             R.join(''),
             mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
                                             <dt>Migration guide</dt>
-                                            <dd><a href="https://github.com/spryker/${moduleName}/releases/tag/${R.prop('name',cur)}" target="_blank">Read it on our documentation space</a></dd>
+                                            <dd><a href="${migrationLinkForModule(packageName, R.prop('name',cur))}" target="_blank">Read it on our documentation space</a></dd>
                                             <dt>This new version brings</dt>
                                             <dd>${converter.makeHtml(R.prop('description', cur))}</dd>
                                             ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
@@ -466,7 +466,7 @@ function templateForPackage(package) {
                     <h3 class="card-title">${ph(['package', 'name'])}</h3>
                     <h6 class="card-subtitle mb-2 text-muted">${R.isNil(ph(['package', 'description'])) ? '' : cleanDescription(ph(['package', 'description']))}</h6>
                     <p class="card-text">Installed version <span class="badge badge-secondary">${pp('installedVersion')}</span></p>
-                        ${templateMajorAvailable(ph(['package', 'name']) ,pp('installedVersion'), R.sortBy(R.prop('name'), ph(['package', 'module_versions'])))}
+                        ${templateMajorAvailable(pp('module') ,ph(['package', 'name']) ,pp('installedVersion'), R.sortBy(R.prop('name'), ph(['package', 'module_versions'])))}
                 </div>
             </div>`;
 }
