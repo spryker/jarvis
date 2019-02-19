@@ -63,9 +63,7 @@ function r() {
 
 const isNotNil = R.complement(R.isNil);
 
-const nextMajor = version => R.concat(R.head(R.split('.', version)), '.0.0');
-
-const nextMajorLink = version => R.concat(R.head(R.split('.', version)), '-0-0');
+const nextMajorLink = version => `migrate-to-version-${R.concat(R.head(R.split('.', version)), '-0-0')}`;
 
 // cleanDescription :: String -> String
 const cleanDescription = description => R.compose(
@@ -303,7 +301,7 @@ function templateForModulesThatNeedMigration(listOfModules) {
                             role="tab"
                             aria-controls="v-pills-${properName('/', 'name', cur)}"
                             aria-selected="true">${pp('name')}
-                            <span class="badge badge-pill float-right badge-light">${pp('version')} -> ${nextMajor(ph(['package', 'version']))}</span>
+                            <span class="badge badge-pill float-right badge-light">${pp('version')} -> ${ph(['package', 'version'])}</span>
                         </a>`;
         }, listOfMod));
     }
