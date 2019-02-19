@@ -1,4 +1,4 @@
-const composerLock3 = {
+const productReleaseNeedMigrationLock = {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",

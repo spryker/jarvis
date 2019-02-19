@@ -1,4 +1,4 @@
-const composer2 = {
+const modulesNeedMigration = {
     "name": "sourceability/platform",
     "description": "Sourceability-Platform",
     "license": "proprietary",

@@ -7,17 +7,17 @@
         <title>Migration analyser</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
         <style type="text/css">
-            .card {
-                margin-bottom: 1rem;
-            }
+        .card {
+            margin-bottom: 1rem;
+        }
 
-            .section-in-release {
-                margin: 2rem 0rem;
-            }
+        .section-in-release {
+            margin: 2rem 0rem;
+        }
 
-            .features-not-used {
-                margin-top: 1rem;
-            }
+        .features-not-used {
+            margin-top: 1rem;
+        }
 
         </style>
     </head>
@@ -42,12 +42,12 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.26.1/ramda.min.js"></script>
         <!-- composer.json and composer.lock example file to see different use cases -->
-        <script type="text/javascript" src="example-composer/json-1.js"></script> <!-- Expose composer1 property -->
-        <script type="text/javascript" src="example-composer/lock-1.js"></script> <!-- Expose composerLock1 property -->
-        <script type="text/javascript" src="example-composer/json-2.js"></script> <!-- Expose composer2 property -->
-        <script type="text/javascript" src="example-composer/lock-2.js"></script> <!-- Expose composerLock2 property -->
-        <script type="text/javascript" src="example-composer/json-3.js"></script> <!-- Expose composer3 property -->
-        <script type="text/javascript" src="example-composer/lock-3.js"></script> <!-- Expose composerLock3 property -->
+        <script type="text/javascript" src="example-composer/all-up-to-date.js"></script> <!-- Expose allUpToDate property -->
+        <script type="text/javascript" src="example-composer/all-up-to-date-lock.js"></script> <!-- Expose allUpToDateLock property -->
+        <script type="text/javascript" src="example-composer/modules-need-migration.js"></script> <!-- Expose modulesNeedMigration property -->
+        <script type="text/javascript" src="example-composer/modules-need-migration-lock.js"></script> <!-- Expose modulesNeedMigrationLock property -->
+        <script type="text/javascript" src="example-composer/product-release-need-migration.js"></script> <!-- Expose productReleaseNeedMigration property -->
+        <script type="text/javascript" src="example-composer/product-release-need-migration-lock.js"></script> <!-- Expose productReleaseNeedMigrationLock property -->
         <!-- Load your composer.json and composer.lock files -->
         <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
         <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
@@ -57,11 +57,11 @@
         <!-- Where the magic happen -->
         <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
         <script type="text/javascript">
-            // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-            //analyseMigrationToNextProductReleases('listOfProductReleases', myComposerJSON, myComposerLOCK, releaseFeatures, releaseModules);
+        // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
+        //analyseMigrationToNextProductReleases('listOfProductReleases', myComposerJSON, myComposerLOCK, releaseFeatures, releaseModules);
 
-            // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-            //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
+        // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
+        //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
 
         </script>
     </body>

@@ -26,7 +26,7 @@ function analyseMigrationToNextModulesMajors(el, currentComposer, currentCompose
 
 // log :: a -> a
 function log(content) {
-    console.log(content);
+    console.log(...arguments);
     return content;
 }
 
@@ -43,6 +43,14 @@ const converter = new showdown.Converter();
 
 function isNextMajor(last, newVersion) {
     return semVerMajor(newVersion) > semVerMajor(last) ? true : false;
+}
+
+function isNextMinor(last, newVersion) {
+    return semVerMinor(newVersion) > semVerMinor(last) ? true : false;
+}
+
+function isNextPatched(last, newVersion) {
+    return semVerPatched(newVersion) > semVerPatched(last) ? true : false;
 }
 
 // Used to generate random DOM id
@@ -89,6 +97,10 @@ const isActive = index => index === 0 ? 'active' : '';
 const isShow = index => index === 0 ? 'show' : '';
 
 const semVerMajor = version => R.nth(0, R.split('.', version));
+
+const semVerMinor = version => R.nth(1, R.split('.', version));
+
+const semVerPatched = version => R.nth(2, R.split('.', version));
 
 const templateUpToDate = content => [`<div class="alert alert-primary" role="alert">${content}</div>`];
 
@@ -311,14 +323,6 @@ function templateForModulesThatNeedMigration(listOfModules) {
 
 function groupModulesByFeature(currentComposerLock, productRelease) {
     function leftPills(productRelease) {
-        const lengthForFeature = R.compose(
-            R.length,
-            R.toPairs,
-            R.path(['data', 'composer', 'require']),
-            R.find(R.propEq('name', R.prop('name', productRelease))),
-            R.path(['package', 'feature_versions'])
-        );
-
         return R.join('', mapIndexed((cur, index) =>
             `<a
                     class="nav-link ${isActive(index)}
@@ -337,7 +341,7 @@ function groupModulesByFeature(currentComposerLock, productRelease) {
                         <a href="https://github.com/${R.path(['data', 'composer', 'name'], cur)}/compare/${R.prop('installedVersion', cur)}%E2%80%A6${R.prop('name', cur)}" target="_blank">Check the diff between both versions</a>
                     </li>`,
             cur => R.assoc('installedVersion', findInstalledFeatureByName(currentComposerLock, R.path(['data', 'composer', 'name'], cur)), cur),
-            R.find(R.propEq('name', R.prop('name', productRelease))),
+            R.find(R.propEq('name', R.prop('name', productRelease)))
         )(featureVersions);
     }
 
@@ -393,14 +397,20 @@ function migrateModuleToNextMajor(currentComposer, currentComposerLock, currentM
     )(currentComposer);
 }
 
+function onlyLastVersionInAMajor(listOfPreviousVersions, newVersion) {
+    return R.cond([
+        [version => R.lte(R.prop('name', version), R.prop('name', R.last(listOfPreviousVersions))), () => listOfPreviousVersions],
+        [version => isNextMajor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.append(version, listOfPreviousVersions)],
+        [version => isNextMinor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.compose(R.append(version), R.dropLast(1))(listOfPreviousVersions)],
+        [version => isNextPatched(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.compose(R.append(version), R.dropLast(1))(listOfPreviousVersions)],
+        [R.T, () => listOfPreviousVersions]
+    ])(newVersion);
+}
+
 function templateMajorAvailable(moduleName, currentVersion, allVersions) {
     const onlyRelevantMajorVersion = R.compose(
         R.tail,
-        R.reduce((prev, cur) => R.ifElse(
-            newVersion => isNextMajor(R.prop('name', R.last(prev)), R.prop('name', newVersion)),
-            newVersion => R.append(newVersion, prev),
-            () => prev
-        )(cur), [{ name: currentVersion }])
+        R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
     )(allVersions);
 
     function tabsForModule(majorsAvailable) {
