@@ -229,7 +229,6 @@ function missingSprykerFeatures(currentFeatures, currentComposer) {
 
 function templateForMissingFeatures(feature) {
     const p = R.prop(R.__, feature);
-    log(feature);
 
     return `<dt><a href="https://github.com/${p('package')}" target="_blank">${p('name')}</a> ${isNewFeature(p('feature_versions'))}</dt>
             <dd>${p('description')}</dd>`;
