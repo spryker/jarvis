@@ -8,9 +8,9 @@
 //////////////////////////////////////////////////
 
 
-// analyseMigrationToNextProductReleases :: (String, Object, Object, [Object], [Object]) -> HTML
-function analyseMigrationToNextProductReleases(el, currentComposer, currentComposerLock, currentFeatures, currentModules) {
-    return render(el, migrateToNextProductReleases(currentComposer, currentComposerLock, currentFeatures, currentModules));
+// analyseMigrationToNextProductReleases :: (String, String, Object, Object, [Object], [Object]) -> HTML
+function analyseMigrationToNextProductReleases(el, currentProductReleaseVersion, currentComposer, currentComposerLock, currentFeatures, currentModules) {
+    return render(el, migrateToNextProductReleases(currentProductReleaseVersion, currentComposer, currentComposerLock, currentFeatures, currentModules));
 }
 
 // analyseMigrationToNextProductReleases :: (String, Object, Object, [Object]) -> HTML
@@ -133,7 +133,7 @@ function keepOnlyModulesFromOrgs(composer) {
 }
 
 const getNameAndVersionFromInstalledModules = R.compose(
-    R.map(R.pick(['name', 'version'])),
+    R.map(R.pick(['name', 'version', 'require'])),
     R.prop('packages')
 );
 
@@ -152,7 +152,10 @@ const findModuleForModule = currentList => mod => R.find(R.propEq('package', R.p
 const reconstruct = keys => values => R.zipObj(keys, values);
 
 const findInstalledVersion = composerLock => moduleList => R.map(
-    cur => R.append(R.prop('version', R.find(R.propEq('name', R.nth(0, cur)), getNameAndVersionFromInstalledModules(composerLock))), cur),
+    R.compose(
+        cur => R.append(R.prop('require', R.find(R.propEq('name', R.nth(0, cur)), getNameAndVersionFromInstalledModules(composerLock))), cur),
+        cur => R.append(R.prop('version', R.find(R.propEq('name', R.nth(0, cur)), getNameAndVersionFromInstalledModules(composerLock))), cur)
+    ),
     moduleList
 );
 
@@ -162,30 +165,32 @@ const findInstalledVersion = composerLock => moduleList => R.map(
 ///////////////////////////////////////////
 
 
-function migrateToNextProductReleases(currentComposer, currentComposerLock, currentFeatures, currentModules) {
+function migrateToNextProductReleases(currentProductReleaseVersion, currentComposer, currentComposerLock, currentFeatures, currentModules) {
     return R.compose(
         R.ifElse(
             R.isEmpty,
             () => templateUpToDate('All your Spryker features are up to date or you do not use any!'),
             R.compose(
-                templateForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures),
+                templateForContainerForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures),
                 R.sortBy(R.prop('name')),
+                R.filter(cur => R.prop('name', cur) > currentProductReleaseVersion),
                 groupByRelease
             )
         ),
+        log,
         R.filter(cur => R.prop('upToDate', cur) === false),
         R.map(R.compose(
             R.assoc('identifier', r()),
             cur => R.assoc('upToDate', R.equals(R.prop('installedVersion', cur), R.path(['package', 'version'], cur)), cur),
             cur => R.assoc('package', findPackageForModule(currentFeatures)(cur), cur),
-            reconstruct(['module', 'requiredVersion', 'installedVersion']))),
+            reconstruct(['module', 'requiredVersion', 'installedVersion', 'require']))),
         findInstalledVersion(currentComposerLock),
         specificTypeOfModules(['spryker-feature']),
         keepOnlyModulesFromOrgs
     )(currentComposer);
 }
 
-function templateForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures) {
+function templateForContainerForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures) {
     return function(productRelease) {
         return `<nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
@@ -255,17 +260,23 @@ function groupByRelease(listOfFeatures) {
 function contentForTabs(composerLock, currentModules, content) {
     return R.compose(
         R.join(''),
-        mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
-                                        <h5 class="section-in-release">Modules that need a migration inside this Product Release</h5>
-                                        <div class="row">
-                                            ${modulesThatNeedMigration(composerLock, currentModules)}
-                                        </div>
-                                        <h5 class="section-in-release">Diff for each feature inside this Product Release</h5>
-                                        <div class="row">
-                                            ${groupModulesByFeature(composerLock, cur)}
-                                        </div>
-                                    </div>`)
+        mapIndexed(templateForProductRelease(composerLock, currentModules))
     )(content);
+}
+
+function templateForProductRelease(composerLock, currentModules) {
+    return function(cur, index) {
+        return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
+                <h5 class="section-in-release">Modules that need a migration inside this Product Release</h5>
+                <div class="row">
+                    ${modulesThatNeedMigration(composerLock, currentModules)}
+                </div>
+                <h5 class="section-in-release">Diff for each feature inside this Product Release</h5>
+                <div class="row">
+                    ${groupModulesByFeature(composerLock, cur)}
+                </div>
+            </div>`;
+    };
 }
 
 function modulesThatNeedMigration(currentComposerLock, currentModules) {

@@ -31,15 +31,15 @@
         <section>
             <h1>Spryker Migration Analyser</h1>
             <dt>What is the purpose of this tool?</dt>
-            <dd>To help you understand what is needed to keep your Spryker project up to date with our Product Release.</dd>
+            <dd>To help you understand what is needed to keep your Spryker project up to date with our Product Releases.</dd>
             <dt>For who is this tool?</dt>
             <dd>Developer, Product Owner/Manager that wants to understand the migration path for their Spryker project.</dd>
         </section>
         <hr>
         <section>
             <h2>Product Releases</h2>
-            <p>This section describes the new Spryker Product Releases available to your Spryker project.</p>
-            <p>This should help you understand your migration efforts and what to expect for the features your are currently using.</p>
+            <p>This section displays the next Spryker Product Releases available to your Spryker project.</p>
+            <p>Some Product Releases will require databases migrations or some changes to be done on your code or nothing at all.</p>
             <div id="listOfProductReleases"></div>
             <hr>
             <h2>Modules</h2>
@@ -76,10 +76,10 @@
         <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
         <script type="text/javascript">
         // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-        //analyseMigrationToNextProductReleases('listOfProductReleases', myComposerJSON, myComposerLOCK, releaseFeatures, releaseModules);
+        analyseMigrationToNextProductReleases('listOfProductReleases', '2018.11.0', productReleaseNeedMigration, productReleaseNeedMigrationLock, releaseFeatures, releaseModules);
 
         // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-        //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
+        analyseMigrationToNextModulesMajors('listOfModules', productReleaseNeedMigration, productReleaseNeedMigrationLock, releaseModules);
 
         </script>
     </body>

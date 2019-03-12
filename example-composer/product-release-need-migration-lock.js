@@ -2120,7 +2120,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-eco/loggly",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-eco/loggly.git",
@@ -2165,7 +2165,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/agent-assist",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/agent-assist.git",
@@ -2187,7 +2187,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/alternative-products",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/alternative-products.git",
@@ -2195,7 +2195,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/product-alternative-widget": "^1.1.0",
                 "spryker-shop/product-replacement-for-widget": "^1.2.1",
                 "spryker/product-alternative": "^1.0.0",
@@ -2212,7 +2212,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/cart",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/cart.git",
@@ -2234,7 +2234,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/cart-notes",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/cart-notes.git",
@@ -2242,7 +2242,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/cart": "~2018.08.0",
+                "spryker-feature/cart": "~2018.11.0",
                 "spryker-shop/cart-note-widget": "^1.1.0",
                 "spryker/cart-note": "^0.1.0"
             },
@@ -2255,7 +2255,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/catalog",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/catalog.git",
@@ -2263,7 +2263,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/spryker-core": "~2018.08.0",
+                "spryker-feature/spryker-core": "~2018.11.0",
                 "spryker-shop/catalog-page": "^1.4.0",
                 "spryker/catalog": "^5.4.0"
             },
@@ -2276,7 +2276,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/category-management",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/category-management.git",
@@ -2284,7 +2284,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/spryker-core": "~2018.08.0",
+                "spryker-feature/spryker-core": "~2018.11.0",
                 "spryker-shop/category-widget": "^1.0.2",
                 "spryker/category": "^4.8.0",
                 "spryker/category-data-feed": "^0.2.1",
@@ -2302,7 +2302,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/checkout",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/checkout.git",
@@ -2325,7 +2325,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/cms",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/cms.git",
@@ -2356,7 +2356,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/content-based-shop-navigation",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/content-based-shop-navigation.git",
@@ -2364,7 +2364,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/navigation": "~2018.08.0"
+                "spryker-feature/navigation": "~2018.11.0"
             },
             "type": "metapackage",
             "license": [
@@ -2375,7 +2375,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/customer-account-management",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/customer-account-management.git",
@@ -2396,7 +2396,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/customer-notes",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/customer-notes.git",
@@ -2404,7 +2404,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/customer-account-management": "~2018.08.0",
+                "spryker-feature/customer-account-management": "~2018.11.0",
                 "spryker/customer-note": "^1.0.0",
                 "spryker/customer-note-gui": "^1.0.0"
             },
@@ -2417,7 +2417,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/deployment-tools",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/deployment-tools.git",
@@ -2439,7 +2439,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/development-integration",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/development-integration.git",
@@ -2458,7 +2458,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/development-tools",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/development-tools.git",
@@ -2479,7 +2479,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/digital-asset-management",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/digital-asset-management.git",
@@ -2497,7 +2497,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/discontinued-products",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/discontinued-products.git",
@@ -2505,7 +2505,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/product-discontinued-widget": "^1.1.0",
                 "spryker/product-discontinued": "^1.0.0",
                 "spryker/product-discontinued-data-import": "^1.0.0",
@@ -2521,7 +2521,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/file-manager",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/file-manager.git",
@@ -2544,7 +2544,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/gift-cards",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/gift-cards.git",
@@ -2552,7 +2552,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/payments": "~2018.08.0",
+                "spryker-feature/payments": "~2018.11.0",
                 "spryker/gift-card": "^1.0.3",
                 "spryker/gift-card-balance": "^1.0.1"
             },
@@ -2565,7 +2565,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/inventory-management",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/inventory-management.git",
@@ -2573,7 +2573,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/availability-widget": "^1.1.0",
                 "spryker/availability": "^6.3.1",
                 "spryker/availability-data-feed": "^0.1.3",
@@ -2590,7 +2590,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/invoice",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/invoice.git",
@@ -2598,7 +2598,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/payments": "~2018.08.0",
+                "spryker-feature/payments": "~2018.11.0",
                 "spryker/invoice": "^2.0.1"
             },
             "type": "metapackage",
@@ -2610,7 +2610,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/mailing-notifications",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/mailing-notifications.git",
@@ -2632,7 +2632,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/navigation",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/navigation.git",
@@ -2640,7 +2640,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/spryker-core": "~2018.08.0",
+                "spryker-feature/spryker-core": "~2018.11.0",
                 "spryker/navigation": "^2.3.1",
                 "spryker/navigation-collector": "^1.0.4",
                 "spryker/navigation-gui": "^2.2.0",
@@ -2655,7 +2655,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/newsletter-subscription",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/newsletter-subscription.git",
@@ -2673,7 +2673,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/non-splittable-products",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/non-splittable-products.git",
@@ -2681,7 +2681,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker/product-quantity": "^1.1.0",
                 "spryker/product-quantity-data-import": "^1.2.0",
                 "spryker/product-quantity-storage": "^1.0.2"
@@ -2695,7 +2695,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/order-management",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/order-management.git",
@@ -2717,7 +2717,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/order-threshold",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/order-threshold.git",
@@ -2725,11 +2725,11 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/cart": "~2018.08.0",
-                "spryker-feature/checkout": "~2018.08.0",
-                "spryker-feature/order-management": "~2018.08.0",
-                "spryker-feature/prices": "~2018.08.0",
-                "spryker-feature/spryker-core-e-commerce": "~2018.08.0",
+                "spryker-feature/cart": "~2018.11.0",
+                "spryker-feature/checkout": "~2018.11.0",
+                "spryker-feature/order-management": "~2018.11.0",
+                "spryker-feature/prices": "~2018.11.0",
+                "spryker-feature/spryker-core-e-commerce": "~2018.11.0",
                 "spryker-shop/sales-order-threshold-widget": "^1.1.0",
                 "spryker/sales-order-threshold": "^1.1.2",
                 "spryker/sales-order-threshold-data-import": "^0.1.0",
@@ -2744,7 +2744,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/payments",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/payments.git",
@@ -2763,7 +2763,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/persistent-cart",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/persistent-cart.git",
@@ -2771,7 +2771,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/cart": "~2018.08.0",
+                "spryker-feature/cart": "~2018.11.0",
                 "spryker/persistent-cart": "^1.4.2"
             },
             "type": "metapackage",
@@ -2783,7 +2783,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/prices",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/prices.git",
@@ -2813,7 +2813,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product.git",
@@ -2821,7 +2821,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/spryker-core": "~2018.08.0",
+                "spryker-feature/spryker-core": "~2018.11.0",
                 "spryker-shop/product-category-widget": "^1.1.1",
                 "spryker-shop/product-detail-page": "^1.7.1",
                 "spryker-shop/product-image-widget": "^1.0.1",
@@ -2850,7 +2850,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-barcode",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-barcode.git",
@@ -2858,7 +2858,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/product-barcode-widget": "^1.1.0",
                 "spryker/product-barcode": "^1.1.0",
                 "spryker/product-barcode-gui": "^1.0.0"
@@ -2872,7 +2872,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-bundles",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-bundles.git",
@@ -2880,7 +2880,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/product-bundle-widget": "^1.3.0",
                 "spryker/product-bundle": "^4.7.4"
             },
@@ -2893,7 +2893,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-groups",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-groups.git",
@@ -2901,7 +2901,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/product-group-widget": "^1.2.0",
                 "spryker/product-group": "^1.2.1",
                 "spryker/product-group-storage": "^1.0.1"
@@ -2915,7 +2915,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-image-management",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-image-management.git",
@@ -2933,7 +2933,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-labels",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-labels.git",
@@ -2941,7 +2941,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/product-label-widget": "^1.1.0",
                 "spryker-shop/product-new-page": "^1.0.1",
                 "spryker/product-label-gui": "^2.0.11",
@@ -2957,7 +2957,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-options",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-options.git",
@@ -2965,7 +2965,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/product-option-widget": "^1.2.2",
                 "spryker/product-option": "^6.6.0",
                 "spryker/product-option-storage": "^1.0.1"
@@ -2979,7 +2979,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-promotions",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-promotions.git",
@@ -2997,7 +2997,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-rating-reviews",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-rating-reviews.git",
@@ -3020,7 +3020,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-relations",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-relations.git",
@@ -3028,7 +3028,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/product-relation-widget": "^1.1.0",
                 "spryker/product-relation": "^2.1.6",
                 "spryker/product-relation-collector": "^2.0.3",
@@ -3043,7 +3043,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-sets",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-sets.git",
@@ -3051,7 +3051,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker-shop/product-set-detail-page": "^1.3.0",
                 "spryker-shop/product-set-list-page": "^1.0.0",
                 "spryker-shop/product-set-widget": "^1.1.1",
@@ -3069,7 +3069,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/product-validity",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/product-validity.git",
@@ -3077,7 +3077,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/product": "~2018.08.0",
+                "spryker-feature/product": "~2018.11.0",
                 "spryker/product-validity": "^1.0.1"
             },
             "type": "metapackage",
@@ -3089,7 +3089,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/promotions-discounts",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/promotions-discounts.git",
@@ -3115,7 +3115,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/reclamations",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/reclamations.git",
@@ -3134,7 +3134,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/refunds",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/refunds.git",
@@ -3153,7 +3153,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/reorder",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/reorder.git",
@@ -3161,7 +3161,7 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/cart": "~2018.08.0",
+                "spryker-feature/cart": "~2018.11.0",
                 "spryker-shop/customer-reorder-widget": "^4.1.0"
             },
             "type": "metapackage",
@@ -3173,7 +3173,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/search",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/search.git",
@@ -3192,7 +3192,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/shipment",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/shipment.git",
@@ -3211,7 +3211,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/spryker-core",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/spryker-core.git",
@@ -3266,7 +3266,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/spryker-core-back-office",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/spryker-core-back-office.git",
@@ -3290,7 +3290,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/spryker-core-e-commerce",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/spryker-core-e-commerce.git",
@@ -3298,19 +3298,19 @@ const productReleaseNeedMigrationLock = {
             },
             "require": {
                 "php": ">=7.1",
-                "spryker-feature/cart": "~2018.08.0",
-                "spryker-feature/catalog": "~2018.08.0",
-                "spryker-feature/checkout": "~2018.08.0",
-                "spryker-feature/customer-account-management": "~2018.08.0",
-                "spryker-feature/inventory-management": "~2018.08.0",
-                "spryker-feature/order-management": "~2018.08.0",
-                "spryker-feature/payments": "~2018.08.0",
-                "spryker-feature/prices": "~2018.08.0",
-                "spryker-feature/product": "~2018.08.0",
-                "spryker-feature/search": "~2018.08.0",
-                "spryker-feature/shipment": "~2018.08.0",
-                "spryker-feature/spryker-core": "~2018.08.0",
-                "spryker-feature/tax": "~2018.08.0"
+                "spryker-feature/cart": "~2018.11.0",
+                "spryker-feature/catalog": "~2018.11.0",
+                "spryker-feature/checkout": "~2018.11.0",
+                "spryker-feature/customer-account-management": "~2018.11.0",
+                "spryker-feature/inventory-management": "~2018.11.0",
+                "spryker-feature/order-management": "~2018.11.0",
+                "spryker-feature/payments": "~2018.11.0",
+                "spryker-feature/prices": "~2018.11.0",
+                "spryker-feature/product": "~2018.11.0",
+                "spryker-feature/search": "~2018.11.0",
+                "spryker-feature/shipment": "~2018.11.0",
+                "spryker-feature/spryker-core": "~2018.11.0",
+                "spryker-feature/tax": "~2018.11.0"
             },
             "type": "metapackage",
             "license": [
@@ -3321,7 +3321,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/state-machine",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/state-machine.git",
@@ -3340,7 +3340,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/tax",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/tax.git",
@@ -3359,7 +3359,7 @@ const productReleaseNeedMigrationLock = {
         },
         {
             "name": "spryker-feature/wishlist",
-            "version": "2018.08.0",
+            "version": "2018.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-feature/wishlist.git",
@@ -8461,7 +8461,7 @@ const productReleaseNeedMigrationLock = {
                 "proprietary"
             ],
             "description": "Chart module",
-            "time": "2018-08-07T09:07:57+00:00"
+            "time": "2018.11.07T09:07:57+00:00"
         },
         {
             "name": "spryker/checkout",
@@ -10258,7 +10258,7 @@ const productReleaseNeedMigrationLock = {
                 "proprietary"
             ],
             "description": "CustomerCatalog module",
-            "time": "2018-08-06T14:30:50+00:00"
+            "time": "2018.11.06T14:30:50+00:00"
         },
         {
             "name": "spryker/customer-extension",
@@ -10705,7 +10705,7 @@ const productReleaseNeedMigrationLock = {
                 "proprietary"
             ],
             "description": "Dashboard module",
-            "time": "2018-08-07T09:36:35+00:00"
+            "time": "2018.11.07T09:36:35+00:00"
         },
         {
             "name": "spryker/data-import",
@@ -11576,7 +11576,7 @@ const productReleaseNeedMigrationLock = {
                 "MIT"
             ],
             "description": "FileManagerDataImport module",
-            "time": "2018-08-08T10:51:12+00:00"
+            "time": "2018.11.08T10:51:12+00:00"
         },
         {
             "name": "spryker/file-manager-gui",
@@ -11623,7 +11623,7 @@ const productReleaseNeedMigrationLock = {
                 "proprietary"
             ],
             "description": "FileManagerGui module",
-            "time": "2018-08-01T10:53:28+00:00"
+            "time": "2018.11.01T10:53:28+00:00"
         },
         {
             "name": "spryker/file-manager-storage",
@@ -11673,7 +11673,7 @@ const productReleaseNeedMigrationLock = {
                 "proprietary"
             ],
             "description": "FileManagerStorage module",
-            "time": "2018-08-01T14:24:30+00:00"
+            "time": "2018.11.01T14:24:30+00:00"
         },
         {
             "name": "spryker/file-system",
@@ -17911,7 +17911,7 @@ const productReleaseNeedMigrationLock = {
                 "proprietary"
             ],
             "description": "ProductSet module",
-            "time": "2018-08-03T10:02:01+00:00"
+            "time": "2018.11.03T10:02:01+00:00"
         },
         {
             "name": "spryker/product-set-gui",
@@ -18173,7 +18173,7 @@ const productReleaseNeedMigrationLock = {
                 "proprietary"
             ],
             "description": "ProductStorageExtension module",
-            "time": "2018-08-06T14:30:50+00:00"
+            "time": "2018.11.06T14:30:50+00:00"
         },
         {
             "name": "spryker/product-tax-sets-rest-api",
@@ -19523,7 +19523,7 @@ const productReleaseNeedMigrationLock = {
                 "proprietary"
             ],
             "description": "SalesStatistics module",
-            "time": "2018-08-07T12:53:30+00:00"
+            "time": "2018.11.07T12:53:30+00:00"
         },
         {
             "name": "spryker/search",
@@ -22762,7 +22762,7 @@ const productReleaseNeedMigrationLock = {
                 "polyfill",
                 "portable"
             ],
-            "time": "2018-08-06T14:22:27+00:00"
+            "time": "2018.11.06T14:22:27+00:00"
         },
         {
             "name": "symfony/polyfill-intl-icu",
@@ -22819,7 +22819,7 @@ const productReleaseNeedMigrationLock = {
                 "portable",
                 "shim"
             ],
-            "time": "2018-08-06T14:22:27+00:00"
+            "time": "2018.11.06T14:22:27+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -22934,7 +22934,7 @@ const productReleaseNeedMigrationLock = {
                 "portable",
                 "shim"
             ],
-            "time": "2018-08-06T14:22:27+00:00"
+            "time": "2018.11.06T14:22:27+00:00"
         },
         {
             "name": "symfony/polyfill-php55",
@@ -25637,7 +25637,7 @@ const productReleaseNeedMigrationLock = {
                 "spy",
                 "stub"
             ],
-            "time": "2018-08-05T17:53:17+00:00"
+            "time": "2018.11.05T17:53:17+00:00"
         },
         {
             "name": "phpstan/phpdoc-parser",
@@ -26130,7 +26130,7 @@ const productReleaseNeedMigrationLock = {
                 "mock",
                 "xunit"
             ],
-            "time": "2018-08-09T05:50:03+00:00"
+            "time": "2018.11.09T05:50:03+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
