@@ -49,7 +49,6 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
     )(allVersions);
 
     function tabsForModule(majorsAvailable) {
-        log(majorsAvailable, packageName);
         return R.compose(
             R.join(''),
             mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">

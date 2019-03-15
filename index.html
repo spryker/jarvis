@@ -25,6 +25,7 @@
             <div id="listOfProductReleases"></div>
             <hr>
             <h2>Modules</h2>
+            <p>This section displays the next majors available for the Spryker modules that you use inside your Spryker project.</p>
             <div id="listOfModules"></div>
         </section>
         <!-- Libraries -->
@@ -63,10 +64,10 @@
         <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
         <script type="text/javascript">
         // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-        analyseMigrationToNextProductReleases('listOfProductReleases', '2018.12.0', allUpToDate, allUpToDateLock, releaseFeatures);
+        analyseMigrationToNextProductReleases('listOfProductReleases', '2018.11.0', b2cDemoShop201811, b2cDemoShop201811Lock, releaseFeatures);
 
         // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-        analyseMigrationToNextModulesMajors('listOfModules', allUpToDate, allUpToDateLock, releaseModules);
+        analyseMigrationToNextModulesMajors('listOfModules', b2cDemoShop201811, b2cDemoShop201811Lock, releaseModules);
 
         </script>
     </body>

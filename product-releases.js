@@ -8,13 +8,13 @@ function migrateToNextProductReleases(currentProductReleaseVersion, currentCompo
     const productReleasesAvailable = featuresForProductReleases(currentProductReleaseVersion, currentFeatures);
     const featuresToMigratePerProductRelease = R.map(keepForEachProductReleaseUsedFeatures(featuresUsedInProject), productReleasesAvailable);
 
-    return R.ifElse(
-        R.isEmpty,
-        R.always(`<div class="alert alert-info" role="alert">
-                      You do not use any features, need the mapping tool here!
-                    </div>`),
-        () => templateForProductReleases(currentComposer, currentFeatures, featuresToMigratePerProductRelease)
-    )(featuresUsedInProject);
+    log(featuresUsedInProject, productReleasesAvailable, featuresToMigratePerProductRelease);
+
+    return R.cond([
+        [list => R.isEmpty(R.nth(0, list)), R.always(templateUpToDate('You do not use any features, need the mapping tool here!'))],
+        [list => R.isEmpty(R.nth(1, list)), R.always(templateUpToDate('You are up to date, nothing to do here!'))],
+        [R.T, list => templateForProductReleases(currentComposer, currentFeatures, R.nth(2, list))]
+    ])([featuresUsedInProject, productReleasesAvailable, featuresToMigratePerProductRelease]);
 }
 
 // reduceFeatureVersions :: [Object] -> [String]
