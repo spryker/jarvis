@@ -22,14 +22,23 @@
         "reconstruct": false,
         "sortStrings": false,
         "findInstalledVersion": false,
-        "navigationForTabs": false,
         "keepOnlyModulesFromOrgs": false,
-        "specificTypeOfModules": false
+        "specificTypeOfModules": false,
+        "isNextMajor": false,
+        "isNextMinor": false,
+        "cleanDescription": false,
+        "converter": false,
+        "templateUpToDate": false,
+        "majorAvailable": false,
+        "findPackageForModule": false,
+        "isNextPatched": false,
+        "migrationLinkForModule": false
     },
     "exported": {
         "analyseMigrationToNextProductReleases": true,
         "analyseMigrationToNextModulesMajors": true,
-        "migrateToNextProductReleases": true
+        "migrateToNextProductReleases": true,
+        "migrateModuleToNextMajor": true
     },
     "esversion": 6
 }

@@ -84,19 +84,6 @@ const templateUpToDate = content => [`<div class="alert alert-primary" role="ale
 
 const properName = (sep, prop, name) => R.join(`${R.prop('identifier', name)}`, R.split(sep, R.prop(prop, name)));
 
-function navigationForTabs(listOfVersions) {
-    return R.compose(
-        R.join(''),
-        mapIndexed((cur, index) => `<a
-                                        class="nav-item nav-link ${isActive(index)}"
-                                        id="nav-${properName('.', 'productRelease', cur)}-tab"
-                                        data-toggle="tab" href="#nav-${properName('.', 'productRelease', cur)}"
-                                        role="tab" aria-controls="nav-home"
-                                        aria-selected="true">Version: ${R.prop('productRelease', cur)}
-                                    </a>`)
-    )(listOfVersions);
-}
-
 function keepOnlyModulesFromOrgs(composer) {
     const modulesForOrgs = ['spryker', 'spryker-feature', 'spryker-shop', 'spryker-eco'];
 

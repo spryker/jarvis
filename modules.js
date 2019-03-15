@@ -34,21 +34,38 @@ function onlyLastVersionInAMajor(listOfPreviousVersions, newVersion) {
     ])(newVersion);
 }
 
+function migrationGuideAvailable(guideUrl) {
+    return R.ifElse(
+        R.isNil,
+        R.always(''),
+        url => `<a href="${url}" target="_blank" class="btn btn-info">Migration guide</a>`
+    )(guideUrl);
+}
+
 function templateMajorAvailable(packageName, moduleName, currentVersion, allVersions) {
-    const onlyRelevantMajorVersion = R.compose(
+    const onlyRelevantMajorVersions = R.compose(
         R.tail,
         R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
     )(allVersions);
 
     function tabsForModule(majorsAvailable) {
+        log(majorsAvailable, packageName);
         return R.compose(
             R.join(''),
             mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
-                                            <dt>Migration guide</dt>
-                                            <dd><a href="${migrationLinkForModule(packageName, R.prop('name',cur))}" target="_blank">Read it on our documentation space</a></dd>
-                                            <dt>This new version brings</dt>
-                                            <dd>${converter.makeHtml(R.prop('description', cur))}</dd>
-                                            ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
+                                            <div class="links">
+                                                <a
+                                                    href="https://github.com/${packageName}/releases/tag/${R.prop('name', cur)}"
+                                                    target="_blank"
+                                                    class="btn btn-secondary"
+                                                >Github repository</a>
+                                            </div>
+                                            ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
+                                            <dl>
+                                                <dt>This new version brings</dt>
+                                                <dd>${converter.makeHtml(R.prop('description', cur))}</dd>
+                                                ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
+                                            </dl>
                                         </div>`),
             R.map(cur => R.assoc('identifier', r(), cur))
         )(majorsAvailable);
@@ -58,7 +75,7 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
         return R.ifElse(
             o => R.gt(R.length(R.toPairs(o)), 0),
             o => R.compose(
-                s => R.concat(s, '<ul></dd>'),
+                s => R.concat(s, '</ul></dd>'),
                 s => R.concat('<dt>You might also be interested in the following modules</dt><dd><ul>', s),
                 R.join(''),
                 R.map(mod => `<li><a href="https://github.com/${R.head(mod)}}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
@@ -68,26 +85,36 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
         )(objectWithModules);
     }
 
+    function navigationForTabs(listOfVersions) {
+        return R.compose(
+            R.join(''),
+            mapIndexed((cur, index) => `<a
+                                        class="nav-item nav-link ${isActive(index)}"
+                                        id="nav-${properName('.', 'name', cur)}-tab"
+                                        data-toggle="tab" href="#nav-${properName('.', 'name', cur)}"
+                                        role="tab" aria-controls="nav-home"
+                                        aria-selected="true">Version: ${R.prop('name', cur)}
+                                    </a>`)
+        )(listOfVersions);
+    }
+
     return `<nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
-                    ${navigationForTabs(onlyRelevantMajorVersion)}
+                    ${navigationForTabs(onlyRelevantMajorVersions)}
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
-                ${tabsForModule(onlyRelevantMajorVersion)}
+                ${tabsForModule(onlyRelevantMajorVersions)}
             </div>`;
 }
 
-function templateForPackage(package) {
-    const pp = R.prop(R.__, package);
-    const ph = R.path(R.__, package);
-
+function templateForPackage(data) {
     return `<div class="card">
                 <div class="card-body">
-                    <h3 class="card-title">${ph(['package', 'name'])}</h3>
-                    <h6 class="card-subtitle mb-2 text-muted">${R.isNil(ph(['package', 'description'])) ? '' : cleanDescription(ph(['package', 'description']))}</h6>
-                    <p class="card-text">Installed version <span class="badge badge-secondary">${pp('installedVersion')}</span></p>
-                        ${templateMajorAvailable(pp('module') ,ph(['package', 'name']) ,pp('installedVersion'), R.sortBy(R.prop('name'), ph(['package', 'module_versions'])))}
+                    <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
+                    <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
+                    <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
+                        ${templateMajorAvailable(R.prop('module', data), R.path(['package', 'name'], data) ,R.prop('installedVersion', data), R.sortBy(R.prop('name'), R.path(['package', 'module_versions'], data)))}
                 </div>
             </div>`;
 }

@@ -2,6 +2,21 @@
 // Migration Analysis for Product Release //
 ///////////////////////////////////////////
 
+
+function migrateToNextProductReleases(currentProductReleaseVersion, currentComposer, currentComposerLock, currentFeatures) {
+    const featuresUsedInProject = featuresFromComposer(currentComposerLock, currentComposer);
+    const productReleasesAvailable = featuresForProductReleases(currentProductReleaseVersion, currentFeatures);
+    const featuresToMigratePerProductRelease = R.map(keepForEachProductReleaseUsedFeatures(featuresUsedInProject), productReleasesAvailable);
+
+    return R.ifElse(
+        R.isEmpty,
+        R.always(`<div class="alert alert-info" role="alert">
+                      You do not use any features, need the mapping tool here!
+                    </div>`),
+        () => templateForProductReleases(currentComposer, currentFeatures, featuresToMigratePerProductRelease)
+    )(featuresUsedInProject);
+}
+
 // reduceFeatureVersions :: [Object] -> [String]
 function reduceFeatureVersions(currentFeatures) {
     return R.compose(
@@ -117,16 +132,20 @@ const keepForEachProductReleaseUsedFeatures = featuresUsed => productReleases =>
     )(productReleases);
 };
 
-
-function migrateToNextProductReleases(currentProductReleaseVersion, currentComposer, currentComposerLock, currentFeatures) {
-    const featuresUsedInProject = featuresFromComposer(currentComposerLock, currentComposer);
-    const productReleasesAvailable = featuresForProductReleases(currentProductReleaseVersion, currentFeatures);
-    const featuresToMigratePerProductRelease = R.map(keepForEachProductReleaseUsedFeatures(featuresUsedInProject), productReleasesAvailable);
-
-    return templateForProductReleases(currentComposer, currentFeatures, featuresToMigratePerProductRelease);
-}
-
 function templateForProductReleases(currentComposer, currentFeatures, productReleases) {
+    function navigationForTabs(listOfVersions) {
+        return R.compose(
+            R.join(''),
+            mapIndexed((cur, index) => `<a
+                                        class="nav-item nav-link ${isActive(index)}"
+                                        id="nav-${properName('.', 'productRelease', cur)}-tab"
+                                        data-toggle="tab" href="#nav-${properName('.', 'productRelease', cur)}"
+                                        role="tab" aria-controls="nav-home"
+                                        aria-selected="true">Version: ${R.prop('productRelease', cur)}
+                                    </a>`)
+        )(listOfVersions);
+    }
+
     return `<nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
                     ${navigationForTabs(productReleases)}
