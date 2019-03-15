@@ -1,5 +1,3 @@
-/* jshint esversion:6, unused:true  */
-
 /////////////////////////////////////////////
 // Migration Analysis for Product Release //
 ///////////////////////////////////////////
@@ -15,15 +13,15 @@ function reduceFeatureVersions(currentFeatures) {
 
 const keepMoreRecentVersion = currentProductReleaseVersion => listOfVersions => {
     return R.filter(cur => cur > currentProductReleaseVersion, listOfVersions);
-}
+};
 
 const availableProductReleases = currentProductReleaseVersion => currentFeatures => {
     return R.compose(
         keepMoreRecentVersion(currentProductReleaseVersion),
-        reduceFeatureVersions,
+        reduceFeatureVersions
     )(currentFeatures);
 
-}
+};
 
 const retrieveAllFeaturesInsideProductRelease = currentFeatures => productReleaseVersion => {
     return R.filter(cur => R.compose(
@@ -31,11 +29,19 @@ const retrieveAllFeaturesInsideProductRelease = currentFeatures => productReleas
         R.length,
         feature => R.filter(c => R.equals(R.prop('name', c), R.prop('productRelease', productReleaseVersion)), R.prop('feature_versions', feature))
     )(cur), currentFeatures);
-}
+};
 
 function cleanFeaturesInsideProductRelease(productRelease) {
     return R.over(R.lensProp('features'), R.compose(
         R.map(R.compose(
+            pr => R.assoc('identifier', r(), pr),
+            R.over(
+                R.lensPath(['feature_versions', 'data', 'diff']),
+                R.compose(
+                    R.map(reconstruct(['package', 'beforeAfter'])),
+                    R.toPairs
+                )
+            ),
             R.over(
                 R.lensPath(['feature_versions', 'data', 'composer', 'require']),
                 R.compose(
@@ -76,6 +82,7 @@ function featuresForProductReleases(currentProductReleaseVersion, currentFeature
         R.map(cleanFeaturesInsideProductRelease),
         // Assoc only the relevant feature for each product releases
         R.map(cur => R.compose(
+            list => R.assoc('identifier', r(), list),
             list => R.assoc('features', list, cur),
             retrieveAllFeaturesInsideProductRelease(currentFeatures)
         )(cur)),
@@ -88,20 +95,18 @@ function featuresForProductReleases(currentProductReleaseVersion, currentFeature
 
 const keepForEachProductReleaseUsedFeatures = featuresUsed => productReleases => {
     return R.compose(
+        // Keep only the features that had a new module major
         R.over(
             R.lensProp('features'),
-            R.filter(cur => {
-                log(cur);
-                return cur;
-            })
+            R.filter(cur => R.and(
+                isNotEmpty(R.path(['feature_versions', 'data', 'diff'], cur)),
+                isNotEmpty(R.reduce((prev, current) => R.ifElse(
+                    c => R.isNil(R.path(['beforeAfter', 'after'], c)),
+                    R.always(prev),
+                    c => R.append(c, prev)
+                )(current), [], R.path(['feature_versions', 'data', 'diff'], cur)))))
         ),
-        R.over(
-            R.lensProp('features'),
-            R.filter(cur => R.not(R.equals(
-                R.path(['feature_versions', 'data', 'composer', 'require'], cur),
-                R.prop('require', R.find(R.propEq('package', R.prop('package', cur)), featuresUsed))
-            )))
-        ),
+        // Keep only the features that the user uses currently
         R.over(
             R.lensProp('features'),
             R.filter(cur => R.equals(
@@ -110,56 +115,31 @@ const keepForEachProductReleaseUsedFeatures = featuresUsed => productReleases =>
             ))
         )
     )(productReleases);
-}
+};
 
 
-function migrateToNextProductReleases(currentProductReleaseVersion, currentComposer, currentComposerLock, currentFeatures, currentModules) {
+function migrateToNextProductReleases(currentProductReleaseVersion, currentComposer, currentComposerLock, currentFeatures) {
     const featuresUsedInProject = featuresFromComposer(currentComposerLock, currentComposer);
     const productReleasesAvailable = featuresForProductReleases(currentProductReleaseVersion, currentFeatures);
+    const featuresToMigratePerProductRelease = R.map(keepForEachProductReleaseUsedFeatures(featuresUsedInProject), productReleasesAvailable);
 
-    return log(R.map(keepForEachProductReleaseUsedFeatures(featuresUsedInProject), productReleasesAvailable));
-
-    /*
-    return R.compose(
-        R.ifElse(
-            R.isEmpty,
-            () => templateUpToDate('All your Spryker features are up to date or you do not use any!'),
-            R.compose(
-                templateForContainerForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures),
-                R.sortBy(R.prop('name')),
-                R.filter(cur => R.prop('name', cur) > currentProductReleaseVersion),
-                groupByRelease
-            )
-        ),
-        log,
-        R.filter(cur => R.prop('upToDate', cur) === false),
-        R.map(R.compose(
-            R.assoc('identifier', r()),
-            cur => R.assoc('upToDate', R.equals(R.prop('installedVersion', cur), R.path(['package', 'version'], cur)), cur),
-            cur => R.assoc('package', findPackageForModule(currentFeatures)(cur), cur),
-            reconstruct(['module', 'requiredVersion', 'installedVersion', 'require']))),
-        findInstalledVersion(currentComposerLock),
-        specificTypeOfModules(['spryker-feature']),
-        keepOnlyModulesFromOrgs
-    )(currentComposer);
-    */
+    return templateForProductReleases(currentComposer, currentFeatures, featuresToMigratePerProductRelease);
 }
 
-function templateForContainerForProductRelease(currentComposer, currentComposerLock, currentModules, currentFeatures) {
-    return function(productRelease) {
-        return `<nav>
-                    <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
-                        ${navigationForTabs(productRelease)}
-                    </div>
-                </nav>
-                <div class="tab-content" id="nav-tabContent">
-                    ${contentForTabs(currentComposerLock, currentModules, productRelease)}
+function templateForProductReleases(currentComposer, currentFeatures, productReleases) {
+    return `<nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
+                    ${navigationForTabs(productReleases)}
                 </div>
-                <div class="features-not-used">
-                    <h5>Spryker features you might be interested in</h5>
-                    ${missingSprykerFeatures(currentFeatures, currentComposer)}
-                </div>`;
-    };
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <h3 class="section-in-release">You need a migration for the following features</h3>
+                ${contentForTabs(productReleases)}
+            </div>
+            <div class="features-not-used">
+                <h3>Spryker features you might be interested in</h3>
+                ${missingSprykerFeatures(currentFeatures, currentComposer)}
+            </div>`;
 }
 
 function missingSprykerFeatures(currentFeatures, currentComposer) {
@@ -199,145 +179,148 @@ function isNewFeature(listOfVersions) {
     )(listOfVersions);
 }
 
-function groupByRelease(listOfFeatures) {
-    return R.compose(
-        R.map(R.compose(
-            cur => R.assoc('featuresToMigrate', R.filter(feature => R.any(version => R.equals(R.prop('name', version), R.prop('name', cur)), R.path(['package', 'feature_versions'], feature)), listOfFeatures), cur),
-            cur => ({ name: cur, featuresToMigrate: [], identifier: r() })
-        )),
-        R.uniq,
-        R.reduce((prev, cur) => {
-            return R.concat(prev, R.map(R.prop('name'), R.path(['package', 'feature_versions'], cur)));
-        }, [])
-    )(listOfFeatures);
-}
-
-function contentForTabs(composerLock, currentModules, content) {
+function contentForTabs(productReleases) {
     return R.compose(
         R.join(''),
-        mapIndexed(templateForProductRelease(composerLock, currentModules))
-    )(content);
+        mapIndexed(templateForProductRelease)
+    )(productReleases);
 }
 
-function templateForProductRelease(composerLock, currentModules) {
-    return function(cur, index) {
-        return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
-                <h5 class="section-in-release">Modules that need a migration inside this Product Release</h5>
-                <div class="row">
-                    ${modulesThatNeedMigration(composerLock, currentModules)}
-                </div>
-                <h5 class="section-in-release">Diff for each feature inside this Product Release</h5>
-                <div class="row">
-                    ${groupModulesByFeature(composerLock, cur)}
-                </div>
-            </div>`;
-    };
-}
-
-function modulesThatNeedMigration(currentComposerLock, currentModules) {
-    return R.compose(
-        R.ifElse(
-            R.isEmpty,
-            () => '<div class="alert alert-primary" role="alert">No module migrations needed for this Product Release.</div>',
-            templateForModulesThatNeedMigration
-        ),
-        R.filter(cur => R.prop('upToDate', cur) === false && majorAvailableForModule(cur)),
-        R.filter(cur => isNotNil(R.prop('package', cur))),
-        list => R.filter(cur => isNotNil(R.prop('package', cur)), list),
-        R.map(R.compose(
-            cur => R.assoc('upToDate', R.equals(R.prop('version', cur), R.path(['package', 'version'], cur)), cur),
-            cur => R.assoc('package', findModuleForModule(currentModules)(cur), cur),
-            cur => R.assoc('identifier', r(), cur)
-        )),
-        R.prop('packages')
-    )(currentComposerLock);
-}
-
-function templateForModulesThatNeedMigration(listOfModules) {
+function templateForProductRelease(productRelease, index) {
     function leftPills(listOfMod) {
-        return R.join('', mapIndexed((cur, index) => {
-            const pp = R.prop(R.__, cur);
-            const ph = R.path(R.__, cur);
-            return `<a
-                            class="nav-link ${isActive(index)}
-                            id="v-pills-${properName('/', 'name', cur)}-tab"
-                            data-toggle="pill"
-                            href="#v-pills-${properName('/', 'name', cur)}"
-                            role="tab"
-                            aria-controls="v-pills-${properName('/', 'name', cur)}"
-                            aria-selected="true">${pp('name')}
-                            <span class="badge badge-pill float-right badge-light">${pp('version')} -> ${ph(['package', 'version'])}</span>
-                        </a>`;
-        }, listOfMod));
+        return R.join('', mapIndexed((cur, index) => `<a
+                                                        class="nav-link ${isActive(index)}
+                                                        id="v-pills-${properName('/', 'package', cur)}-tab"
+                                                        data-toggle="pill"
+                                                        href="#v-pills-${properName('/', 'package', cur)}"
+                                                        role="tab"
+                                                        aria-controls="v-pills-${properName('/', 'package', cur)}"
+                                                        aria-selected="true">${R.prop('name', cur)}
+                                                    </a>`, listOfMod));
     }
 
     function rightPills(listOfMod) {
-        return R.join('', mapIndexed((cur, index) => `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'name', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'name', cur)}-tab">
-                                                        <ul class="list-group">
-                                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                                <a href="${migrationLinkForModule(R.prop('name',cur), R.path(['package', 'version'], cur))}" target="_blank">Migration guide for module ${R.prop('name', cur)}</a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>`, listOfMod));
+        return R.join('', mapIndexed((cur, index) => {
+            return `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'package', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'package', cur)}-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <h4>Dependencies added</h4>
+                                <div class="row">
+                                    ${dependenciesAdded(cur)}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <h4>Upgraded dependencies</h4>
+                                <div class="row">
+                                    ${dependenciesUpgraded(R.path(['feature_versions', 'data','diff'], cur))}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <h4>Dependencies removed</h4>
+                                <div class="row">
+                                    ${dependenciesRemoved(R.path(['feature_versions', 'data','diff'], cur))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+        }, listOfMod));
+
+        // <a href="${migrationLinkForModule(R.prop('package',cur), R.path(['feature_versions', 'name'], cur))}" target="_blank">Migration guide for module ${R.prop('name', cur)}</a>
     }
 
-    return `<div class="col-6">
-                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    ${leftPills(listOfModules)}
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="tab-content" id="v-pills-tabContent">
-                    ${rightPills(listOfModules)}
-                </div>
-            </div>`;
-}
-
-function groupModulesByFeature(currentComposerLock, productRelease) {
-    function leftPills(productRelease) {
-        return R.join('', mapIndexed((cur, index) =>
-            `<a
-                    class="nav-link ${isActive(index)}
-                    id="v-pills-${properName('/', 'module', cur)}-tab"
-                    data-toggle="pill"
-                    href="#v-pills-${properName('/', 'module', cur)}"
-                    role="tab"
-                    aria-controls="v-pills-${properName('/', 'module', cur)}"
-                    aria-selected="true">${R.prop('module', cur)}
-                </a>`, R.prop('featuresToMigrate', productRelease)));
-    }
-
-    function listGroupForFeature(currentComposerLock, featureVersions) {
-        return R.compose(
-            cur => `<li class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="https://github.com/${R.path(['data', 'composer', 'name'], cur)}/compare/${R.prop('installedVersion', cur)}%E2%80%A6${R.prop('name', cur)}" target="_blank">Check the diff between both versions</a>
-                    </li>`,
-            cur => R.assoc('installedVersion', findInstalledFeatureByName(currentComposerLock, R.path(['data', 'composer', 'name'], cur)), cur),
-            R.find(R.propEq('name', R.prop('name', productRelease)))
-        )(featureVersions);
-    }
-
-    function rightPills(productRelease) {
-        return R.join('', mapIndexed((cur, index) =>
-            `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'module', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'module', cur)}-tab">
-                    <ul class="list-group">
-                        ${listGroupForFeature(currentComposerLock, R.path(['package', 'feature_versions'], cur))}
-                    </ul>
-                </div>`, R.prop('featuresToMigrate', productRelease)));
-    }
-
-    return `<div class="col-6">
-                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    ${leftPills(productRelease)}
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="tab-content" id="v-pills-tabContent">
-                    ${rightPills(productRelease)}
+    return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'productRelease', productRelease)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'productRelease', productRelease)}-tab">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                            ${leftPills(R.prop('features', productRelease), index)}
+                        </div>
+                    </div>
+                    <div class="col-9">
+                        <div class="tab-content" id="v-pills-tabContent">
+                            ${rightPills(R.prop('features', productRelease), index)}
+                        </div>
+                    </div>
                 </div>
             </div>`;
 }
 
-function findInstalledFeatureByName(currentComposerLock, featureName) {
-    return R.prop('version', R.find(R.propEq('name', featureName), R.prop('packages', currentComposerLock)));
+function dependenciesAdded(feature) {
+    log(feature);
+    return R.ifElse(
+        list => R.isEmpty(R.filter(cur => R.isNil(R.path(['beforeAfter', 'before'], cur)), list)),
+        () => `<p class="empty-result">No dependencies were added in this version.</p>`,
+        list => R.join('', R.map(cur => `<div class="card col-12">
+                                            <div class="card-body">
+                                                <h5 class="card-title">${R.prop('package', cur)}</h5>
+                                                <dl>
+                                                    <dt>Version added</dt>
+                                                    <dd><span class="badge badge-primary">${R.path(['beforeAfter','after'], cur)}</span></dd>
+                                                </dl>
+                                                <a
+                                                    href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
+                                                    target="_blank"
+                                                    class="btn btn-secondary"
+                                                >Github repository</a>
+                                                ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
+                                            </div>
+                                        </div>`, list))
+    )(R.path(['feature_versions', 'data', 'diff'], feature));
+}
+
+function integrationGuideExist(guideUrl) {
+    return R.ifElse(
+        R.isNil,
+        R.always(''),
+        url => `<a href="${url}" target="_blank" class="btn btn-info">Integration guide</a>`
+    )(guideUrl);
+}
+
+function dependenciesRemoved(listOfDependencies) {
+    return R.ifElse(
+        list => R.isEmpty(R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)),
+        () => `<p class="empty-result">No dependencies were removed in this version.</p>`,
+        list => R.join('', R.map(cur => `<div class="card col-12">
+                                            <div class="card-body">
+                                                <h5 class="card-title">${R.prop('package', cur)}</h5>
+                                                <dl>
+                                                    <dt>Version removed</dt>
+                                                    <dd><span class="badge badge-primary">${R.path(['beforeAfter','before'], cur)}</span></dd>
+                                                </dl>
+                                                <a
+                                                    href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','before'], cur))}"
+                                                    target="_blank"
+                                                    class="btn btn-secondary"
+                                                >Github repository</a>
+                                                ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
+                                            </div>
+                                        </div>`, list))
+    )(listOfDependencies);
+}
+
+function dependenciesUpgraded(listOfDependencies) {
+    return R.ifElse(
+        list => R.isEmpty(R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)),
+        () => `<p class="empty-result">No dependencies were upgraded in this version.</p>`,
+        list => R.join('', R.map(cur => `<a
+                                            href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
+                                            target="_blank"
+                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                                            >${R.prop('package', cur)} <span class="badge badge-primary badge-pill">${R.path(['beforeAfter','before'], cur)} -> ${R.path(['beforeAfter','after'], cur)}</span>
+                                        </a
+                                        <div class="card col-12">
+                                            <div class="card-body">
+                                                <h5 class="card-title">${R.prop('package', cur)}</h5>
+                                                <dl>
+                                                    <dt>Version removed</dt>
+                                                    <dd><span class="badge badge-primary">${R.path(['beforeAfter','before'], cur)} -> ${R.path(['beforeAfter','after'], cur)}</span></dd>
+                                                </dl>
+                                                <a
+                                                    href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
+                                                    target="_blank"
+                                                    class="btn btn-secondary"
+                                                >Github repository</a>
+                                                ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
+                                            </div>
+                                        </div>`, list))
+    )(listOfDependencies);
 }

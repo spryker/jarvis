@@ -1,0 +1,35 @@
+{
+    "undef": true,
+    "unused": true,
+    "globals": {
+        "console": false,
+        "showdown": false,
+        "R": false,
+        "document": false,
+        "analyseMigrationToNextProductReleases": false,
+        "analyseMigrationToNextModulesMajors": false,
+        "log": false,
+        "render": false,
+        "migrateToNextProductReleases": false,
+        "migrateModuleToNextMajor": false,
+        "mapIndexed": false,
+        "isActive": false,
+        "isNotEmpty": false,
+        "properName": false,
+        "isShow": false,
+        "r": false,
+        "isNotNil": false,
+        "reconstruct": false,
+        "sortStrings": false,
+        "findInstalledVersion": false,
+        "navigationForTabs": false,
+        "keepOnlyModulesFromOrgs": false,
+        "specificTypeOfModules": false
+    },
+    "exported": {
+        "analyseMigrationToNextProductReleases": true,
+        "analyseMigrationToNextModulesMajors": true,
+        "migrateToNextProductReleases": true
+    },
+    "esversion": 6
+}

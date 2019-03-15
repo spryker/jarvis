@@ -17,6 +17,9 @@ function render(selector, content) {
     return selector;
 }
 
+const isNotNil = R.complement(R.isNil);
+const isNotEmpty = R.complement(R.isEmpty);
+
 // Used to parse Module markdown and proce HTML
 const converter = new showdown.Converter();
 
@@ -39,8 +42,6 @@ function r() {
         .toString(36)
         .substring(7);
 }
-
-const isNotNil = R.complement(R.isNil);
 
 const nextMajorLink = version => `migrate-to-version-${R.concat(R.head(R.split('.', version)), '-0-0')}`;
 
@@ -88,10 +89,10 @@ function navigationForTabs(listOfVersions) {
         R.join(''),
         mapIndexed((cur, index) => `<a
                                         class="nav-item nav-link ${isActive(index)}"
-                                        id="nav-${properName('.', 'name', cur)}-tab"
-                                        data-toggle="tab" href="#nav-${properName('.', 'name', cur)}"
+                                        id="nav-${properName('.', 'productRelease', cur)}-tab"
+                                        data-toggle="tab" href="#nav-${properName('.', 'productRelease', cur)}"
                                         role="tab" aria-controls="nav-home"
-                                        aria-selected="true">Version: ${R.prop('name', cur)}
+                                        aria-selected="true">Version: ${R.prop('productRelease', cur)}
                                     </a>`)
     )(listOfVersions);
 }
