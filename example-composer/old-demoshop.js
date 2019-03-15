@@ -1,4 +1,4 @@
-const oldDemoshop = {
+const oldDemoShop = {
     "name": "spryker/demoshop",
     "description": "Demoshop",
     "license": "MIT",

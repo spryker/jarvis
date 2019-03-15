@@ -6,25 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>Migration analyzer</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-        <style type="text/css">
-        .card {
-            margin-bottom: 1rem;
-        }
-
-        .section-in-release {
-            margin: 2rem 0rem;
-        }
-
-        .features-not-used {
-            margin-top: 1rem;
-        }
-
-        h1 {
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        </style>
+        <link rel="stylesheet" type="text/css" href="index.css">
     </head>
 
     <body class="container">
@@ -43,6 +25,7 @@
             <div id="listOfProductReleases"></div>
             <hr>
             <h2>Modules</h2>
+            <p>This section displays the next majors available for the Spryker modules that you use inside your Spryker project.</p>
             <div id="listOfModules"></div>
         </section>
         <!-- Libraries -->
@@ -64,8 +47,10 @@
         <script type="text/javascript" src="example-composer/gourmondo-lock.js"></script> <!-- Expose gourmondoLock property -->
         <script type="text/javascript" src="example-composer/modules-need-migration.js"></script> <!-- Expose modulesNeedMigration property -->
         <script type="text/javascript" src="example-composer/modules-need-migration-lock.js"></script> <!-- Expose modulesNeedMigrationLock property -->
-        <script type="text/javascript" src="example-composer/product-release-need-migration.js"></script> <!-- Expose productReleaseNeedMigration property -->
-        <script type="text/javascript" src="example-composer/product-release-need-migration-lock.js"></script> <!-- Expose productReleaseNeedMigrationLock property -->
+        <script type="text/javascript" src="example-composer/b2c-demo-shop-201811.js"></script> <!-- Expose b2cDemoShop201811 property -->
+        <script type="text/javascript" src="example-composer/b2c-demo-shop-201811-lock.js"></script> <!-- Expose b2cDemoShop201811Lock property -->
+        <script type="text/javascript" src="example-composer/b2b-demo-shop-201811.js"></script> <!-- Expose b2bDemoShop201811 property -->
+        <script type="text/javascript" src="example-composer/b2b-demo-shop-201811-lock.js"></script> <!-- Expose b2bDemoShop201811Lock property -->
         <!-- Load your composer.json and composer.lock files -->
         <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
         <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
@@ -73,13 +58,16 @@
         <script type="text/javascript" src="release-app-data/release-module.js"></script> <!-- Expose releaseModules property -->
         <script type="text/javascript" src="release-app-data/release-feature.js"></script> <!-- Expose releaseFeatures property -->
         <!-- Where the magic happen -->
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="modules.js"></script>
+        <script type="text/javascript" src="product-releases.js"></script>
         <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
         <script type="text/javascript">
         // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-        analyseMigrationToNextProductReleases('listOfProductReleases', '2018.11.0', productReleaseNeedMigration, productReleaseNeedMigrationLock, releaseFeatures, releaseModules);
+        analyseMigrationToNextProductReleases('listOfProductReleases', '2018.11.0', b2cDemoShop201811, b2cDemoShop201811Lock, releaseFeatures);
 
         // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-        analyseMigrationToNextModulesMajors('listOfModules', productReleaseNeedMigration, productReleaseNeedMigrationLock, releaseModules);
+        analyseMigrationToNextModulesMajors('listOfModules', b2cDemoShop201811, b2cDemoShop201811Lock, releaseModules);
 
         </script>
     </body>
