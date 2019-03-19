@@ -53,6 +53,8 @@
         <script type="text/javascript" src="example-composer/b2c-demo-shop-201812-lock.js"></script> <!-- Expose b2cDemoShop201812Lock property -->
         <script type="text/javascript" src="example-composer/b2b-demo-shop-201811.js"></script> <!-- Expose b2bDemoShop201811 property -->
         <script type="text/javascript" src="example-composer/b2b-demo-shop-201811-lock.js"></script> <!-- Expose b2bDemoShop201811Lock property -->
+        <script type="text/javascript" src="example-composer/b2b-demo-shop-201812.js"></script> <!-- Expose b2bDemoShop201812 property -->
+        <script type="text/javascript" src="example-composer/b2b-demo-shop-201812-lock.js"></script> <!-- Expose b2bDemoShop201812Lock property -->
         <!-- Load your composer.json and composer.lock files -->
         <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
         <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
@@ -66,10 +68,10 @@
         <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
         <script type="text/javascript">
         // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-        analyseMigrationToNextProductReleases('listOfProductReleases', '2018.12.0', b2cDemoShop201812, b2cDemoShop201812Lock, releaseFeatures);
+        analyseMigrationToNextProductReleases('listOfProductReleases', '2018.12.0', b2bDemoShop201812, b2bDemoShop201812Lock, releaseFeatures);
 
         // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-        analyseMigrationToNextModulesMajors('listOfModules', b2cDemoShop201812, b2cDemoShop201812Lock, releaseModules);
+        analyseMigrationToNextModulesMajors('listOfModules', b2bDemoShop201812, b2bDemoShop201812Lock, releaseModules);
 
         </script>
     </body>
