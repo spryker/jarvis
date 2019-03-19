@@ -8,8 +8,6 @@ function migrateToNextProductReleases(currentProductReleaseVersion, currentCompo
     const productReleasesAvailable = featuresForProductReleases(currentProductReleaseVersion, currentFeatures);
     const featuresToMigratePerProductRelease = R.map(keepForEachProductReleaseUsedFeatures(featuresUsedInProject), productReleasesAvailable);
 
-    log(featuresUsedInProject, productReleasesAvailable, featuresToMigratePerProductRelease);
-
     return R.cond([
         [list => R.isEmpty(R.nth(0, list)), R.always(templateUpToDate('You do not use any features, need the mapping tool here!'))],
         [list => R.isEmpty(R.nth(1, list)), R.always(templateUpToDate('You are up to date, nothing to do here!'))],
@@ -243,8 +241,6 @@ function templateForProductRelease(productRelease, index) {
                         </div>
                     </div>`;
         }, listOfMod));
-
-        // <a href="${migrationLinkForModule(R.prop('package',cur), R.path(['feature_versions', 'name'], cur))}" target="_blank">Migration guide for module ${R.prop('name', cur)}</a>
     }
 
     return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'productRelease', productRelease)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'productRelease', productRelease)}-tab">
@@ -264,7 +260,6 @@ function templateForProductRelease(productRelease, index) {
 }
 
 function dependenciesAdded(feature) {
-    log(feature);
     return R.ifElse(
         list => R.isEmpty(R.filter(cur => R.isNil(R.path(['beforeAfter', 'before'], cur)), list)),
         () => `<p class="empty-result">No dependencies were added in this version.</p>`,
@@ -282,7 +277,7 @@ function dependenciesAdded(feature) {
                                                 >Github repository</a>
                                                 ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
                                             </div>
-                                        </div>`, list))
+                                        </div>`, R.filter(cur => R.isNil(R.path(['beforeAfter', 'before'], cur)), list)))
     )(R.path(['feature_versions', 'data', 'diff'], feature));
 }
 
@@ -312,7 +307,7 @@ function dependenciesRemoved(listOfDependencies) {
                                                 >Github repository</a>
                                                 ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
                                             </div>
-                                        </div>`, list))
+                                        </div>`, R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)))
     )(listOfDependencies);
 }
 
@@ -320,13 +315,7 @@ function dependenciesUpgraded(listOfDependencies) {
     return R.ifElse(
         list => R.isEmpty(R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)),
         () => `<p class="empty-result">No dependencies were upgraded in this version.</p>`,
-        list => R.join('', R.map(cur => `<a
-                                            href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
-                                            target="_blank"
-                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                                            >${R.prop('package', cur)} <span class="badge badge-primary badge-pill">${R.path(['beforeAfter','before'], cur)} -> ${R.path(['beforeAfter','after'], cur)}</span>
-                                        </a
-                                        <div class="card col-12">
+        list => R.join('', R.map(cur => `<div class="card col-12">
                                             <div class="card-body">
                                                 <h5 class="card-title">${R.prop('package', cur)}</h5>
                                                 <dl>
@@ -340,6 +329,6 @@ function dependenciesUpgraded(listOfDependencies) {
                                                 >Github repository</a>
                                                 ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
                                             </div>
-                                        </div>`, list))
+                                        </div>`, R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)))
     )(listOfDependencies);
 }
