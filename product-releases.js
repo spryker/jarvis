@@ -297,7 +297,7 @@ function dependenciesRemoved(listOfDependencies) {
                                             <div class="card-body">
                                                 <h5 class="card-title">${R.prop('package', cur)}</h5>
                                                 <dl>
-                                                    <dt>Version removed</dt>
+                                                    <dt>Version upgraded</dt>
                                                     <dd><span class="badge badge-primary">${R.path(['beforeAfter','before'], cur)}</span></dd>
                                                 </dl>
                                                 <a
