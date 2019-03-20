@@ -268,7 +268,7 @@ function dependenciesAdded(feature) {
                                                 <h5 class="card-title">${R.prop('package', cur)}</h5>
                                                 <dl>
                                                     <dt>Version added</dt>
-                                                    <dd><span class="badge badge-primary">${R.path(['beforeAfter','after'], cur)}</span></dd>
+                                                    <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','after'], cur))}</span></dd>
                                                 </dl>
                                                 <a
                                                     href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
@@ -297,8 +297,8 @@ function dependenciesRemoved(listOfDependencies) {
                                             <div class="card-body">
                                                 <h5 class="card-title">${R.prop('package', cur)}</h5>
                                                 <dl>
-                                                    <dt>Version upgraded</dt>
-                                                    <dd><span class="badge badge-primary">${R.path(['beforeAfter','before'], cur)}</span></dd>
+                                                    <dt>Version removed</dt>
+                                                    <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))}</span></dd>
                                                 </dl>
                                                 <a
                                                     href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','before'], cur))}"
@@ -319,8 +319,8 @@ function dependenciesUpgraded(listOfDependencies) {
                                             <div class="card-body">
                                                 <h5 class="card-title">${R.prop('package', cur)}</h5>
                                                 <dl>
-                                                    <dt>Version removed</dt>
-                                                    <dd><span class="badge badge-primary">${R.path(['beforeAfter','before'], cur)} -> ${R.path(['beforeAfter','after'], cur)}</span></dd>
+                                                    <dt>Version upgraded</dt>
+                                                    <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))} -> ${R.tail(R.path(['beforeAfter','after'], cur))}</span></dd>
                                                 </dl>
                                                 <a
                                                     href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
