@@ -168,7 +168,6 @@ function integrationGuideExist(version, packageName) {
             [R.T, p => `<a href="${R.prop('guide_url', p)}" target="_blank" class="btn btn-info">Integration guide</a>`]
         ]),
         R.head,
-        log,
         keepOnlyVersionsInMajor(version),
         R.prop('module_versions'),
         p => R.find(R.propEq('package', p), releaseModules)
