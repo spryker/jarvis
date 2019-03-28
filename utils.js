@@ -145,3 +145,32 @@ function sortStrings(a, b) {
         return 0;
     }
 }
+
+const keepOnlyVersionsInMajor = version => listOfVersion => {
+    // version = 0.x.z
+    if (semVerMajor(version) === 0) {
+        // version = 0.0.z
+        if (semVerMinor(version) === 0) {
+            return R.filter(cur => isNotNil(R.prop('guide_url', cur)) && R.prop('name', cur) >= '0.0.0' && R.prop('name', cur) <= version, listOfVersion);
+        } else {
+            return R.filter(cur => isNotNil(R.prop('guide_url', cur)) && R.prop('name', cur) >= `0.${semVerMinor(version)}.0` && R.prop('name', cur) <= version, listOfVersion);
+        }
+    } else {
+        return R.filter(cur => isNotNil(R.prop('guide_url', cur)) && R.prop('name', cur) >= `${semVerMajor(version)}.0.0` && R.prop('name', cur) <= version, listOfVersion);
+    }
+}
+
+function integrationGuideExist(version, packageName) {
+    return R.compose(
+        R.cond([
+            [p => R.isNil(p), R.always('')],
+            [p => R.equals('n/a', R.prop('guide_url', p)), R.always('<div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>')],
+            [R.T, p => `<a href="${R.prop('guide_url', p)}" target="_blank" class="btn btn-info">Integration guide</a>`]
+        ]),
+        R.head,
+        log,
+        keepOnlyVersionsInMajor(version),
+        R.prop('module_versions'),
+        p => R.find(R.propEq('package', p), releaseModules)
+    )(packageName);
+}

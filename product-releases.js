@@ -114,7 +114,10 @@ const keepForEachProductReleaseUsedFeatures = featuresUsed => productReleases =>
             R.filter(cur => R.and(
                 isNotEmpty(R.path(['feature_versions', 'data', 'diff'], cur)),
                 isNotEmpty(R.reduce((prev, current) => R.ifElse(
-                    c => R.isNil(R.path(['beforeAfter', 'after'], c)),
+                    c => R.or(
+                        R.isNil(R.path(['beforeAfter', 'after'], c)),
+                        R.isNil(R.path(['beforeAfter', 'before'], c))
+                    ),
                     R.always(prev),
                     c => R.append(c, prev)
                 )(current), [], R.path(['feature_versions', 'data', 'diff'], cur)))))
@@ -152,10 +155,6 @@ function templateForProductReleases(currentComposer, currentFeatures, productRel
             <div class="tab-content" id="nav-tabContent">
                 <h3 class="section-in-release">You need a migration for the following features</h3>
                 ${contentForTabs(productReleases)}
-            </div>
-            <div class="features-not-used">
-                <h3>Spryker features you might be interested in</h3>
-                ${missingSprykerFeatures(currentFeatures, currentComposer)}
             </div>`;
 }
 
@@ -174,6 +173,8 @@ function missingSprykerFeatures(currentFeatures, currentComposer) {
                 R.sortBy(R.prop('name'))
             )
         ),
+        // Keep only live features and hide draft and deprecated features
+        R.filter(cur => R.prop('status', cur) === 1),
         R.differenceWith(diff, currentFeatures),
         R.map(reconstruct(['feature', 'requiredVersion'])),
         specificTypeOfModules(['spryker-feature']),
@@ -221,12 +222,6 @@ function templateForProductRelease(productRelease, index) {
             return `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'package', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'package', cur)}-tab">
                         <div class="row">
                             <div class="col-12">
-                                <h4>Dependencies added</h4>
-                                <div class="row">
-                                    ${dependenciesAdded(cur)}
-                                </div>
-                            </div>
-                            <div class="col-12">
                                 <h4>Upgraded dependencies</h4>
                                 <div class="row">
                                     ${dependenciesUpgraded(R.path(['feature_versions', 'data','diff'], cur))}
@@ -259,11 +254,12 @@ function templateForProductRelease(productRelease, index) {
             </div>`;
 }
 
+/*
 function dependenciesAdded(feature) {
     return R.ifElse(
         list => R.isEmpty(R.filter(cur => R.isNil(R.path(['beforeAfter', 'before'], cur)), list)),
         () => `<p class="empty-result">No dependencies were added in this version.</p>`,
-        list => R.join('', R.map(cur => `<div class="card col-12">
+        list => R.join('', R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6"><div class="card">
                                             <div class="card-body">
                                                 <h5 class="card-title">${R.prop('package', cur)}</h5>
                                                 <dl>
@@ -277,57 +273,68 @@ function dependenciesAdded(feature) {
                                                 >Github repository</a>
                                                 ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
                                             </div>
-                                        </div>`, R.filter(cur => R.isNil(R.path(['beforeAfter', 'before'], cur)), list)))
+                                        </div></div>`, R.filter(cur => R.isNil(R.path(['beforeAfter', 'before'], cur)), list)))
     )(R.path(['feature_versions', 'data', 'diff'], feature));
 }
-
-function integrationGuideExist(guideUrl) {
-    return R.ifElse(
-        R.isNil,
-        R.always(''),
-        url => `<a href="${url}" target="_blank" class="btn btn-info">Integration guide</a>`
-    )(guideUrl);
-}
+*/
 
 function dependenciesRemoved(listOfDependencies) {
     return R.ifElse(
         list => R.isEmpty(R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)),
         () => `<p class="empty-result">No dependencies were removed in this version.</p>`,
-        list => R.join('', R.map(cur => `<div class="card col-12">
-                                            <div class="card-body">
-                                                <h5 class="card-title">${R.prop('package', cur)}</h5>
-                                                <dl>
-                                                    <dt>Version removed</dt>
-                                                    <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))}</span></dd>
-                                                </dl>
-                                                <a
-                                                    href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','before'], cur))}"
-                                                    target="_blank"
-                                                    class="btn btn-secondary"
-                                                >Github repository</a>
-                                                ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
+        list => R.join('', R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <b>${R.prop('package', cur)}</b>
+                                                </div>
+                                                <div class="card-body">
+                                                    <dl>
+                                                        <dt>Version removed</dt>
+                                                        <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))}</span></dd>
+                                                    </dl>
+                                                    <p>⚠️ Check in your project code if you use/extend/customize the following namespace: <b>${pascalCase(R.prop('package', cur))}</b></p>
+                                                    <a
+                                                        href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','before'], cur))}"
+                                                        target="_blank"
+                                                        class="btn btn-secondary"
+                                                    >Github repository</a>
+                                                </div>
                                             </div>
                                         </div>`, R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)))
     )(listOfDependencies);
+}
+
+function pascalCase(packageName) {
+    return R.compose(
+        R.reduce((prev, cur) => R.concat(prev, R.concat(R.toUpper(R.head(cur)), R.tail(cur))), ''),
+        R.split('-'),
+        R.head,
+        R.tail,
+        R.split('/')
+    )(packageName);
 }
 
 function dependenciesUpgraded(listOfDependencies) {
     return R.ifElse(
         list => R.isEmpty(R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)),
         () => `<p class="empty-result">No dependencies were upgraded in this version.</p>`,
-        list => R.join('', R.map(cur => `<div class="card col-12">
-                                            <div class="card-body">
-                                                <h5 class="card-title">${R.prop('package', cur)}</h5>
-                                                <dl>
-                                                    <dt>Version upgraded</dt>
-                                                    <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))} -> ${R.tail(R.path(['beforeAfter','after'], cur))}</span></dd>
-                                                </dl>
-                                                <a
-                                                    href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
-                                                    target="_blank"
-                                                    class="btn btn-secondary"
-                                                >Github repository</a>
-                                                ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
+        list => R.join('', R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <b>${R.prop('package', cur)}</b>
+                                                </div>
+                                                <div class="card-body">
+                                                    <dl>
+                                                        <dt>Version upgraded</dt>
+                                                        <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))} -> ${R.tail(R.path(['beforeAfter','after'], cur))}</span></dd>
+                                                    </dl>
+                                                    ${integrationGuideExist(R.tail(R.path(['beforeAfter','after'], cur)), R.prop('package', cur))}
+                                                    <a
+                                                        href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
+                                                        target="_blank"
+                                                        class="btn btn-secondary"
+                                                    >Github repository</a>
+                                                </div>
                                             </div>
                                         </div>`, R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)))
     )(listOfDependencies);

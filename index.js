@@ -12,3 +12,7 @@ function analyseMigrationToNextProductReleases(el, currentProductReleaseVersion,
 function analyseMigrationToNextModulesMajors(el, currentComposer, currentComposerLock, currentModules) {
     return render(el, migrateModuleToNextMajor(currentComposer, currentComposerLock, currentModules));
 }
+
+function sprykerFeaturesYouDoNotUse(el, currentComposer, currentFeatures) {
+    return render(el, missingSprykerFeatures(currentFeatures, currentComposer));
+}
