@@ -23,8 +23,17 @@ const isNotEmpty = R.complement(R.isEmpty);
 // Used to parse Module markdown and proce HTML
 const converter = new showdown.Converter();
 
+// Check if the new version is a major
 function isNextMajor(last, newVersion) {
-    return semVerMajor(newVersion) > semVerMajor(last) ? true : false;
+    if (semVerMajor(newVersion) === '0') {
+        if (semVerMinor(newVersion === '0')) {
+            return isNextPatched(last, newVersion);
+        } else {
+            return isNextMinor(last, newVersion);
+        }
+    } else {
+        return semVerMajor(newVersion) > semVerMajor(last) ? true : false;
+    }
 }
 
 function isNextMinor(last, newVersion) {
