@@ -175,7 +175,7 @@ function integrationGuideExist(version, packageName) {
         R.cond([
             [p => R.isNil(p), R.always('')],
             [p => R.equals('n/a', R.prop('guide_url', p)), R.always('<div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>')],
-            [R.T, p => `<a href="${R.prop('guide_url', p)}" target="_blank" class="btn btn-info">Integration guide</a>`]
+            [R.T, p => `<a href="${R.prop('guide_url', p)}" target="_blank" class="btn btn-warning">Integration guide</a>`]
         ]),
         R.head,
         keepOnlyVersionsInMajor(version),

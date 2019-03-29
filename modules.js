@@ -38,7 +38,7 @@ function migrationGuideAvailable(guideUrl) {
     return R.ifElse(
         R.isNil,
         R.always(''),
-        url => `<a href="${url}" target="_blank" class="btn btn-info">Migration guide</a>`
+        url => `<a href="${url}" target="_blank" class="btn btn-warning">Migration guide</a>`
     )(guideUrl);
 }
 
@@ -67,6 +67,7 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
                                                 ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
                                             </dl>
                                         </div>`),
+            log,
             R.map(cur => R.assoc('identifier', r(), cur))
         )(majorsAvailable);
     }
