@@ -26,7 +26,7 @@ const converter = new showdown.Converter();
 // Check if the new version is a major
 function isNextMajor(last, newVersion) {
     if (semVerMajor(newVersion) === '0') {
-        if (semVerMinor(newVersion === '0')) {
+        if (semVerMinor(newVersion) === '0') {
             return isNextPatched(last, newVersion);
         } else {
             return isNextMinor(last, newVersion);
@@ -64,10 +64,20 @@ const cleanDescription = description => R.compose(
 const migrationLinkForModule = (packageName, version) => `https://documentation.spryker.com/module_migration_guides/mg-${R.last(R.split('/', packageName))}.htm#${nextMajorLink(version)}`;
 
 function majorAvailable(mod) {
-    const installedVersionMajor = R.head(R.split('.', R.prop('installedVersion', mod)));
-    const lastVersionAvailableMajor = R.head(R.split('.', R.path(['package', 'version'], mod)));
+    const installedVersion = R.split('.', R.prop('installedVersion', mod));
+    const lastVersionAvailable = R.split('.', R.path(['package', 'version'], mod));
 
-    return lastVersionAvailableMajor > installedVersionMajor ? true : false;
+    // version = 0.x.z
+    if (R.nth(0, installedVersion) === '0' && R.nth(0, lastVersionAvailable) === '0') {
+        // version = 0.0.z
+        if (R.nth(1, installedVersion) === '0' && R.nth(1, lastVersionAvailable) === '0') {
+            return R.nth(2, lastVersionAvailable) > R.nth(2, installedVersion) ? true : false;
+        } else {
+            return R.nth(1, lastVersionAvailable) > R.nth(1, installedVersion) ? true : false;
+        }
+    } else {
+        return R.nth(0, lastVersionAvailable) > R.nth(0, installedVersion) ? true : false;
+    }
 }
 
 function majorAvailableForModule(mod) {

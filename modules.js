@@ -45,7 +45,7 @@ function migrationGuideAvailable(guideUrl) {
 function templateMajorAvailable(packageName, moduleName, currentVersion, allVersions) {
     const onlyRelevantMajorVersions = R.compose(
         R.tail,
-        R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
+        R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }]),
     )(allVersions);
 
     function tabsForModule(majorsAvailable) {
