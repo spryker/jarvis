@@ -1,85 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Migration analyzer</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="index.css">
-    </head>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Migration analyzer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="index.css">
+  </head>
 
-    <body class="container">
-        <section>
-            <h1>Spryker Migration Analyzer</h1>
-            <dt>What is the purpose of this tool?</dt>
-            <dd>To help you understand what is needed to keep your Spryker project up to date with our Product Releases.</dd>
-            <dt>For who is this tool?</dt>
-            <dd>Developer, Product Owner/Manager that wants to understand the migration path for their Spryker project.</dd>
-        </section>
-        <hr>
-        <section>
-            <h2>Product Releases</h2>
-            <p>This section displays the next Spryker Product Releases available to your Spryker project.</p>
-            <p>Some Product Releases will require databases migrations or some changes to be done on your code or nothing at all.</p>
-            <div id="listOfProductReleases"></div>
-            <hr>
-            <h2>Modules</h2>
-            <p>This section displays the next majors available for the Spryker modules that you use inside your Spryker project.</p>
-            <div id="listOfModules"></div>
-            <hr>
-            <h2>Spryker features you currently do not use</h2>
-            <div id="listOfNotUsedFeatures"></div>
-        </section>
-        <!-- Libraries -->
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.26.1/ramda.min.js"></script>
-        <!-- composer.json and composer.lock example file to see different use cases -->
-        <script type="text/javascript" src="example-composer/all-up-to-date.js"></script> <!-- Expose allUpToDate property -->
-        <script type="text/javascript" src="example-composer/all-up-to-date-lock.js"></script> <!-- Expose allUpToDateLock property -->
-        <script type="text/javascript" src="example-composer/old-demoshop.js"></script> <!-- Expose oldDemoshop property -->
-        <script type="text/javascript" src="example-composer/old-demoshop-lock.js"></script> <!-- Expose olDemoshopLock property -->
-        <script type="text/javascript" src="example-composer/sourcability.js"></script> <!-- Expose sourcability property -->
-        <script type="text/javascript" src="example-composer/sourcability-lock.js"></script> <!-- Expose sourcabilityLock property -->
-        <script type="text/javascript" src="example-composer/ekz.js"></script> <!-- Expose ekz property -->
-        <script type="text/javascript" src="example-composer/ekz-lock.js"></script> <!-- Expose ekzLock property -->
-        <script type="text/javascript" src="example-composer/gourmondo.js"></script> <!-- Expose gourmondo property -->
-        <script type="text/javascript" src="example-composer/gourmondo-lock.js"></script> <!-- Expose gourmondoLock property -->
-        <script type="text/javascript" src="example-composer/modules-need-migration.js"></script> <!-- Expose modulesNeedMigration property -->
-        <script type="text/javascript" src="example-composer/modules-need-migration-lock.js"></script> <!-- Expose modulesNeedMigrationLock property -->
-        <script type="text/javascript" src="example-composer/b2c-demo-shop-201811.js"></script> <!-- Expose b2cDemoShop201811 property -->
-        <script type="text/javascript" src="example-composer/b2c-demo-shop-201811-lock.js"></script> <!-- Expose b2cDemoShop201811Lock property -->
-        <script type="text/javascript" src="example-composer/b2c-demo-shop-201812.js"></script> <!-- Expose b2cDemoShop201812 property -->
-        <script type="text/javascript" src="example-composer/b2c-demo-shop-201812-lock.js"></script> <!-- Expose b2cDemoShop201812Lock property -->
-        <script type="text/javascript" src="example-composer/b2b-demo-shop-201811.js"></script> <!-- Expose b2bDemoShop201811 property -->
-        <script type="text/javascript" src="example-composer/b2b-demo-shop-201811-lock.js"></script> <!-- Expose b2bDemoShop201811Lock property -->
-        <script type="text/javascript" src="example-composer/b2b-demo-shop-201812.js"></script> <!-- Expose b2bDemoShop201812 property -->
-        <script type="text/javascript" src="example-composer/b2b-demo-shop-201812-lock.js"></script> <!-- Expose b2bDemoShop201812Lock property -->
-        <!-- Load your composer.json and composer.lock files -->
-        <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
-        <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
-        <!-- Data from the release app -->
-        <script type="text/javascript" src="release-app-data/release-module.js"></script> <!-- Expose releaseModules property -->
-        <script type="text/javascript" src="release-app-data/release-feature.js"></script> <!-- Expose releaseFeatures property -->
-        <!-- Where the magic happen -->
-        <script type="text/javascript" src="utils.js"></script>
-        <script type="text/javascript" src="modules.js"></script>
-        <script type="text/javascript" src="product-releases.js"></script>
-        <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
-        <script type="text/javascript">
-        // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-        //analyseMigrationToNextProductReleases('listOfProductReleases', '2018.11.0', myComposerJSON, myComposerLOCK, releaseFeatures);
+  <body class="container">
+    <section>
+      <h1>Spryker Migration Analyzer</h1>
+      <dt>What is the purpose of this tool?</dt>
+      <dd>To help you understand what is needed to keep your Spryker project up to date with our Product Releases.</dd>
+      <dt>For who is this tool?</dt>
+      <dd>Developer, Product Owner/Manager that wants to understand the migration path for their Spryker project.</dd>
+    </section>
+    <hr>
+    <section>
+      <h2>Product Releases</h2>
+      <p>This section displays the next Spryker Product Releases available to your Spryker project.</p>
+      <p>Some Product Releases will require databases migrations or some changes to be done on your code or nothing at all.</p>
+      <div id="listOfProductReleases"></div>
+      <hr>
+      <h2>Modules</h2>
+      <p>This section displays the next majors available for the Spryker modules that you use inside your Spryker project.</p>
+      <div id="listOfModules"></div>
+      <hr>
+      <h2>Spryker features you currently do not use</h2>
+      <div id="listOfNotUsedFeatures"></div>
+    </section>
+    <!-- Libraries -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.26.1/ramda.min.js"></script>
+    <!-- composer.json and composer.lock example file to see different use cases -->
+    <script type="text/javascript" src="example-composer/all-up-to-date.js"></script> <!-- Expose allUpToDate property -->
+    <script type="text/javascript" src="example-composer/all-up-to-date-lock.js"></script> <!-- Expose allUpToDateLock property -->
+    <script type="text/javascript" src="example-composer/old-demoshop.js"></script> <!-- Expose oldDemoshop property -->
+    <script type="text/javascript" src="example-composer/old-demoshop-lock.js"></script> <!-- Expose olDemoshopLock property -->
+    <script type="text/javascript" src="example-composer/sourcability.js"></script> <!-- Expose sourcability property -->
+    <script type="text/javascript" src="example-composer/sourcability-lock.js"></script> <!-- Expose sourcabilityLock property -->
+    <script type="text/javascript" src="example-composer/ekz.js"></script> <!-- Expose ekz property -->
+    <script type="text/javascript" src="example-composer/ekz-lock.js"></script> <!-- Expose ekzLock property -->
+    <script type="text/javascript" src="example-composer/gourmondo.js"></script> <!-- Expose gourmondo property -->
+    <script type="text/javascript" src="example-composer/gourmondo-lock.js"></script> <!-- Expose gourmondoLock property -->
+    <script type="text/javascript" src="example-composer/modules-need-migration.js"></script> <!-- Expose modulesNeedMigration property -->
+    <script type="text/javascript" src="example-composer/modules-need-migration-lock.js"></script> <!-- Expose modulesNeedMigrationLock property -->
+    <script type="text/javascript" src="example-composer/b2c-demo-shop-201811.js"></script> <!-- Expose b2cDemoShop201811 property -->
+    <script type="text/javascript" src="example-composer/b2c-demo-shop-201811-lock.js"></script> <!-- Expose b2cDemoShop201811Lock property -->
+    <script type="text/javascript" src="example-composer/b2c-demo-shop-201812.js"></script> <!-- Expose b2cDemoShop201812 property -->
+    <script type="text/javascript" src="example-composer/b2c-demo-shop-201812-lock.js"></script> <!-- Expose b2cDemoShop201812Lock property -->
+    <script type="text/javascript" src="example-composer/b2b-demo-shop-201811.js"></script> <!-- Expose b2bDemoShop201811 property -->
+    <script type="text/javascript" src="example-composer/b2b-demo-shop-201811-lock.js"></script> <!-- Expose b2bDemoShop201811Lock property -->
+    <script type="text/javascript" src="example-composer/b2b-demo-shop-201812.js"></script> <!-- Expose b2bDemoShop201812 property -->
+    <script type="text/javascript" src="example-composer/b2b-demo-shop-201812-lock.js"></script> <!-- Expose b2bDemoShop201812Lock property -->
+    <!-- Load your composer.json and composer.lock files -->
+    <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
+    <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
+    <!-- Data from the release app -->
+    <script type="text/javascript" src="release-app-data/release-module.js"></script> <!-- Expose releaseModules property -->
+    <script type="text/javascript" src="release-app-data/release-feature.js"></script> <!-- Expose releaseFeatures property -->
+    <!-- Where the magic happen -->
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="modules.js"></script>
+    <script type="text/javascript" src="product-releases.js"></script>
+    <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
+    <script type="text/javascript">
+    // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
+    analyseMigrationToNextProductReleases('listOfProductReleases', '2018.12.0', b2cDemoShop201812, b2cDemoShop201812Lock, releaseFeatures);
 
-        // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-        //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
+    // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
+    analyseMigrationToNextModulesMajors('listOfModules', b2cDemoShop201812, b2cDemoShop201812Lock, releaseModules);
 
-        // Display all Spryker features you currently do not use
-        //sprykerFeaturesYouDoNotUse('listOfNotUsedFeatures', myComposerJSON, releaseFeatures);
+    // Display all Spryker features you currently do not use
+    sprykerFeaturesYouDoNotUse('listOfNotUsedFeatures', b2cDemoShop201812, releaseFeatures);
 
-        </script>
-    </body>
+    </script>
+  </body>
 
 </html>
