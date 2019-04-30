@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 
   <head>
     <meta charset="utf-8">
@@ -11,11 +11,14 @@
 
   <body class="container">
     <section>
-      <h1>Spryker Migration Analyzer</h1>
+      <h1>Spryker Migration Analyzer <span class="badge badge-secondary">Beta</span></h1>
       <dt>What is the purpose of this tool?</dt>
       <dd>To help you understand what is needed to keep your Spryker project up to date with our Product Releases.</dd>
       <dt>For who is this tool?</dt>
       <dd>Developer, Product Owner/Manager that wants to understand the migration path for their Spryker project.</dd>
+      <div class="alert alert-warning" role="alert">
+        ⚠️ This tool is here to help you migrate your Spryker project, you are still responsible of your Spryker project when using this tool.
+      </div>
     </section>
     <hr>
     <section>
@@ -71,13 +74,13 @@
     <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
     <script type="text/javascript">
     // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-    analyseMigrationToNextProductReleases('listOfProductReleases', '2018.12.0', b2cDemoShop201812, b2cDemoShop201812Lock, releaseFeatures);
+    //analyseMigrationToNextProductReleases('listOfProductReleases', '2018.11.0', myComposerJSON, myComposerLOCK, releaseFeatures);
 
     // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-    analyseMigrationToNextModulesMajors('listOfModules', b2cDemoShop201812, b2cDemoShop201812Lock, releaseModules);
+    //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
 
     // Display all Spryker features you currently do not use
-    sprykerFeaturesYouDoNotUse('listOfNotUsedFeatures', b2cDemoShop201812, releaseFeatures);
+    //sprykerFeaturesYouDoNotUse('listOfNotUsedFeatures', myComposerJSON, releaseFeatures);
 
     </script>
   </body>

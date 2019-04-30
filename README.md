@@ -7,7 +7,7 @@
 1. Fork/Clone/Download this repo
 2. Copy/Paste your `composer.json` inside the property `myComposerJSON` of the file `my-composer-files/composerJSON.js`
 3. Copy/Paste your `composer.lock` inside the property `myComposerLOCK` of the file `my-composer-files/composerLOCK.js`
-4. Uncomment the lines __74__, __77__ and __80__ inside `index.html` and save
+4. Uncomment the lines __77__, __80__ and __83__ inside `index.html` and save
 5. Open `index.html` inside your browser and enjoy your migration analysis
 
 ## Resources
