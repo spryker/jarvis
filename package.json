@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/spryker-sdk/migration-analyzer#readme",
   "dependencies": {
+    "compression": "^1.7.4",
     "express": "^4.16.4",
     "ramda": "^0.26.1"
   }
