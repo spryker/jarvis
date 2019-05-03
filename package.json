@@ -1,0 +1,25 @@
+{
+  "name": "migration-analyzer",
+  "version": "0.2.0",
+  "description": "POC for Migration Analyzer Tool",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spryker-sdk/migration-analyzer.git"
+  },
+  "author": "Jeremy Fourna <jeremy.fourna@spryker.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/spryker-sdk/migration-analyzer/issues"
+  },
+  "homepage": "https://github.com/spryker-sdk/migration-analyzer#readme",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.16.4",
+    "ramda": "^0.26.1"
+  }
+}
