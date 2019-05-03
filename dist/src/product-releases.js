@@ -138,24 +138,24 @@ function templateForProductReleases(currentComposer, currentFeatures, productRel
     return R.compose(
       R.join(''),
       mapIndexed((cur, index) => `<a
-                                        class="nav-item nav-link ${isActive(index)}"
-                                        id="nav-${properName('.', 'productRelease', cur)}-tab"
-                                        data-toggle="tab" href="#nav-tab-${properName('.', 'productRelease', cur)}"
-                                        role="tab" aria-controls="nav-home"
-                                        aria-selected="true">Version: ${R.prop('productRelease', cur)}
-                                    </a>`)
+                                    class="nav-item nav-link ${isActive(index)}"
+                                    id="nav-${properName('.', 'productRelease', cur)}-tab"
+                                    data-toggle="tab" href="#nav-tab-${properName('.', 'productRelease', cur)}"
+                                    role="tab" aria-controls="nav-home"
+                                    aria-selected="true">Version: ${R.prop('productRelease', cur)}
+                                  </a>`)
     )(listOfVersions);
   }
 
   return `<nav>
-                <div class="nav nav-tabs" id="nav-tab-product-release" role="tablist" style="margin-bottom: 1rem;">
-                    ${navigationForTabs(productReleases)}
-                </div>
-            </nav>
-            <div class="tab-content" id="nav-tabContent-product-release">
-                <h3 class="section-in-release">You need a migration for the following features</h3>
-                ${contentForTabs(productReleases)}
-            </div>`;
+            <div class="nav nav-tabs" id="nav-tab-product-release" role="tablist" style="margin-bottom: 1rem;">
+              ${navigationForTabs(productReleases)}
+            </div>
+          </nav>
+          <div class="tab-content" id="nav-tabContent-product-release">
+            <h3 class="section-in-release">You need a migration for the following features</h3>
+            ${contentForTabs(productReleases)}
+          </div>`;
 }
 
 function missingSprykerFeatures(currentFeatures, currentComposer) {
@@ -186,7 +186,7 @@ function templateForMissingFeatures(feature) {
   const p = R.prop(R.__, feature);
 
   return `<dt><a rel="noopener" href="https://github.com/${p('package')}" target="_blank">${p('name')}</a> ${isNewFeature(p('feature_versions'))}</dt>
-            <dd>${p('description')}</dd>`;
+          <dd>${p('description')}</dd>`;
 }
 
 function isNewFeature(listOfVersions) {
@@ -207,101 +207,77 @@ function contentForTabs(productReleases) {
 function templateForProductRelease(productRelease, index) {
   function leftPills(listOfMod) {
     return R.join('', mapIndexed((cur, index) => `<a
-                                                        class="nav-link ${isActive(index)}
-                                                        id="v-pills-${properName('/', 'package', cur)}-tab"
-                                                        data-toggle="pill"
-                                                        href="#v-pills-${properName('/', 'package', cur)}"
-                                                        role="tab"
-                                                        aria-controls="v-pills-${properName('/', 'package', cur)}"
-                                                        aria-selected="true">${R.prop('name', cur)}
-                                                    </a>`, listOfMod));
+                                                    class="nav-link ${isActive(index)}
+                                                    id="v-pills-${properName('/', 'package', cur)}-tab"
+                                                    data-toggle="pill"
+                                                    href="#v-pills-${properName('/', 'package', cur)}"
+                                                    role="tab"
+                                                    aria-controls="v-pills-${properName('/', 'package', cur)}"
+                                                    aria-selected="true">${R.prop('name', cur)}
+                                                  </a>`, listOfMod));
   }
 
   function rightPills(listOfMod) {
     return R.join('', mapIndexed((cur, index) => {
       return `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'package', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'package', cur)}-tab">
-                        <div class="row">
-                            <div class="col-12">
-                                <h4>Upgraded dependencies</h4>
-                                <div class="row">
-                                    ${dependenciesUpgraded(R.path(['feature_versions', 'data','diff'], cur))}
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <h4>Dependencies removed</h4>
-                                <div class="row">
-                                    ${dependenciesRemoved(R.path(['feature_versions', 'data','diff'], cur))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
+                <div class="row">
+                  <div class="col-12">
+                    <h4>Upgraded dependencies</h4>
+                    <div class="row">
+                      ${dependenciesUpgraded(R.path(['feature_versions', 'data','diff'], cur))}
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <h4>Dependencies removed</h4>
+                    <div class="row">
+                      ${dependenciesRemoved(R.path(['feature_versions', 'data','diff'], cur))}
+                    </div>
+                  </div>
+                </div>
+              </div>`;
     }, listOfMod));
   }
 
   return `<div class="tab-pane fade show ${isActive(index)}" id="nav-tab-${properName('.', 'productRelease', productRelease)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'productRelease', productRelease)}-tab">
-                <div class="row">
-                    <div class="col-3">
-                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                            ${leftPills(R.prop('features', productRelease), index)}
-                        </div>
-                    </div>
-                    <div class="col-9">
-                        <div class="tab-content" id="v-pills-tabContent">
-                            ${rightPills(R.prop('features', productRelease), index)}
-                        </div>
-                    </div>
+            <div class="row">
+              <div class="col-3">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                  ${leftPills(R.prop('features', productRelease), index)}
                 </div>
-            </div>`;
+              </div>
+              <div class="col-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                  ${rightPills(R.prop('features', productRelease), index)}
+                </div>
+              </div>
+            </div>
+          </div>`;
 }
-
-/*
-function dependenciesAdded(feature) {
-    return R.ifElse(
-        list => R.isEmpty(R.filter(cur => R.isNil(R.path(['beforeAfter', 'before'], cur)), list)),
-        () => `<p class="empty-result">No dependencies were added in this version.</p>`,
-        list => R.join('', R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6"><div class="card">
-                                            <div class="card-body">
-                                                <h5 class="card-title">${R.prop('package', cur)}</h5>
-                                                <dl>
-                                                    <dt>Version added</dt>
-                                                    <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','after'], cur))}</span></dd>
-                                                </dl>
-                                                <a
-                                                    href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
-                                                    target="_blank"
-                                                    class="btn btn-secondary"
-                                                >Github repository</a>
-                                                ${integrationGuideExist(R.path(['feature_versions','guide_url'], cur))}
-                                            </div>
-                                        </div></div>`, R.filter(cur => R.isNil(R.path(['beforeAfter', 'before'], cur)), list)))
-    )(R.path(['feature_versions', 'data', 'diff'], feature));
-}
-*/
 
 function dependenciesRemoved(listOfDependencies) {
   return R.ifElse(
     list => R.isEmpty(R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)),
     () => `<p class="empty-result">No dependencies were removed in this version.</p>`,
     list => R.join('', R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <b>${R.prop('package', cur)}</b>
-                                                </div>
-                                                <div class="card-body">
-                                                    <dl>
-                                                        <dt>Version removed</dt>
-                                                        <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))}</span></dd>
-                                                    </dl>
-                                                    <p>⚠️ Check in your project code if you use/extend/customize the following namespace: <b>${pascalCase(R.prop('package', cur))}</b></p>
-                                                    <a
-                                                        rel="noopener"
-                                                        href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','before'], cur))}"
-                                                        target="_blank"
-                                                        class="btn btn-secondary"
-                                                    >Github repository</a>
-                                                </div>
-                                            </div>
-                                        </div>`, R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)))
+                                      <div class="card">
+                                        <div class="card-header">
+                                          <b>${R.prop('package', cur)}</b>
+                                        </div>
+                                        <div class="card-body">
+                                          <dl>
+                                            <dt>Version removed</dt>
+                                            <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))}</span></dd>
+                                          </dl>
+                                          <p>⚠️ Check in your project code if you use/extend/customize the following namespace: <b>${pascalCase(R.prop('package', cur))}</b></p>
+                                          <a
+                                            rel="noopener"
+                                            href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','before'], cur))}"
+                                            target="_blank"
+                                            class="btn btn-secondary"
+                                          >Github repository</a>
+                                        </div>
+                                      </div>
+                                    </div>`, R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)))
   )(listOfDependencies);
 }
 
@@ -320,23 +296,24 @@ function dependenciesUpgraded(listOfDependencies) {
     list => R.isEmpty(R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)),
     () => `<p class="empty-result">No dependencies were upgraded in this version.</p>`,
     list => R.join('', R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <b>${R.prop('package', cur)}</b>
-                                                </div>
-                                                <div class="card-body">
-                                                    <dl>
-                                                        <dt>Version upgraded</dt>
-                                                        <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))} -> ${R.tail(R.path(['beforeAfter','after'], cur))}</span></dd>
-                                                    </dl>
-                                                    ${migrationGuideExist(R.tail(R.path(['beforeAfter','after'], cur)), R.prop('package', cur))}
-                                                    <a
-                                                        href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
-                                                        target="_blank"
-                                                        class="btn btn-secondary"
-                                                    >Github repository</a>
-                                                </div>
-                                            </div>
-                                        </div>`, R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)))
+                                      <div class="card">
+                                        <div class="card-header">
+                                          <b>${R.prop('package', cur)}</b>
+                                        </div>
+                                        <div class="card-body">
+                                          <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))} -> ${R.tail(R.path(['beforeAfter','after'], cur))}</span></dd>
+                                          </dl>
+                                          ${migrationGuideExist(R.tail(R.path(['beforeAfter','after'], cur)), R.prop('package', cur))}
+                                          <a
+                                            rel="noopener"
+                                            href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
+                                            target="_blank"
+                                            class="btn btn-secondary"
+                                          >Github repository</a>
+                                        </div>
+                                      </div>
+                                    </div>`, R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)))
   )(listOfDependencies);
 }
