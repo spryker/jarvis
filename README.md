@@ -1,14 +1,13 @@
 # Spryker Migration Analyzer
 
-:warning: :rotating_light: Alpha version - Spryker internal! :rotating_light: :warning:
+:warning: :rotating_light: Beta version - Spryker internal! :rotating_light: :warning:
 
 ## Installation & Usage
 
 1. Fork/Clone/Download this repo
-2. Copy/Paste your `composer.json` inside the property `myComposerJSON` of the file `my-composer-files/composerJSON.js`
-3. Copy/Paste your `composer.lock` inside the property `myComposerLOCK` of the file `my-composer-files/composerLOCK.js`
-4. Uncomment the lines __77__, __80__ and __83__ inside `index.html` and save
-5. Open `index.html` inside your browser and enjoy your migration analysis
+2. Install nodejs & npm in case you do not have them already installed on your machine 
+3. Open a termninal inside the folder and run `npm install` and then `node app.js <path to your spryker project folder>`
+4. Open `http://localhost:3000` inside your browser and enjoy your migration analysis
 
 ## Resources
 
