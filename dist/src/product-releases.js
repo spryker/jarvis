@@ -3,13 +3,23 @@
 ///////////////////////////////////////////
 
 
-function migrateToNextProductReleases(currentProductReleaseVersion, currentComposer, currentComposerLock, currentFeatures) {
+function migrateToNextProductReleases(currentComposer, currentComposerLock, currentFeatures) {
+  const currentProductReleaseVersion = R.compose(
+    R.tail,
+    R.prop('version'),
+    R.ifElse(R.isNil, R.always({ version: '~2018.11.0' }), R.identity),
+    R.find(cur => R.includes('spryker-feature', R.prop('package', cur))),
+    R.map(reconstruct(['package', 'version'])),
+    R.toPairs,
+    R.prop('require')
+  )(currentComposer);
+
   const featuresUsedInProject = featuresFromComposer(currentComposerLock, currentComposer);
   const productReleasesAvailable = featuresForProductReleases(currentProductReleaseVersion, currentFeatures);
   const featuresToMigratePerProductRelease = R.map(keepForEachProductReleaseUsedFeatures(featuresUsedInProject), productReleasesAvailable);
 
   return R.cond([
-    [list => R.isEmpty(R.nth(0, list)), R.always(templateUpToDate('You do not use any features, need the mapping tool here!'))],
+    [list => R.isEmpty(R.nth(0, list)), R.always(templateUpToDate('You do not use any Spryker Features, soon we will help you migrate your Spryker modules to Spryker Features!'))],
     [list => R.isEmpty(R.nth(1, list)), R.always(templateUpToDate('You are up to date, nothing to do here!'))],
     [R.T, list => templateForProductReleases(currentComposer, currentFeatures, R.nth(2, list))]
   ])([featuresUsedInProject, productReleasesAvailable, featuresToMigratePerProductRelease]);
@@ -268,7 +278,7 @@ function dependenciesRemoved(listOfDependencies) {
                                             <dt>Version removed</dt>
                                             <dd><span class="badge badge-primary">${R.tail(R.path(['beforeAfter','before'], cur))}</span></dd>
                                           </dl>
-                                          <p>⚠️ Check in your project code if you use/extend/customize the following namespace: <b>${pascalCase(R.prop('package', cur))}</b></p>
+                                          <p>⚠️ Check in your project code if you use/extend/customize <code>${pascalCase(R.prop('package', cur))}</code> namespace.</p>
                                           <a
                                             rel="noopener"
                                             href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','before'], cur))}"
@@ -295,7 +305,7 @@ function dependenciesUpgraded(listOfDependencies) {
   return R.ifElse(
     list => R.isEmpty(R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)),
     () => `<p class="empty-result">No dependencies were upgraded in this version.</p>`,
-    list => R.join('', R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+    list => R.join('', R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
                                       <div class="card">
                                         <div class="card-header">
                                           <b>${R.prop('package', cur)}</b>

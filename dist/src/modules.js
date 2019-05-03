@@ -61,7 +61,7 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
                                       >Github repository</a>
                                       ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
                                     </div>
-                                    <p class="module-new-changes">⚠️ The information below is only useful to you if you use/extend/customize the following namespace: <b>${moduleName}</b></p>
+                                    <p class="module-new-changes">⚠️ The information below is only useful to you if you use/extend/customize <code>${moduleName}</code> namespace.</p>
                                     <dl>
                                       <dt>This new version brings</dt>
                                       <dd>${converter.makeHtml(R.prop('description', cur))}</dd>
