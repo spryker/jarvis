@@ -38,7 +38,7 @@ function migrationGuideAvailable(guideUrl) {
   return R.ifElse(
     R.isNil,
     R.always(''),
-    url => `<a href="${url}" target="_blank" class="btn btn-warning">Migration guide</a>`
+    url => `<a rel="noopener" href="${url}" target="_blank" class="btn btn-warning">Migration guide</a>`
   )(guideUrl);
 }
 
@@ -54,6 +54,7 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
       mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
                                       <div class="links">
                                           <a
+                                              rel="noopener"
                                               href="https://github.com/${packageName}/releases/tag/${R.prop('name', cur)}"
                                               target="_blank"
                                               class="btn btn-secondary"
@@ -78,7 +79,7 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
         s => R.concat(s, '</ul></dd>'),
         s => R.concat('<dt>You might also be interested in the following modules</dt><dd><ul>', s),
         R.join(''),
-        R.map(mod => `<li><a href="https://github.com/${R.head(mod)}}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
+        R.map(mod => `<li><a rel="noopener" href="https://github.com/${R.head(mod)}}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
         R.toPairs
       )(o),
       () => ''
@@ -99,11 +100,11 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
   }
 
   return `<nav>
-                <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
+                <div class="nav nav-tabs" id="nav-tab-modules" role="tablist" style="margin-bottom: 1rem;">
                     ${navigationForTabs(onlyRelevantMajorVersions)}
                 </div>
             </nav>
-            <div class="tab-content" id="nav-tabContent">
+            <div class="tab-content" id="nav-tabContent-modules">
                 ${tabsForModule(onlyRelevantMajorVersions)}
             </div>`;
 }

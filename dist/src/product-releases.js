@@ -140,7 +140,7 @@ function templateForProductReleases(currentComposer, currentFeatures, productRel
       mapIndexed((cur, index) => `<a
                                         class="nav-item nav-link ${isActive(index)}"
                                         id="nav-${properName('.', 'productRelease', cur)}-tab"
-                                        data-toggle="tab" href="#nav-${properName('.', 'productRelease', cur)}"
+                                        data-toggle="tab" href="#nav-tab-${properName('.', 'productRelease', cur)}"
                                         role="tab" aria-controls="nav-home"
                                         aria-selected="true">Version: ${R.prop('productRelease', cur)}
                                     </a>`)
@@ -148,11 +148,11 @@ function templateForProductReleases(currentComposer, currentFeatures, productRel
   }
 
   return `<nav>
-                <div class="nav nav-tabs" id="nav-tab" role="tablist" style="margin-bottom: 1rem;">
+                <div class="nav nav-tabs" id="nav-tab-product-release" role="tablist" style="margin-bottom: 1rem;">
                     ${navigationForTabs(productReleases)}
                 </div>
             </nav>
-            <div class="tab-content" id="nav-tabContent">
+            <div class="tab-content" id="nav-tabContent-product-release">
                 <h3 class="section-in-release">You need a migration for the following features</h3>
                 ${contentForTabs(productReleases)}
             </div>`;
@@ -185,7 +185,7 @@ function missingSprykerFeatures(currentFeatures, currentComposer) {
 function templateForMissingFeatures(feature) {
   const p = R.prop(R.__, feature);
 
-  return `<dt><a href="https://github.com/${p('package')}" target="_blank">${p('name')}</a> ${isNewFeature(p('feature_versions'))}</dt>
+  return `<dt><a rel="noopener" href="https://github.com/${p('package')}" target="_blank">${p('name')}</a> ${isNewFeature(p('feature_versions'))}</dt>
             <dd>${p('description')}</dd>`;
 }
 
@@ -238,7 +238,7 @@ function templateForProductRelease(productRelease, index) {
     }, listOfMod));
   }
 
-  return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'productRelease', productRelease)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'productRelease', productRelease)}-tab">
+  return `<div class="tab-pane fade show ${isActive(index)}" id="nav-tab-${properName('.', 'productRelease', productRelease)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'productRelease', productRelease)}-tab">
                 <div class="row">
                     <div class="col-3">
                         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -294,6 +294,7 @@ function dependenciesRemoved(listOfDependencies) {
                                                     </dl>
                                                     <p>⚠️ Check in your project code if you use/extend/customize the following namespace: <b>${pascalCase(R.prop('package', cur))}</b></p>
                                                     <a
+                                                        rel="noopener"
                                                         href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','before'], cur))}"
                                                         target="_blank"
                                                         class="btn btn-secondary"
