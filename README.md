@@ -9,6 +9,8 @@
 3. Open a termninal inside the folder and run `npm install` and then `node app.js <path to your spryker project folder>`
 4. Open `http://localhost:3000` inside your browser and enjoy your migration analysis
 
+If you want to reset the local configuration, run `npm run reset`
+
 ## Resources
 
 Links to retrieve data from Release app:
