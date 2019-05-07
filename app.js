@@ -128,6 +128,22 @@ function application(args) {
       }
     }
   };
+
+  /*
+  0. Retrieve composer.json and composer.lock
+    write them locally
+    if hash from composer.lock equals to 1 on the previous project used -> 3
+    if new hash -> 1
+  1. check against customer input for project name or previous
+      if same -> 3
+      if different -> 2
+  2. Run with API call
+  3. Check last API is less than 1 day
+    if true -> 4
+    if false -> 2
+  4. Run locally
+  */
+
   const composerFiles = R.compose(
     R.map(cur => {
       const transformations = {
@@ -188,21 +204,6 @@ function application(args) {
         }
       });
   }
-
-  /*
-  0. Retrieve composer.json and composer.lock
-    write them locally
-    if hash from composer.lock equals to 1 on the previous project used -> 3
-    if new hash -> 1
-  1. check against customer input for project name or previous
-      if same -> 3
-      if different -> 2
-  2. Run with API call
-  3. Check last API is less than 1 day
-    if true -> 4
-    if false -> 2
-  4. Run locally
-  */
 }
 
 application(process.argv);
