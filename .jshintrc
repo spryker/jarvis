@@ -4,7 +4,8 @@
   "globals": {
     "console": false,
     "require": false,
-    "process": false
+    "process": false,
+    "exports": false
   },
   "esversion": 6
 }
