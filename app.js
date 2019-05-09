@@ -46,7 +46,10 @@ function run() {
   app.get('/', (req, res) => res.sendFile('index.html'));
 
   // Web server is listening
-  app.listen(port, () => console.log(`The application is listening on the URL http://localhost:${port}/`));
+  app.listen(port, () => {
+    log(`The application is listening on the URL http://localhost:${port}/`);
+    log('When you migrationg will be over, could you share your experience with us by answering some survey questions https://spryker.typeform.com/to/Qzw9lg');
+  });
 
   return app;
 }
