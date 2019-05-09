@@ -4,6 +4,7 @@ const fs = require('fs');
 const R = require('ramda');
 const inquirer = require('inquirer');
 const moment = require('moment');
+const { updateConfigFile } = require('./utils.js');
 const app = express();
 const port = 3000;
 const isNotNil = R.complement(R.isNil);
@@ -85,12 +86,6 @@ function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
 
     return runWithApiCall(projectName, ...R.map(R.prop('data'), composerFiles));
   }
-}
-
-function updateConfigFile(data) {
-  fs.writeFileSync('config.json', JSON.stringify(data), 'utf8');
-
-  return data;
 }
 
 function lasApiCallLessThanADay(date) {

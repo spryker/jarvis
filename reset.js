@@ -1,14 +1,8 @@
-const fs = require('fs');
+const { updateConfigFile } = require('./utils.js');
 
 const resetObject = {
   "lastCallToReleaseApp": null,
   "previousProjects": []
 };
-
-function updateConfigFile(data) {
-  fs.writeFileSync('config.json', JSON.stringify(data), 'utf8');
-
-  return data;
-}
 
 updateConfigFile(resetObject);
