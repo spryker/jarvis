@@ -1,62 +1,42 @@
 const express = require('express');
 const compression = require('compression');
-const fs = require('fs');
-const R = require('ramda');
 const inquirer = require('inquirer');
 const moment = require('moment');
-const { updateConfigFile } = require('./utils.js');
-const app = express();
-const port = 3000;
-const isNotNil = R.complement(R.isNil);
+const {
+  adjust,
+  append,
+  assoc,
+  compose,
+  concat,
+  equals,
+  evolve,
+  find,
+  findIndex,
+  gt,
+  head,
+  isEmpty,
+  isNil,
+  last,
+  length,
+  map,
+  path,
+  prop,
+  propEq
+} = require('ramda');
+const {
+  cleanNodeInput,
+  getComposerFilesFromPath,
+  getConfig,
+  isNotNil,
+  log,
+  updateConfigFile
+} = require('./utils.js');
 
-// This function does some IO
-// log :: a -> a
-function log(content) {
-  console.log(...arguments);
-  return content;
-}
-
-// This function does some IO
-// cleanNodeInput :: [string] -> [string]
-function cleanNodeInput(args) {
-  return R.drop(2, args);
-}
-
-// This function does some IO
-// getComposerData :: string -> [object]
-function getComposerData(path) {
-  return [{
-    path: './dist/my-composer-files/composerJSON.js',
-    data: fs.readFileSync(R.concat(path, '/composer.json'), 'utf8'),
-    stringStart: 'const myComposerJSON = ',
-    stringEnd: ';'
-  }, {
-    path: './dist/my-composer-files/composerLOCK.js',
-    data: fs.readFileSync(R.concat(path, '/composer.lock'), 'utf8'),
-    stringStart: 'const myComposerLOCK = ',
-    stringEnd: ';'
-  }];
-}
-
-// This function does some IO
-// writeComposerData :: [object] -> [object]
-function writeComposerData(listOfFiles) {
-  R.forEach(cur => {
-    const p = R.prop(R.__, cur);
-    fs.writeFileSync(p('path'), `${p('stringStart')}${p('data')}${p('stringEnd')}`, 'utf8');
-  }, listOfFiles);
-
-  return listOfFiles;
-}
-
-function getComposerFilesFromPath(path) {
-  return R.compose(
-    writeComposerData,
-    getComposerData
-  )(path);
-}
 
 function run() {
+  const app = express();
+  const port = 3000;
+
   // Static files css/html/js
   app.use(express.static('dist'));
   // Compress for performance
@@ -78,18 +58,18 @@ function runWithApiCall(projectName, composerJson, composerLock) {
 function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
   log(`Project ${projectName}, how nice to see you again! We will gladly help you migrating today.`);
 
-  if (lasApiCallLessThanADay(R.prop('lastCallToReleaseApp', config))) {
+  if (lasApiCallLessThanADay(prop('lastCallToReleaseApp', config))) {
     return run();
   } else {
-    const newConfig = R.assoc('lastCallToReleaseApp', moment.utc(), config);
+    const newConfig = assoc('lastCallToReleaseApp', moment.utc(), config);
     updateConfigFile(newConfig);
 
-    return runWithApiCall(projectName, ...R.map(R.prop('data'), composerFiles));
+    return runWithApiCall(projectName, ...map(prop('data'), composerFiles));
   }
 }
 
 function lasApiCallLessThanADay(date) {
-  if (R.isNil(date)) {
+  if (isNil(date)) {
     return false;
   } else {
     return moment().subtract(1, 'days') <= date;
@@ -99,16 +79,16 @@ function lasApiCallLessThanADay(date) {
 function application(args) {
   log('Welcome to the Spryker Migration Analyzer Tool, I hope you will enjoy our service!');
 
-  const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+  const config = getConfig();
   const NOT_IN_THIS_LIST = 'Not in this list';
   const projectNameQuestionList = {
     type: "list",
     name: "projectName",
-    choices: R.concat(R.map(R.prop('projectName'), R.prop('previousProjects', config)), [NOT_IN_THIS_LIST]),
+    choices: concat(map(prop('projectName'), prop('previousProjects', config)), [NOT_IN_THIS_LIST]),
     message: "What is your company/project name?",
     when() {
       // Only ask the question if projects were used
-      return R.gt(R.length(R.prop('previousProjects', config)), 0);
+      return gt(length(prop('previousProjects', config)), 0);
     }
   };
   const projectNameQuestionInput = {
@@ -116,10 +96,10 @@ function application(args) {
     name: "projectName",
     message: "Nice to meet you! Which project are migrating today?",
     when(previousAnswers) {
-      if (R.isEmpty(previousAnswers)) {
+      if (isEmpty(previousAnswers)) {
         return true;
       } else {
-        return R.equals(R.prop('projectName', previousAnswers), NOT_IN_THIS_LIST);
+        return equals(prop('projectName', previousAnswers), NOT_IN_THIS_LIST);
       }
     }
   };
@@ -139,63 +119,63 @@ function application(args) {
   4. Run locally
   */
 
-  const composerFiles = R.compose(
-    R.map(cur => {
+  const composerFiles = compose(
+    map(cur => {
       const transformations = {
         data: a => JSON.parse(a)
       };
-      return R.evolve(transformations, cur);
+      return evolve(transformations, cur);
     }),
     getComposerFilesFromPath,
-    R.head,
+    head,
     cleanNodeInput
   )(args);
-  const previousProjectIsBack = R.find(
-    R.propEq('composerLockHash', R.path(['data', 'content-hash'], R.last(composerFiles))),
-    R.prop('previousProjects', config)
+  const previousProjectIsBack = find(
+    propEq('composerLockHash', path(['data', 'content-hash'], last(composerFiles))),
+    prop('previousProjects', config)
   );
 
   if (isNotNil(previousProjectIsBack)) {
 
-    return checkLastApiCallAndRunApp(R.prop('projectName', previousProjectIsBack), config, composerFiles);
+    return checkLastApiCallAndRunApp(prop('projectName', previousProjectIsBack), config, composerFiles);
 
   } else {
 
     return inquirer.prompt([projectNameQuestionList, projectNameQuestionInput])
       .then(answers => {
         // Take the folder path and read/write the composer files
-        const previousProjectsWithSameName = R.find(
-          R.propEq('projectName', R.prop('projectName', answers)),
-          R.prop('previousProjects', config)
+        const previousProjectsWithSameName = find(
+          propEq('projectName', prop('projectName', answers)),
+          prop('previousProjects', config)
         );
 
-        if (R.isNil(previousProjectsWithSameName)) {
-          const newConfig = R.assoc(
+        if (isNil(previousProjectsWithSameName)) {
+          const newConfig = assoc(
             'previousProjects',
-            R.append(
-              R.assoc('composerLockHash', R.path(['data', 'content-hash'], R.last(composerFiles)), answers),
-              R.prop('previousProjects', config)
+            append(
+              assoc('composerLockHash', path(['data', 'content-hash'], last(composerFiles)), answers),
+              prop('previousProjects', config)
             ),
             config
           );
 
           updateConfigFile(newConfig);
 
-          return runWithApiCall(R.prop('projectName', answers), ...R.map(R.prop('data'), composerFiles));
+          return runWithApiCall(prop('projectName', answers), ...map(prop('data'), composerFiles));
 
         } else {
-          const projectIndex = R.findIndex(R.propEq('projectName', R.prop('projectName', answers)), R.prop('previousProjects', config));
-          const newConfig = R.assoc(
+          const projectIndex = findIndex(propEq('projectName', prop('projectName', answers)), prop('previousProjects', config));
+          const newConfig = assoc(
             'previousProjects',
-            R.adjust(
+            adjust(
               projectIndex,
-              () => R.assoc('composerLockHash', R.path(['data', 'content-hash'], R.last(composerFiles)), answers),
-              R.prop('previousProjects', config)
+              () => assoc('composerLockHash', path(['data', 'content-hash'], last(composerFiles)), answers),
+              prop('previousProjects', config)
             ),
             config
           );
 
-          return checkLastApiCallAndRunApp(R.prop('projectName', answers), newConfig, composerFiles);
+          return checkLastApiCallAndRunApp(prop('projectName', answers), newConfig, composerFiles);
         }
       });
   }
