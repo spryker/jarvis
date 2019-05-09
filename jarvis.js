@@ -47,8 +47,8 @@ function run() {
 
   // Web server is listening
   app.listen(port, () => {
-    log(`The application is listening on the URL http://localhost:${port}/`);
-    log('When you migrationg will be over, could you share your experience with us by answering some survey questions https://spryker.typeform.com/to/Qzw9lg');
+    log(`I am listening on the URL http://localhost:${port}/`);
+    log('When your migration will be over, could you share your feedback with us about Spryker Jarvis? https://spryker.typeform.com/to/Qzw9lg');
   });
 
   return app;
@@ -59,11 +59,18 @@ function runWithApiCall(projectName, composerJson, composerLock) {
 }
 
 function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
-  log(`Project ${projectName}, how nice to see you again! We will gladly help you migrating today.`);
+  log(`Welcome back project ${projectName}! I hope your project is not too outdated...`);
+  log('First let me check if my information about Spryker Features and Modules are up to date.');
 
   if (lastApiCallLessThanADay(prop('lastCallToReleaseApp', config))) {
+    log('Yes, they are. Please follow me.');
+
     return run();
+
   } else {
+
+    log('No, they are not. Let me refresh them. This is take less than 1 minute I hope...');
+
     const newConfig = assoc('lastCallToReleaseApp', moment.utc(), config);
     updateConfigFile(newConfig);
 
@@ -75,12 +82,12 @@ function lastApiCallLessThanADay(date) {
   if (isNil(date)) {
     return false;
   } else {
-    return moment().subtract(1, 'days') <= date;
+    return moment().subtract(1, 'days') <= moment(date);
   }
 }
 
 function application(args) {
-  log('Welcome to the Spryker Migration Analyzer Tool, I hope you will enjoy our service!');
+  log('Welcome, my name is Spryker Jarvis. Today I will help you migrating your Spryker project!');
 
   const config = getConfig();
   const NOT_IN_THIS_LIST = 'Not in this list';
@@ -88,7 +95,7 @@ function application(args) {
     type: "list",
     name: "projectName",
     choices: concat(map(prop('projectName'), prop('previousProjects', config)), [NOT_IN_THIS_LIST]),
-    message: "What is your company/project name?",
+    message: "Is the project name your are migrating inside this list?",
     when() {
       // Only ask the question if projects were used
       return gt(length(prop('previousProjects', config)), 0);
@@ -97,7 +104,7 @@ function application(args) {
   const projectNameQuestionInput = {
     type: "input",
     name: "projectName",
-    message: "Nice to meet you! Which project are migrating today?",
+    message: "What is the project name you are migrating today?",
     when(previousAnswers) {
       if (isEmpty(previousAnswers)) {
         return true;
@@ -138,6 +145,7 @@ function application(args) {
     prop('previousProjects', config)
   );
 
+
   if (isNotNil(previousProjectIsBack)) {
 
     return checkLastApiCallAndRunApp(prop('projectName', previousProjectIsBack), config, composerFiles);
@@ -177,6 +185,8 @@ function application(args) {
             ),
             config
           );
+
+          updateConfigFile(newConfig);
 
           return checkLastApiCallAndRunApp(prop('projectName', answers), newConfig, composerFiles);
         }

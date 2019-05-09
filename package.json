@@ -1,10 +1,10 @@
 {
-  "name": "migration-analyzer",
+  "name": "spryker-jarvis",
   "version": "0.2.0",
-  "description": "POC for Migration Analyzer Tool",
-  "main": "app.js",
+  "description": "Spryker Jarvis",
+  "main": "jarvis.js",
   "scripts": {
-    "reset": "node reset.js"
+    "jarvis-reset": "node reset.js"
   },
   "repository": {
     "type": "git",

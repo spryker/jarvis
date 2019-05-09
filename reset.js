@@ -9,4 +9,4 @@ const resetObject = {
 };
 
 updateConfigFile(resetObject);
-log('Your local configuration has been reset. To use it again please run -> node app.js <path to your spryker project folder>');
+log('I have cleaned your local configuration. To use my services again please run -> node jarvis.js <path to your spryker project folder>');
