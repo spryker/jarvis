@@ -61,7 +61,7 @@ function runWithApiCall(projectName, composerJson, composerLock) {
 function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
   log(`Project ${projectName}, how nice to see you again! We will gladly help you migrating today.`);
 
-  if (lasApiCallLessThanADay(prop('lastCallToReleaseApp', config))) {
+  if (lastApiCallLessThanADay(prop('lastCallToReleaseApp', config))) {
     return run();
   } else {
     const newConfig = assoc('lastCallToReleaseApp', moment.utc(), config);
@@ -71,7 +71,7 @@ function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
   }
 }
 
-function lasApiCallLessThanADay(date) {
+function lastApiCallLessThanADay(date) {
   if (isNil(date)) {
     return false;
   } else {
