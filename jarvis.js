@@ -35,7 +35,7 @@ const {
 
 function run() {
   const app = express();
-  const port = 3000;
+  const port = 7777;
 
   // Static files css/html/js
   app.use(express.static('dist'));
