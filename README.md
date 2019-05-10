@@ -1,4 +1,5 @@
-# Spryker Jarvis
+# Spryker Jarvis - Migration Tool
+Spryker Jarvis helps projects to keep up on Spryker updates, migrate to the latest versions and integrate new features.
 
 :warning: :rotating_light: Alpha version - Spryker internal! :rotating_light: :warning:
 
