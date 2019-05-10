@@ -87,7 +87,7 @@ function lastApiCallLessThanADay(date) {
 }
 
 function application(args) {
-  log('Welcome, my name is Spryker Jarvis. Today I will help you migrating your Spryker project!');
+  log('Welcome, my name is Spryker Jarvis. Today I will help you to migrate your Spryker project!');
 
   const config = getConfig();
   const NOT_IN_THIS_LIST = 'Not in this list';
