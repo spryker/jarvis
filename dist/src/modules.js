@@ -44,6 +44,7 @@ function migrationGuideAvailable(guideUrl) {
 
 function templateMajorAvailable(packageName, moduleName, currentVersion, allVersions) {
   const onlyRelevantMajorVersions = R.compose(
+    R.map(cur => R.assoc('identifier', r(), cur)),
     R.tail,
     R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
   )(allVersions);
@@ -67,8 +68,7 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
                                       <dd>${converter.makeHtml(R.prop('description', cur))}</dd>
                                       ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
                                     </dl>
-                                  </div>`),
-      R.map(cur => R.assoc('identifier', r(), cur))
+                                  </div>`)
     )(majorsAvailable);
   }
 
