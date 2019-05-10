@@ -12,7 +12,7 @@ function migrateModuleToNextMajor(currentComposer, currentComposerLock, currentM
       R.map(templateForPackage)
     ),
     // "spryker-eco/loggly" is the only module that is not part of the release app
-    R.filter(cur => R.prop('module', cur) !== 'spryker-eco/loggly' && R.prop('upToDate', cur) === false && majorAvailable(cur) && R.prop('requiredVersion', cur) !== '*'),
+    R.filter(cur => R.prop('module', cur) !== 'spryker-eco/loggly' && R.prop('upToDate', cur) === false && (minorAvailable(cur) || majorAvailable(cur)) && R.prop('requiredVersion', cur) !== '*'),
     R.map(R.compose(
       R.assoc('identifier', r()),
       cur => R.assoc('upToDate', R.equals(R.prop('installedVersion', cur), R.path(['package', 'version'], cur)), cur),
@@ -28,7 +28,7 @@ function onlyLastVersionInAMajor(listOfPreviousVersions, newVersion) {
   return R.cond([
     [version => R.lte(R.prop('name', version), R.prop('name', R.last(listOfPreviousVersions))), () => listOfPreviousVersions],
     [version => isNextMajor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.append(version, listOfPreviousVersions)],
-    [version => isNextMinor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.compose(R.append(version), R.dropLast(1))(listOfPreviousVersions)],
+    [version => isNextMinor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.append(version, listOfPreviousVersions)],
     [version => isNextPatched(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.compose(R.append(version), R.dropLast(1))(listOfPreviousVersions)],
     [R.T, () => listOfPreviousVersions]
   ])(newVersion);

@@ -80,6 +80,18 @@ function majorAvailable(mod) {
   }
 }
 
+function minorAvailable(mod) {
+  const installedVersion = R.split('.', R.prop('installedVersion', mod));
+  const lastVersionAvailable = R.split('.', R.path(['package', 'version'], mod));
+
+  // version = 0.x.z
+  if (R.nth(0, installedVersion) === '0' && R.nth(0, lastVersionAvailable) === '0') {
+    return R.nth(2, lastVersionAvailable) > R.nth(2, installedVersion) ? true : false;
+  } else {
+    return R.nth(1, lastVersionAvailable) > R.nth(1, installedVersion) ? true : false;
+  }
+}
+
 function majorAvailableForModule(mod) {
   const installedVersionMajor = R.head(R.split('.', R.prop('version', mod)));
   const lastVersionAvailableMajor = R.head(R.split('.', R.path(['package', 'version'], mod)));
