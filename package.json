@@ -1,5 +1,5 @@
 {
-  "name": "spryker-jarvis",
+  "name": "jarvis",
   "version": "0.2.0",
   "description": "Spryker Jarvis",
   "main": "jarvis.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/spryker-sdk/migration-analyzer.git"
+    "url": "git+https://github.com/spryker-sdk/jarvis.git"
   },
   "author": "Jeremy Fourna <jeremy.fourna@spryker.com>",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/spryker-sdk/migration-analyzer/issues"
+    "url": "https://github.com/spryker-sdk/jarvis/issues"
   },
-  "homepage": "https://github.com/spryker-sdk/migration-analyzer#readme",
+  "homepage": "https://github.com/spryker-sdk/jarvis#readme",
   "dependencies": {
     "compression": "^1.7.4",
     "express": "^4.16.4",
