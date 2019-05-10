@@ -37,7 +37,11 @@ function isNextMajor(last, newVersion) {
 }
 
 function isNextMinor(last, newVersion) {
-  return semVerMinor(newVersion) > semVerMinor(last) ? true : false;
+  if (semVerMajor(newVersion) === '0') {
+    return semVerPatched(newVersion) > semVerPatched(last) ? true : false;
+  } else {
+    return semVerMinor(newVersion) > semVerMinor(last) ? true : false;
+  }
 }
 
 function isNextPatched(last, newVersion) {
