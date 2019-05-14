@@ -1,7 +1,5 @@
-const {
-  log,
-  updateConfigFile
-} = require('./utils.js');
+const { log } = require('./utils.js');
+const { updateConfigFile } = require('./file-system.js');
 
 const resetObject = {
   "lastCallToReleaseApp": null,

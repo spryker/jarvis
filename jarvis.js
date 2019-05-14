@@ -25,13 +25,15 @@ const {
 } = require('ramda');
 const {
   cleanNodeInput,
+  isNotNil,
+  log
+} = require('./utils.js');
+const {
   getComposerFilesFromPath,
   getConfig,
-  isNotNil,
-  log,
   updateConfigFile,
   writeReleaseAppData
-} = require('./utils.js');
+} = require('./file-system.js');
 const { getReleaseAppData } = require('./api-call.js');
 
 
