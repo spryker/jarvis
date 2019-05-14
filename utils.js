@@ -49,9 +49,36 @@ function getComposerData(path) {
   }];
 }
 
+function writeReleaseAppData(data) {
+  const p = prop(__, data);
+  const files = [{
+    path: './dist/release-app-data/release-feature.js',
+    data: p('features'),
+    stringStart: 'const releaseFeatures = ',
+    stringEnd: ';'
+  }, {
+    path: './dist/release-app-data/release-module.js',
+    data: p('modules'),
+    stringStart: 'const releaseModules = ',
+    stringEnd: ';'
+  }, {
+    path: './dist/release-app-data/horizontal-barriers.js',
+    data: p('horizontalBarriers'),
+    stringStart: 'const horizontalBarriers = ',
+    stringEnd: ';'
+  }, {
+    path: './dist/release-app-data/unused-features.js',
+    data: p('unusedFeatures'),
+    stringStart: 'const unusedFeatures = ',
+    stringEnd: ';'
+  }];
+
+  return writeFiles(files);
+}
+
 // This function does some IO
-// writeComposerData :: [object] -> [object]
-function writeComposerData(listOfFiles) {
+// writeFiles :: [object] -> [object]
+function writeFiles(listOfFiles) {
   forEach(cur => {
     const p = prop(__, cur);
     fs.writeFileSync(p('path'), `${p('stringStart')}${p('data')}${p('stringEnd')}`, 'utf8');
@@ -62,7 +89,7 @@ function writeComposerData(listOfFiles) {
 
 function getComposerFilesFromPath(path) {
   return compose(
-    writeComposerData,
+    writeFiles,
     getComposerData
   )(path);
 }
@@ -71,5 +98,6 @@ exports.cleanNodeInput = cleanNodeInput;
 exports.getConfig = getConfig;
 exports.getComposerFilesFromPath = getComposerFilesFromPath;
 exports.log = log;
-exports.updateConfigFile = updateConfigFile;
 exports.isNotNil = complement(isNil);
+exports.updateConfigFile = updateConfigFile;
+exports.writeReleaseAppData = writeReleaseAppData;

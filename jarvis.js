@@ -29,13 +29,19 @@ const {
   getConfig,
   isNotNil,
   log,
-  updateConfigFile
+  updateConfigFile,
+  writeReleaseAppData
 } = require('./utils.js');
+const { getReleaseAppData } = require('./api-call.js');
 
 
-function run() {
+function run(newReleaseData = undefined) {
   const app = express();
   const port = 7777;
+
+  if (isNotNil(newReleaseData)) {
+    writeReleaseAppData(newReleaseData);
+  }
 
   // Static files css/html/js
   app.use(express.static('dist'));
@@ -55,7 +61,13 @@ function run() {
 }
 
 function runWithApiCall(projectName, composerJson, composerLock) {
-  return run();
+  return getReleaseAppData({ projectName, composerJson, composerLock }, failedToRetrieveReleaseAppData, run);
+}
+
+function failedToRetrieveReleaseAppData(data) {
+  log('I am sorry to announce that something went wrong, I could not retrieve any information from Spryker...');
+  log('Please verify that you are connected to the Internet. If yes, please send an email to support@spryker.com to notify them that you could not use my services today.');
+  return data;
 }
 
 function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
