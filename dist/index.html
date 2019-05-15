@@ -24,19 +24,7 @@
       </div>
     </section>
     <hr>
-    <section>
-      <h2>Product Releases</h2>
-      <p>This section displays the next Spryker Product Releases available to your Spryker project.</p>
-      <p>Some Product Releases will require databases migrations or some changes to be done in your code or nothing at all.</p>
-      <div id="listOfProductReleases"></div>
-      <hr>
-      <h2>Modules</h2>
-      <p>This section displays the next majors available for the Spryker modules that you use inside your Spryker project.</p>
-      <div id="listOfModules"></div>
-      <hr>
-      <h2>Spryker features you currently do not use</h2>
-      <div id="listOfNotUsedFeatures"></div>
-    </section>
+    <section id="next-target"></section>
     <!-- Libraries -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -55,16 +43,19 @@
     <script type="text/javascript" src="src/utils.js"></script>
     <script type="text/javascript" src="src/modules.js"></script>
     <script type="text/javascript" src="src/product-releases.js"></script>
-    <script type="text/javascript" src="index.js"></script> <!-- Expose analyseMigrationToNextProductReleases and analyseMigrationToNextModulesMajors properties -->
+    <script type="text/javascript" src="src/target.js"></script>
+    <script type="text/javascript" src="index.js"></script>
     <script type="text/javascript">
     // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-    analyseMigrationToNextProductReleases('listOfProductReleases', myComposerJSON, myComposerLOCK, releaseFeatures);
+    //analyseMigrationToNextProductReleases('listOfProductReleases', myComposerJSON, myComposerLOCK, releaseFeatures);
 
     // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-    analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
+    //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
 
     // Display all Spryker features you currently do not use
-    sprykerFeaturesYouDoNotUse('listOfNotUsedFeatures', myComposerJSON, releaseFeatures);
+    //sprykerFeaturesYouDoNotUse('listOfNotUsedFeatures', myComposerJSON, releaseFeatures);
+
+    nextTarget('next-target', { myComposerJSON, myComposerLOCK, releaseFeatures, releaseModules, architectureChanges, recommendedFeatures });
 
     </script>
   </body>
