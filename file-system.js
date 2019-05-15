@@ -1,6 +1,8 @@
 const fs = require('fs');
+const moment = require('moment');
 const {
   __,
+  assoc,
   compose,
   concat,
   forEach,
@@ -15,6 +17,14 @@ function updateConfigFile(data) {
 
 function getConfig() {
   return JSON.parse(fs.readFileSync('config.json', 'utf8'));
+}
+
+function updateLastApiCall(config) {
+  const newConfig = assoc('lastCallToReleaseApp', moment.utc(), config);
+
+  updateConfigFile(newConfig);
+
+  return newConfig;
 }
 
 // This function does some IO
@@ -81,4 +91,5 @@ function getComposerFilesFromPath(path) {
 exports.getConfig = getConfig;
 exports.getComposerFilesFromPath = getComposerFilesFromPath;
 exports.updateConfigFile = updateConfigFile;
+exports.updateLastApiCall = updateLastApiCall;
 exports.writeReleaseAppData = writeReleaseAppData;

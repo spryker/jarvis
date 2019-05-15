@@ -32,6 +32,7 @@ const {
   getComposerFilesFromPath,
   getConfig,
   updateConfigFile,
+  updateLastApiCall,
   writeReleaseAppData
 } = require('./file-system.js');
 const { getReleaseAppData } = require('./api-call.js');
@@ -42,6 +43,7 @@ function run(newReleaseData = undefined) {
   const port = 7777;
 
   if (isNotNil(newReleaseData)) {
+    updateLastApiCall(getConfig());
     writeReleaseAppData(newReleaseData);
   }
 
@@ -85,8 +87,7 @@ function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
 
     log('No, they are not. Let me refresh them. This is take less than 1 minute I hope...');
 
-    const newConfig = assoc('lastCallToReleaseApp', moment.utc(), config);
-    updateConfigFile(newConfig);
+    updateLastApiCall(config);
 
     return runWithApiCall(projectName, ...map(prop('data'), composerFiles));
   }

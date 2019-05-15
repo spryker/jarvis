@@ -18,7 +18,6 @@ function cleanNodeInput(args) {
 }
 
 
-
 exports.cleanNodeInput = cleanNodeInput;
 exports.log = log;
 exports.isNotNil = complement(isNil);
