@@ -37,23 +37,23 @@ function writeReleaseAppData(data) {
   const p = prop(__, data);
   const files = [{
     path: './dist/release-app-data/release-feature.js',
-    data: p('features'),
+    data: JSON.stringify(p('features')),
     stringStart: 'const releaseFeatures = ',
     stringEnd: ';'
   }, {
     path: './dist/release-app-data/release-module.js',
-    data: p('modules'),
+    data: JSON.stringify(p('modules')),
     stringStart: 'const releaseModules = ',
     stringEnd: ';'
   }, {
-    path: './dist/release-app-data/horizontal-barriers.js',
-    data: p('horizontalBarriers'),
-    stringStart: 'const horizontalBarriers = ',
+    path: './dist/release-app-data/architecture-changes.js',
+    data: JSON.stringify(p('architectureChanges')),
+    stringStart: 'const architectureChanges = ',
     stringEnd: ';'
   }, {
-    path: './dist/release-app-data/unused-features.js',
-    data: p('unusedFeatures'),
-    stringStart: 'const unusedFeatures = ',
+    path: './dist/release-app-data/recommended-features.js',
+    data: JSON.stringify(p('recommendedFeatures')),
+    stringStart: 'const recommendedFeatures = ',
     stringEnd: ';'
   }];
 
