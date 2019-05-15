@@ -14,11 +14,12 @@ function getReleaseAppData(data, errorCallback, callback) {
 
   return request(options, (error, response, body) => {
     if (error || equals(prop('code', body), 404)) {
+
       return errorCallback(error);
 
     } else {
 
-      return callback(body);
+      return callback(prop('result', body));
 
     }
   });
