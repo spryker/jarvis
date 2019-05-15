@@ -25,9 +25,12 @@ function logicForProductReleases(data) {
 function logicForOnlyModules(data) {
   const p = R.prop(R.__, data);
   log(data);
+  log('migrateModuleToLastVersionInMajor', migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules')));
 
-  return `<h2>The following modules are outdated.</h2>
-          <div>${migrateModuleToNextMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
+
+  return `<h2>Here a summary of your current state 👇</h2>
+          <h2>The following modules are outdated.</h2>
+          <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
 }
 
 function featuresToMigrateIsEmpty(productRelease) {

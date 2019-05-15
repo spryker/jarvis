@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////
 
 
-function migrateModuleToNextMajor(currentComposer, currentComposerLock, currentModules) {
+function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
   return R.compose(
     R.join(''),
     R.ifElse(
@@ -11,8 +11,20 @@ function migrateModuleToNextMajor(currentComposer, currentComposerLock, currentM
       () => templateUpToDate('All your Spryker modules are up to date or you do not use any outside of the Spryker features!'),
       R.map(templateForPackage)
     ),
+    c => migrateModuleToLastVersionInMajor(c, currentComposerLock, currentModules)
+  )(currentComposer);
+}
+
+function migrateModuleToLastVersionInMajor(currentComposer, currentComposerLock, currentModules) {
+  return R.compose(
     // "spryker-eco/loggly" is the only module that is not part of the release app
-    R.filter(cur => R.prop('module', cur) !== 'spryker-eco/loggly' && R.prop('upToDate', cur) === false && majorAvailable(cur) && R.prop('requiredVersion', cur) !== '*'),
+    R.filter(cur => R.prop('module', cur) !== 'spryker-eco/loggly' && R.prop('upToDate', cur) === false && (minorAvailable(cur) || majorAvailable(cur)) && R.prop('requiredVersion', cur) !== '*'),
+    c => prepareModules(c, currentComposerLock, currentModules)
+  )(currentComposer);
+}
+
+function prepareModules(currentComposer, currentComposerLock, currentModules) {
+  return R.compose(
     R.map(R.compose(
       R.assoc('identifier', r()),
       cur => R.assoc('upToDate', R.equals(R.prop('installedVersion', cur), R.path(['package', 'version'], cur)), cur),
@@ -26,12 +38,20 @@ function migrateModuleToNextMajor(currentComposer, currentComposerLock, currentM
 
 function onlyLastVersionInAMajor(listOfPreviousVersions, newVersion) {
   return R.cond([
-    [version => R.lte(R.prop('name', version), R.prop('name', R.last(listOfPreviousVersions))), () => listOfPreviousVersions],
+    [version => R.lte(versionToNumber(R.prop('name', version)), versionToNumber(R.prop('name', R.last(listOfPreviousVersions)))), () => listOfPreviousVersions],
     [version => isNextMajor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.append(version, listOfPreviousVersions)],
-    [version => isNextMinor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.compose(R.append(version), R.dropLast(1))(listOfPreviousVersions)],
+    [version => isNextMinor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.ifElse(list => R.equals(R.length(list), 1), R.append(version), list => R.compose(R.append(version), R.dropLast(1))(list))(listOfPreviousVersions)],
     [version => isNextPatched(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.compose(R.append(version), R.dropLast(1))(listOfPreviousVersions)],
     [R.T, () => listOfPreviousVersions]
   ])(newVersion);
+}
+
+function versionToNumber(version) {
+  const major = R.multiply(semVerMajor(version), 1000000);
+  const minor = R.multiply(semVerMinor(version), 1000);
+  const patch = semVerPatched(version);
+
+  return R.sum([major, minor, patch]);
 }
 
 function migrationGuideAvailable(guideUrl) {
@@ -42,11 +62,11 @@ function migrationGuideAvailable(guideUrl) {
   )(guideUrl);
 }
 
-function templateMajorAvailable(packageName, moduleName, currentVersion, allVersions) {
+function templateMajorOrMinorAvailable(packageName, moduleName, currentVersion, allVersions) {
   const onlyRelevantMajorVersions = R.compose(
     R.map(cur => R.assoc('identifier', r(), cur)),
     R.tail,
-    R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
+    R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }]),
   )(allVersions);
 
   function tabsForModule(majorsAvailable) {
@@ -121,7 +141,7 @@ function templateForPackage(data) {
               <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
               <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
               <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
-              ${templateMajorAvailable(R.prop('module', data), R.path(['package', 'name'], data) ,R.prop('installedVersion', data), R.sortBy(R.prop('name'), R.path(['package', 'module_versions'], data)))}
+              ${templateMajorOrMinorAvailable(R.prop('module', data), R.path(['package', 'name'], data) ,R.prop('installedVersion', data), R.sortBy(R.prop('name'), R.path(['package', 'module_versions'], data)))}
             </div>
           </div>`;
 }
