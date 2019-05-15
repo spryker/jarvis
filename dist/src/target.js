@@ -2,7 +2,7 @@ function stepsToHitTarget(data) {
   return R.ifElse(
     d => useSprykerFeatures(R.prop('myComposerJSON', d)),
     logicForProductReleases,
-    R.always('<h1>TBD</h1>')
+    logicForOnlyModules
   )(data);
 }
 
@@ -20,6 +20,14 @@ function logicForProductReleases(data) {
     [t => R.isEmpty(R.prop('features', R.head(t))), templateSaveMigrationToNewRelease],
     [R.T, templateNeedMigrationToNewRelease]
   ])(nextTargets);
+}
+
+function logicForOnlyModules(data) {
+  const p = R.prop(R.__, data);
+  log(data);
+
+  return `<h2>The following modules are outdated.</h2>
+          <div>${migrateModuleToNextMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
 }
 
 function featuresToMigrateIsEmpty(productRelease) {

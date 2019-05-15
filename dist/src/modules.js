@@ -54,13 +54,19 @@ function templateMajorAvailable(packageName, moduleName, currentVersion, allVers
       R.join(''),
       mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
                                     <div class="links">
+                                      ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
                                       <a
                                         rel="noopener"
                                         href="https://github.com/${packageName}/releases/tag/${R.prop('name', cur)}"
                                         target="_blank"
                                         class="btn btn-secondary"
-                                      >Github repository</a>
-                                      ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
+                                      >Github changelog</a>
+                                      <a
+                                        rel="noopener"
+                                        href="https://github.com/${packageName}/compare/${currentVersion}...${R.prop('name', cur)}"
+                                        target="_blank"
+                                        class="btn btn-info"
+                                      >Compare the versions</a>
                                     </div>
                                     <p class="module-new-changes">⚠️ The information below is only useful to you if you use/extend/customize <code>${moduleName}</code> namespace.</p>
                                     <dl>
