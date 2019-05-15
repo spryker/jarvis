@@ -25,18 +25,27 @@ function logicForProductReleases(data) {
 function logicForOnlyModules(data) {
   const p = R.prop(R.__, data);
   log(data);
-  log('migrateModuleToLastVersionInMajor', R.map(cur => {
-    return {
-      module: R.prop('module', cur),
-      installedVersion: R.prop('installedVersion', cur),
-      versions: R.sortBy(R.prop('name'), R.path(['package', 'module_versions'], cur))
-    };
-  }, migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))));
+  log(R.compose(R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur)))(migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))));
 
 
   return `<h2>Here a summary of your current state 👇</h2>
           <h2>The following modules are outdated.</h2>
           <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
+}
+
+function countVersionsForModule(mod) {
+  const installedVersion = R.prop('installedVersion', mod);
+  const versions = R.path(['package', 'module_versions'], mod);
+
+  log(versions);
+
+  return R.reduce((prev, cur) => R.cond([
+    [version => R.lte(versionToNumber(R.prop('name', version)), versionToNumber(installedVersion)), () => prev],
+    [version => isNextMajor(installedVersion, R.prop('name', version)), version => R.assoc('major', R.inc(R.prop('major', prev)), prev)],
+    [version => isNextMinor(installedVersion, R.prop('name', version)), version => R.assoc('minor', R.inc(R.prop('minor', prev)), prev)],
+    [version => isNextPatched(installedVersion, R.prop('name', version)), version => R.assoc('patch', R.inc(R.prop('patch', prev)), prev)],
+    [R.T, () => prev]
+  ])(cur), { major: 0, minor: 0, patch: 0 }, versions);
 }
 
 function featuresToMigrateIsEmpty(productRelease) {
