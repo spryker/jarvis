@@ -62,13 +62,18 @@ function migrationGuideAvailable(guideUrl) {
   )(guideUrl);
 }
 
-function templateMajorOrMinorAvailable(packageName, moduleName, currentVersion, allVersions) {
-  const onlyRelevantMajorVersions = R.compose(
+function onlyRelevantMajorVersions(data) {
+  const currentVersion = R.prop('installedVersion', data);
+  const allVersions = R.sortBy(R.prop('name'), R.path(['package', 'module_versions'], data));
+
+  return R.compose(
     R.map(cur => R.assoc('identifier', r(), cur)),
     R.tail,
     R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }]),
   )(allVersions);
+}
 
+function templateMajorOrMinorAvailable(data) {
   function tabsForModule(majorsAvailable) {
     return R.compose(
       R.join(''),
@@ -125,13 +130,18 @@ function templateMajorOrMinorAvailable(packageName, moduleName, currentVersion, 
     )(listOfVersions);
   }
 
+  const p = R.prop(R.__, data);
+  const packageName = p('module');
+  const moduleName = R.path(['package', 'name'], data);
+  const currentVersion = p('installedVersion');
+
   return `<nav>
             <div class="nav nav-tabs" id="nav-tab-modules" role="tablist" style="margin-bottom: 1rem;">
-                ${navigationForTabs(onlyRelevantMajorVersions)}
+                ${navigationForTabs(onlyRelevantMajorVersions(data))}
             </div>
           </nav>
           <div class="tab-content" id="nav-tabContent-modules">
-            ${tabsForModule(onlyRelevantMajorVersions)}
+            ${tabsForModule(onlyRelevantMajorVersions(data))}
           </div>`;
 }
 
@@ -141,7 +151,7 @@ function templateForPackage(data) {
               <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
               <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
               <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
-              ${templateMajorOrMinorAvailable(R.prop('module', data), R.path(['package', 'name'], data) ,R.prop('installedVersion', data), R.sortBy(R.prop('name'), R.path(['package', 'module_versions'], data)))}
+              ${templateMajorOrMinorAvailable(data)}
             </div>
           </div>`;
 }

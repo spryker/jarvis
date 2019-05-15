@@ -25,7 +25,13 @@ function logicForProductReleases(data) {
 function logicForOnlyModules(data) {
   const p = R.prop(R.__, data);
   log(data);
-  log('migrateModuleToLastVersionInMajor', migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules')));
+  log('migrateModuleToLastVersionInMajor', R.map(cur => {
+    return {
+      module: R.prop('module', cur),
+      installedVersion: R.prop('installedVersion', cur),
+      versions: R.sortBy(R.prop('name'), R.path(['package', 'module_versions'], cur))
+    };
+  }, migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))));
 
 
   return `<h2>Here a summary of your current state 👇</h2>
