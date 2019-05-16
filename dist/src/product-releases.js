@@ -3,19 +3,9 @@
 ///////////////////////////////////////////
 
 
-function migrateToNextProductReleases(currentComposer, currentComposerLock, currentFeatures) {
-  const currentProductReleaseVersion = R.compose(
-    R.tail,
-    R.prop('version'),
-    R.ifElse(R.isNil, R.always({ version: '~2018.11.0' }), R.identity),
-    R.find(cur => R.includes('spryker-feature', R.prop('package', cur))),
-    R.map(reconstruct(['package', 'version'])),
-    R.toPairs,
-    R.prop('require')
-  )(currentComposer);
-
+function migrateToNextProductReleases(currentComposer, currentComposerLock, currentFeatures, nextTargets) {
   const featuresUsedInProject = featuresFromComposer(currentComposerLock, currentComposer);
-  const productReleasesAvailable = featuresForProductReleases(currentProductReleaseVersion, currentFeatures);
+  const productReleasesAvailable = featuresForProductReleases('2018.11.0', currentFeatures);
   const featuresToMigratePerProductRelease = R.map(keepForEachProductReleaseUsedFeatures(featuresUsedInProject), productReleasesAvailable);
 
   return R.cond([
@@ -50,7 +40,12 @@ const retrieveAllFeaturesInsideProductRelease = currentFeatures => productReleas
   return R.filter(cur => R.compose(
     l => R.gt(l, 0),
     R.length,
-    feature => R.filter(c => R.equals(R.prop('name', c), R.prop('productRelease', productReleaseVersion)), R.prop('feature_versions', feature))
+    feature => R.filter(
+      c => R.and(
+        R.equals(R.prop('name', c), R.prop('productRelease', productReleaseVersion)),
+        R.equals(R.prop('status', feature), 1)
+      ),
+      R.prop('feature_versions', feature))
   )(cur), currentFeatures);
 };
 
@@ -207,14 +202,7 @@ function isNewFeature(listOfVersions) {
   )(listOfVersions);
 }
 
-function contentForTabs(productReleases) {
-  return R.compose(
-    R.join(''),
-    mapIndexed(templateForProductRelease)
-  )(productReleases);
-}
-
-function templateForProductRelease(productRelease, index) {
+function templateForProductRelease(productRelease) {
   function leftPills(listOfMod) {
     return R.join('', mapIndexed((cur, index) => `<a
                                                     class="nav-link ${isActive(index)}
@@ -248,17 +236,17 @@ function templateForProductRelease(productRelease, index) {
     }, listOfMod));
   }
 
-  return `<div class="tab-pane fade show ${isActive(index)}" id="nav-tab-${properName('.', 'productRelease', productRelease)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'productRelease', productRelease)}-tab">
-            <div class="row">
-              <div class="col-3">
-                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                  ${leftPills(R.prop('features', productRelease), index)}
-                </div>
+  log()
+
+  return `<div class="row">
+            <div class="col-3">
+              <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                ${leftPills(R.prop('features', productRelease))}
               </div>
-              <div class="col-9">
-                <div class="tab-content" id="v-pills-tabContent">
-                  ${rightPills(R.prop('features', productRelease), index)}
-                </div>
+            </div>
+            <div class="col-9">
+              <div class="tab-content" id="v-pills-tabContent">
+                ${rightPills(R.prop('features', productRelease))}
               </div>
             </div>
           </div>`;
@@ -284,7 +272,7 @@ function dependenciesRemoved(listOfDependencies) {
                                             href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','before'], cur))}"
                                             target="_blank"
                                             class="btn btn-secondary"
-                                          >Github repository</a>
+                                          >Github changelog</a>
                                         </div>
                                       </div>
                                     </div>`, R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)))
@@ -321,9 +309,39 @@ function dependenciesUpgraded(listOfDependencies) {
                                             href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.path(['beforeAfter','after'], cur))}"
                                             target="_blank"
                                             class="btn btn-secondary"
-                                          >Github repository</a>
+                                          >Github changelog</a>
+                                          <a
+                                            rel="noopener"
+                                            href="https://github.com/${R.prop('package', cur)}/compare/${R.tail(R.path(['beforeAfter','before'], cur))}...${R.tail(R.path(['beforeAfter','after'], cur))}"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                          >Compare the versions</a>
                                         </div>
                                       </div>
                                     </div>`, R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)))
   )(listOfDependencies);
+}
+
+// useSprykerFeatures :: object -> boolean
+function useSprykerFeatures(composerJson) {
+  return R.compose(
+    R.ifElse(R.isEmpty, R.F, R.T),
+    getSprykerFeatures
+  )(composerJson);
+
+}
+
+function getSprykerFeatures(composerJson) {
+  return R.compose(
+    specificTypeOfModules(['spryker-feature']),
+    keepOnlyModulesFromOrgs
+  )(composerJson);
+}
+
+function getNextSprykerProductReleases(feature, currentFeatures) {
+  return R.compose(
+    R.sortBy(R.prop('name')),
+    f => R.filter(cur => R.gt(R.prop('name', cur), R.prop('requiredVersion', feature)), R.prop('feature_versions', f)),
+    f => R.find(cur => R.propEq('package', R.prop('feature', f), cur), currentFeatures)
+  )(feature);
 }

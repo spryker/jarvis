@@ -19,6 +19,10 @@ function getConfig() {
   return JSON.parse(fs.readFileSync('config.json', 'utf8'));
 }
 
+function getCurrentVersion() {
+  return prop('version', JSON.parse(fs.readFileSync('package.json', 'utf8')));
+}
+
 function updateLastApiCall(config) {
   const newConfig = assoc('lastCallToReleaseApp', moment.utc(), config);
 
@@ -89,6 +93,7 @@ function getComposerFilesFromPath(path) {
 }
 
 exports.getConfig = getConfig;
+exports.getCurrentVersion = getCurrentVersion;
 exports.getComposerFilesFromPath = getComposerFilesFromPath;
 exports.updateConfigFile = updateConfigFile;
 exports.updateLastApiCall = updateLastApiCall;

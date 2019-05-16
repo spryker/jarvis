@@ -1,4 +1,4 @@
-.card {
+.margin-bottom {
   margin-bottom: 1rem;
 }
 
@@ -8,9 +8,14 @@
 }
 
 h1 {
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+  font-size: 4rem;
+}
+
+h2 {
   margin-top: 2rem;
   margin-bottom: 1rem;
-  font-size: 4rem;
 }
 
 h4 {
@@ -32,4 +37,8 @@ h4 {
 
 .card-body>a {
   margin-bottom: 0.5rem;
+}
+
+.card-columns {
+  column-count: 2;
 }

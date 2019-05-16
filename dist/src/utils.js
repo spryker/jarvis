@@ -25,11 +25,11 @@ const converter = new showdown.Converter();
 
 // Check if the new version is a major
 function isNextMajor(last, newVersion) {
-  if (semVerMajor(newVersion) === '0') {
-    if (semVerMinor(newVersion) === '0') {
+  if (semVerMajor(newVersion) === 0) {
+    if (semVerMinor(newVersion) === 0) {
       return isNextPatched(last, newVersion);
     } else {
-      return isNextMinor(last, newVersion);
+      return semVerMinor(newVersion) > semVerMinor(last) ? true : false;
     }
   } else {
     return semVerMajor(newVersion) > semVerMajor(last) ? true : false;
@@ -37,7 +37,23 @@ function isNextMajor(last, newVersion) {
 }
 
 function isNextMinor(last, newVersion) {
-  return semVerMinor(newVersion) > semVerMinor(last) ? true : false;
+  if (semVerMajor(newVersion) === 0) {
+    return semVerPatched(newVersion) > semVerPatched(last) ? true : false;
+  } else {
+    return semVerMinor(newVersion) > semVerMinor(last) ? true : false;
+  }
+}
+
+function minorAvailable(mod) {
+  const installedVersion = R.split('.', R.prop('installedVersion', mod));
+  const lastVersionAvailable = R.split('.', R.path(['package', 'version'], mod));
+
+  // version = 0.x.z
+  if (R.nth(0, installedVersion) === '0' && R.nth(0, lastVersionAvailable) === '0') {
+    return R.nth(2, lastVersionAvailable) > R.nth(2, installedVersion) ? true : false;
+  } else {
+    return R.nth(1, lastVersionAvailable) > R.nth(1, installedVersion) ? true : false;
+  }
 }
 
 function isNextPatched(last, newVersion) {
@@ -93,13 +109,13 @@ const isActive = index => index === 0 ? 'active' : '';
 
 const isShow = index => index === 0 ? 'show' : '';
 
-const semVerMajor = version => R.nth(0, R.split('.', version));
+const semVerMajor = version => Number(R.nth(0, R.split('.', version)));
 
-const semVerMinor = version => R.nth(1, R.split('.', version));
+const semVerMinor = version => Number(R.nth(1, R.split('.', version)));
 
-const semVerPatched = version => R.nth(2, R.split('.', version));
+const semVerPatched = version => Number(R.nth(2, R.split('.', version)));
 
-const templateUpToDate = content => [`<div class="alert alert-primary" role="alert">${content}</div>`];
+const templateUpToDate = content => `<div class="alert alert-primary" role="alert">${content}</div>`;
 
 const properName = (sep, prop, name) => R.join(`${R.prop('identifier', name)}`, R.split(sep, R.prop(prop, name)));
 
