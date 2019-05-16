@@ -120,10 +120,7 @@ function templateForEachGroupOfMigration(listOfModules) {
             </div>
             <div class="card-body">
               <ul class="list-unstyled">
-                ${R.join('', R.map(cur => {
-                  log(cur);
-                  return `<li><a href=#${R.path(['package', 'identifier'], cur)}><code>${R.prop('module', cur)}</code></a></li>`
-                }, listOfModules))}
+                ${R.join('', R.map(cur => `<li><a href=#${R.path(['package', 'identifier'], cur)}><code>${R.prop('module', cur)}</code></a></li>`, listOfModules))}
               <ul>
             </div>
           </div>`;
