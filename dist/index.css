@@ -38,3 +38,7 @@ h4 {
 .card-body>a {
   margin-bottom: 0.5rem;
 }
+
+.card-columns {
+  column-count: 2;
+}

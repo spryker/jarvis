@@ -1,9 +1,12 @@
 function stepsToHitTarget(data) {
+  const releaseModulesLens = R.lensProp('releaseModules');
+  const newData = R.over(releaseModulesLens, R.map(cur => R.assoc('identifier', r(), cur)), data);
+
   return R.ifElse(
     d => useSprykerFeatures(R.prop('myComposerJSON', d)),
     logicForProductReleases,
     logicForOnlyModules
-  )(data);
+  )(newData);
 }
 
 function logicForProductReleases(data) {
@@ -28,8 +31,6 @@ function logicForOnlyModules(data) {
     R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur))
   )(migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules')));
 
-  log(modulesWithTheirCount);
-
   return `<h2>Here is a summary of your current state 👇</h2>
           <div>${templateForTable(modulesWithTheirCount)}</div>
           <h2>The following modules are outdated.</h2>
@@ -48,7 +49,6 @@ function groupWithLevel(level) {
 }
 
 function templateForTable(listOfModules) {
-  log(listOfModules);
   const groupingByMajor = R.compose(
     groupWithLevel('major'),
     R.sortWith([R.descend(R.path(['nextVersionsCount', 'major']))]),
@@ -61,11 +61,13 @@ function templateForTable(listOfModules) {
   )(listOfModules);
   const finalList = R.filter(isNotEmpty, [groupingByMajor, groupingByMinor]);
 
-  log(finalList);
-
-  return `<div class="accordion" id="accordionExample">
+  return `<div class="accordion" id="summary-table">
             ${templateForSummaryElement(finalList)}
           </div>`;
+}
+
+function count(list) {
+  return R.reduce((prev, cur) => R.add(prev, R.length(cur)), 0, list);
 }
 
 function templateForSummaryElement(listOfElements) {
@@ -77,9 +79,6 @@ function templateForSummaryElement(listOfElements) {
     }
   }
 
-  function count(list) {
-    return R.reduce((prev, cur) => R.add(prev, R.length(cur)), 0, list);
-  }
   return R.compose(
     R.join(''),
     mapIndexed((cur, index) => {
@@ -87,19 +86,47 @@ function templateForSummaryElement(listOfElements) {
       const id = r();
 
       return `<div class="card">
-                <div class="card-header" id="headingOne">
+                <div class="card-header" id="heading-${id}">
                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#${id}" aria-expanded="true" aria-controls="collapseOne">
                       ${textForBoxTitle(isMajor, cur)}
                     </button>
                 </div>
-                <div id="${id}" class="collapse ${isShow(index)}" aria-labelledby="headingOne" data-parent="#accordionExample">
+                <div id="${id}" class="collapse ${isShow(index)}" aria-labelledby="heading-${id}" data-parent="#summary-table">
                   <div class="card-body">
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                    <div class="card-columns">
+                      ${R.join('',R.map(templateForEachGroupOfMigration, cur))}
+                    </div>
                   </div>
                 </div>
               </div>`;
     })
   )(listOfElements);
+}
+
+function templateForEachGroupOfMigration(listOfModules) {
+  function textForBoxTitle(isMajor, count, mod) {
+    if (isMajor) {
+      return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${R.path(['nextVersionsCount', 'major'], mod)}</span> major version(s).`
+    } else {
+      return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${R.path(['nextVersionsCount', 'minor'], mod)}</span> minor version(s).`
+    }
+  }
+
+  const isMajor = R.gt(R.path(['nextVersionsCount', 'major'], R.head(listOfModules)), 0);
+
+  return `<div class="card margin-bottom">
+            <div class="card-header">
+              <b>${textForBoxTitle(isMajor, R.length(listOfModules), R.head(listOfModules))}</b>
+            </div>
+            <div class="card-body">
+              <ul class="list-unstyled">
+                ${R.join('', R.map(cur => {
+                  log(cur);
+                  return `<li><a href=#${R.path(['package', 'identifier'], cur)}><code>${R.prop('module', cur)}</code></a></li>`
+                }, listOfModules))}
+              <ul>
+            </div>
+          </div>`;
 }
 
 function countVersionsForModule(mod) {
