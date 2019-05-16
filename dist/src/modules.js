@@ -77,30 +77,40 @@ function templateMajorOrMinorAvailable(data) {
   function tabsForModule(majorsAvailable) {
     return R.compose(
       R.join(''),
-      mapIndexed((cur, index) => `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
-                                    <div class="links">
-                                      ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
-                                      <a
-                                        rel="noopener"
-                                        href="https://github.com/${packageName}/releases/tag/${R.prop('name', cur)}"
-                                        target="_blank"
-                                        class="btn btn-secondary"
-                                      >Github changelog</a>
-                                      <a
-                                        rel="noopener"
-                                        href="https://github.com/${packageName}/compare/${currentVersion}...${R.prop('name', cur)}"
-                                        target="_blank"
-                                        class="btn btn-info"
-                                      >Compare the versions</a>
-                                    </div>
-                                    <p class="module-new-changes">⚠️ The information below is only useful to you if you use/extend/customize <code>${moduleName}</code> namespace.</p>
-                                    <dl>
-                                      <dt>This new version brings</dt>
-                                      <dd>${converter.makeHtml(R.prop('description', cur))}</dd>
-                                      ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
-                                    </dl>
-                                  </div>`)
-    )(majorsAvailable);
+      mapIndexed((cur, index) => {
+        const descriptionForAllVersions = R.compose(
+          R.join('<hr>'),
+          R.map(R.compose(
+            cur => converter.makeHtml(cur),
+            R.prop('description')
+          )),
+          R.dropWhile(mod => R.gt(versionToNumber(R.prop('name', mod)), versionToNumber(R.prop('name', cur)))),
+          R.takeWhile(mod => R.gt(versionToNumber(R.prop('name', mod)), versionToNumber(currentVersion))),
+          R.path(['package', 'module_versions'])
+        )(data);
+
+        return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
+                  <div class="links">
+                    ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
+                    <a
+                      rel="noopener"
+                      href="https://github.com/${packageName}/releases/tag/${R.prop('name', cur)}"
+                      target="_blank"
+                      class="btn btn-secondary"
+                    >Github changelog</a>
+                    <a
+                      rel="noopener"
+                      href="https://github.com/${packageName}/compare/${currentVersion}...${R.prop('name', cur)}"
+                      target="_blank"
+                      class="btn btn-info"
+                    >Compare the versions</a>
+                  </div>
+                  <p class="module-new-changes">⚠️ The information below is only useful to you if you use/extend/customize <code>${moduleName}</code> namespace.</p>
+                    <h2>Changes between <em>v${R.prop('name', cur)}</em> and <em>v${currentVersion}</em></h2>
+                    <section>${descriptionForAllVersions}</section>
+                    ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
+                </div>`;
+      }))(majorsAvailable);
   }
 
   function isThereSuggestedModules(objectWithModules) {
@@ -108,7 +118,7 @@ function templateMajorOrMinorAvailable(data) {
       o => R.gt(R.length(R.toPairs(o)), 0),
       o => R.compose(
         s => R.concat(s, '</ul></dd>'),
-        s => R.concat('<dt>You might also be interested in the following modules</dt><dd><ul>', s),
+        s => R.concat('<h2>You might also be interested in the following modules</h2><dd><ul>', s),
         R.join(''),
         R.map(mod => `<li><a rel="noopener" href="https://github.com/${R.head(mod)}}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
         R.toPairs
