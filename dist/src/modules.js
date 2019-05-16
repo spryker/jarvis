@@ -134,14 +134,15 @@ function templateMajorOrMinorAvailable(data) {
   const packageName = p('module');
   const moduleName = R.path(['package', 'name'], data);
   const currentVersion = p('installedVersion');
+  const relevantMajorVersions = onlyRelevantMajorVersions(data);
 
   return `<nav>
             <div class="nav nav-tabs" id="nav-tab-modules" role="tablist" style="margin-bottom: 1rem;">
-                ${navigationForTabs(onlyRelevantMajorVersions(data))}
+                ${navigationForTabs(relevantMajorVersions)}
             </div>
           </nav>
           <div class="tab-content" id="nav-tabContent-modules">
-            ${tabsForModule(onlyRelevantMajorVersions(data))}
+            ${tabsForModule(relevantMajorVersions)}
           </div>`;
 }
 

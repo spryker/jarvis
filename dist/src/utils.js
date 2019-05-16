@@ -29,7 +29,7 @@ function isNextMajor(last, newVersion) {
     if (semVerMinor(newVersion) === 0) {
       return isNextPatched(last, newVersion);
     } else {
-      return isNextMinor(last, newVersion);
+      return semVerMinor(newVersion) > semVerMinor(last) ? true : false;
     }
   } else {
     return semVerMajor(newVersion) > semVerMajor(last) ? true : false;
