@@ -147,7 +147,7 @@ function templateMajorOrMinorAvailable(data) {
 }
 
 function templateForPackage(data) {
-  return `<div class="card">
+  return `<div class="card margin-bottom">
             <div class="card-body">
               <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
               <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>

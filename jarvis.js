@@ -31,6 +31,7 @@ const {
 const {
   getComposerFilesFromPath,
   getConfig,
+  getCurrentVersion,
   updateConfigFile,
   updateLastApiCall,
   writeReleaseAppData
@@ -65,7 +66,7 @@ function run(newReleaseData = undefined) {
 }
 
 function runWithApiCall(projectName, composerJson, composerLock) {
-  return getReleaseAppData({ projectName, composerJson, composerLock }, failedToRetrieveReleaseAppData, run);
+  return getReleaseAppData({ projectName, composerJson, composerLock, currentVersion: getCurrentVersion() }, failedToRetrieveReleaseAppData, run);
 }
 
 function failedToRetrieveReleaseAppData(data) {

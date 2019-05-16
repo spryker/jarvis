@@ -1,4 +1,4 @@
-.card {
+.margin-bottom {
   margin-bottom: 1rem;
 }
 
@@ -8,12 +8,13 @@
 }
 
 h1 {
-  margin-top: 2rem;
+  margin-top: 3rem;
   margin-bottom: 2rem;
   font-size: 4rem;
 }
 
 h2 {
+  margin-top: 2rem;
   margin-bottom: 1rem;
 }
 
