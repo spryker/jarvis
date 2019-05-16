@@ -106,6 +106,8 @@ function majorAvailableForModule(mod) {
 const mapIndexed = R.addIndex(R.map);
 
 const isActive = index => index === 0 ? 'active' : '';
+const isActiveBool = index => index === 0 ? 'true' : 'false';
+const shouldBeCollapsed = index => index === 0 ? '' : 'collapsed';
 
 const isShow = index => index === 0 ? 'show' : '';
 

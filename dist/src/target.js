@@ -87,11 +87,11 @@ function templateForSummaryElement(listOfElements) {
 
       return `<div class="card">
                 <div class="card-header" id="heading-${id}">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#${id}" aria-expanded="true" aria-controls="collapseOne">
+                    <button class="btn btn-link ${shouldBeCollapsed(index)}" type="button" data-toggle="collapse" data-target="#summary-${id}" aria-expanded="${isActiveBool(index)}" aria-controls="summary-${id}">
                       ${textForBoxTitle(isMajor, cur)}
                     </button>
                 </div>
-                <div id="${id}" class="collapse ${isShow(index)}" aria-labelledby="heading-${id}" data-parent="#summary-table">
+                <div id="summary-${id}" class="collapse ${isShow(index)}" aria-labelledby="heading-${id}" data-parent="#summary-table">
                   <div class="card-body">
                     <div class="card-columns">
                       ${R.join('',R.map(templateForEachGroupOfMigration, cur))}
