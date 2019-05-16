@@ -80,6 +80,7 @@ function templateMajorOrMinorAvailable(data) {
       mapIndexed((cur, index) => {
         const descriptionForAllVersions = R.compose(
           R.join('<hr>'),
+          R.reverse,
           R.map(R.compose(
             cur => converter.makeHtml(cur),
             R.prop('description')
@@ -106,7 +107,7 @@ function templateMajorOrMinorAvailable(data) {
                     >Compare the versions</a>
                   </div>
                   <p class="module-new-changes">⚠️ The information below is only useful to you if you use/extend/customize <code>${moduleName}</code> namespace.</p>
-                    <h2>Changes between <em>v${R.prop('name', cur)}</em> and <em>v${currentVersion}</em></h2>
+                    <h2>Changes between <em>v${currentVersion}</em> and <em>v${R.prop('name', cur)}</em></h2>
                     <section>${descriptionForAllVersions}</section>
                     ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
                 </div>`;
