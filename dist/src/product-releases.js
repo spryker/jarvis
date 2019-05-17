@@ -294,7 +294,7 @@ function dependenciesUpgraded(listOfDependencies) {
     list => R.isEmpty(R.filter(cur => R.and(isNotNil(R.path(['beforeAfter', 'after'], cur)), isNotNil(R.path(['beforeAfter', 'before'], cur))), list)),
     () => `<p class="empty-result">No dependencies were upgraded in this version.</p>`,
     list => R.join('', R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                                      <div class="card">
+                                      <div class="card margin-bottom">
                                         <div class="card-header">
                                           <b>${R.prop('package', cur)}</b>
                                         </div>

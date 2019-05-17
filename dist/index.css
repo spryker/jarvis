@@ -8,19 +8,24 @@
 }
 
 h1 {
-  margin-top: 3rem;
-  margin-bottom: 2rem;
+  padding-top: 3rem;
+  padding-bottom: 2rem;
   font-size: 4rem;
 }
 
 h2 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+  padding-top: 2rem;
+  padding-bottom: 1rem;
+}
+
+h3 {
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
 }
 
 h4 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .empty-result {
@@ -41,4 +46,9 @@ h4 {
 
 .card-columns {
   column-count: 2;
+}
+
+#product-release {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
 }

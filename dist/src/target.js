@@ -21,7 +21,7 @@ function logicForProductReleases(data) {
   return R.cond([
     [R.isEmpty, templateUpToDateWithProductRelease],
     [t => R.isEmpty(R.prop('features', R.head(t))), templateSaveMigrationToNewRelease],
-    [R.T, templateNeedMigrationToNewRelease]
+    [R.T, templateNeedMigrationToNewRelease(data)]
   ])(nextTargets);
 }
 
@@ -31,9 +31,9 @@ function logicForOnlyModules(data) {
     R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur))
   )(migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules')));
 
-  return `<h2>Here is a summary of your current state 👇</h2>
+  return `<h2>Here is a summary of your Spryker modules current state 👇</h2>
           <div>${templateForTable(modulesWithTheirCount)}</div>
-          <h2>The following modules are outdated.</h2>
+          <h3>The following modules are outdated</h3>
           <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
 }
 
@@ -151,10 +151,19 @@ function templateSaveMigrationToNewRelease(nextTargets) {
           <div class="alert alert-success">Switch all your <code>spryker-feature/xxx</code> package to the version <code>~${R.prop('productRelease',R.head(nextTargets))}</code></div>`;
 }
 
-function templateNeedMigrationToNewRelease(nextTargets) {
-  return `<h2>Your next target is the Product Release: ${R.prop('productRelease',R.head(nextTargets))}</h2>
-          <p>You have the following Spryker Features to migrate.</p>
-          <div id="listOfProductReleases">${templateForProductRelease(R.head(nextTargets))}</div>`
+function templateNeedMigrationToNewRelease(data) {
+  return function(nextTargets) {
+    return `<section id="product-release">
+              <h2>Your next target is the Product Release: ${R.prop('productRelease',R.head(nextTargets))}</h2>
+              <p>You have the following Spryker Features to migrate.</p>
+              <div id="listOfProductReleases">${templateForProductRelease(R.head(nextTargets))}</div>
+            </section>
+            <section>${logicForOnlyModules(data)}</section>
+            <section>
+              <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
+              ${missingSprykerFeatures(R.prop('releaseFeatures', data), R.prop('myComposerJSON', data))}
+            </section>`;
+  }
 }
 
 function templateUpToDateWithProductRelease() {
