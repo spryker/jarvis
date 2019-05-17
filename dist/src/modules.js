@@ -106,7 +106,7 @@ function templateMajorOrMinorAvailable(data) {
                       class="btn btn-info"
                     >Compare the versions</a>
                   </div>
-                  <p class="module-new-changes">⚠️ The information below is only useful to you if you use/extend/customize <code>${moduleName}</code> namespace.</p>
+                  <div class="alert alert-warning" role="alert">⚠️ The information below are only useful if you use/extend/customize the <code>${moduleName}</code> namespace.</div>
                     <h2>Changes between <em>v${currentVersion}</em> and <em>v${R.prop('name', cur)}</em></h2>
                     <section>${descriptionForAllVersions}</section>
                     ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
