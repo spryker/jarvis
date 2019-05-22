@@ -146,18 +146,18 @@ function application(args) {
   */
 
   const composerFiles = compose(
-    map(cur => {
-      const transformations = {
-        data: a => JSON.parse(a)
-      };
-      return evolve(transformations, cur);
-    }),
     getComposerFilesFromPath,
     head,
     cleanNodeInput
   )(args);
+  const JSONcomposerFiles = map(cur => {
+    const transformations = {
+      data: a => JSON.parse(a)
+    };
+    return evolve(transformations, cur);
+  }, composerFiles);
   const previousProjectIsBack = find(
-    propEq('composerLockHash', path(['data', 'content-hash'], last(composerFiles))),
+    propEq('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles))),
     prop('previousProjects', config)
   );
 
@@ -180,7 +180,7 @@ function application(args) {
           const newConfig = assoc(
             'previousProjects',
             append(
-              assoc('composerLockHash', path(['data', 'content-hash'], last(composerFiles)), answers),
+              assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles)), answers),
               prop('previousProjects', config)
             ),
             config
@@ -196,7 +196,7 @@ function application(args) {
             'previousProjects',
             adjust(
               projectIndex,
-              () => assoc('composerLockHash', path(['data', 'content-hash'], last(composerFiles)), answers),
+              () => assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles)), answers),
               prop('previousProjects', config)
             ),
             config

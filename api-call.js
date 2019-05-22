@@ -1,6 +1,8 @@
 const request = require('request');
 const {
   equals,
+  forEach,
+  keys,
   prop
 } = require('ramda');
 
