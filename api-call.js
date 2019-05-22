@@ -13,7 +13,7 @@ function getReleaseAppData(data, errorCallback, callback) {
   };
 
   return request(options, (error, response, body) => {
-    if (error || equals(prop('code', body), 404)) {
+    if (error || equals(prop('code', body), 404) || equals(prop('code', body), 500)) {
 
       return errorCallback(error);
 
