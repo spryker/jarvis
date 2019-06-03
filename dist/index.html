@@ -1,62 +1,62 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="Description" content="Spryker tool that helps you migrate your project to the last available versions.">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Spryker Jarvis</title>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="index.css">
-  </head>
+    <head>
+        <meta charset="utf-8">
+        <meta name="Description" content="Spryker tool that helps you migrate your project to the last available versions.">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Spryker Jarvis</title>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="index.css">
+    </head>
 
-  <body class="container">
-    <section>
-      <h1 id="spryker-jarvis">Spryker Jarvis <span class="badge badge-secondary">Alpha</span></h1>
-      <dl>
-        <dt>What is the mission of Spryker Jarvis?</dt>
-        <dd>To help you understand what is needed to keep your Spryker project up to date with our Product Releases.</dd>
-        <dt>To who Spryker Jarvis is useful?</dt>
-        <dd>Developer, IT Manager, Product Owner/Manager that wants to understand the migration path for their Spryker project.</dd>
-      </dl>
-      <div class="alert alert-warning" role="alert">
-        ⚠️ I am merely a tool to help you migrate your Spryker project, you are still responsible of your Spryker project when using my services.
-      </div>
-    </section>
-    <section id="next-target"></section>
-    <!-- Libraries -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.26.1/ramda.min.js"></script>
-    <!-- Load your composer.json and composer.lock files -->
-    <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
-    <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
-    <!-- Data from the release app -->
-    <script type="text/javascript" src="release-app-data/release-module.js"></script> <!-- Expose releaseModules property -->
-    <script type="text/javascript" src="release-app-data/release-feature.js"></script> <!-- Expose releaseFeatures property -->
-    <script type="text/javascript" src="release-app-data/architecture-changes.js"></script> <!-- Expose architectureChanges property -->
-    <script type="text/javascript" src="release-app-data/recommended-features.js"></script> <!-- Expose recommendedFeatures property -->
-    <!-- Where the magic happen -->
-    <script type="text/javascript" src="src/utils.js"></script>
-    <script type="text/javascript" src="src/modules.js"></script>
-    <script type="text/javascript" src="src/product-releases.js"></script>
-    <script type="text/javascript" src="src/target.js"></script>
-    <script type="text/javascript" src="index.js"></script>
-    <script type="text/javascript">
-    // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
-    //analyseMigrationToNextProductReleases('listOfProductReleases', myComposerJSON, myComposerLOCK, releaseFeatures);
+    <body class="container">
+        <section>
+            <h1 id="spryker-jarvis">Spryker Jarvis <span class="badge badge-secondary">Alpha</span></h1>
+            <dl>
+                <dt>What is the mission of Spryker Jarvis?</dt>
+                <dd>To help you understand what is needed to keep your Spryker project up to date with our Product Releases.</dd>
+                <dt>To who Spryker Jarvis is useful?</dt>
+                <dd>Developer, IT Manager, Product Owner/Manager that wants to understand the migration path for their Spryker project.</dd>
+            </dl>
+            <div class="alert alert-warning" role="alert">
+                ⚠️ I am merely a tool to help you migrate your Spryker project, you are still responsible of your Spryker project when using my services.
+            </div>
+        </section>
+        <section id="next-target"></section>
+        <!-- Libraries -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.26.1/ramda.min.js"></script>
+        <!-- Load your composer.json and composer.lock files -->
+        <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
+        <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
+        <!-- Data from the release app -->
+        <script type="text/javascript" src="release-app-data/release-module.js"></script> <!-- Expose releaseModules property -->
+        <script type="text/javascript" src="release-app-data/release-feature.js"></script> <!-- Expose releaseFeatures property -->
+        <script type="text/javascript" src="release-app-data/architecture-changes.js"></script> <!-- Expose architectureChanges property -->
+        <script type="text/javascript" src="release-app-data/recommended-features.js"></script> <!-- Expose recommendedFeatures property -->
+        <!-- Where the magic happen -->
+        <script type="text/javascript" src="src/utils.js"></script>
+        <script type="text/javascript" src="src/modules.js"></script>
+        <script type="text/javascript" src="src/product-releases.js"></script>
+        <script type="text/javascript" src="src/target.js"></script>
+        <script type="text/javascript" src="index.js"></script>
+        <script type="text/javascript">
+        // Analize migrations needed for spryker-feature packages. Uncomment the line below after completing installation steps
+        //analyseMigrationToNextProductReleases('listOfProductReleases', myComposerJSON, myComposerLOCK, releaseFeatures);
 
-    // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
-    //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
+        // Analize migrations needed for spryker packages. Uncomment the line below after completing installation steps
+        //analyseMigrationToNextModulesMajors('listOfModules', myComposerJSON, myComposerLOCK, releaseModules);
 
-    // Display all Spryker features you currently do not use
-    //sprykerFeaturesYouDoNotUse('listOfNotUsedFeatures', myComposerJSON, releaseFeatures);
+        // Display all Spryker features you currently do not use
+        //sprykerFeaturesYouDoNotUse('listOfNotUsedFeatures', myComposerJSON, releaseFeatures);
 
-    nextTarget('next-target', { myComposerJSON, myComposerLOCK, releaseFeatures, releaseModules, architectureChanges, recommendedFeatures });
+        nextTarget('next-target', { myComposerJSON, myComposerLOCK, releaseFeatures, releaseModules, architectureChanges, recommendedFeatures });
 
-    </script>
-  </body>
+        </script>
+    </body>
 
 </html>

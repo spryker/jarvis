@@ -1,20 +1,20 @@
 const {
-  complement,
-  drop,
-  isNil
+    complement,
+    drop,
+    isNil
 } = require('ramda');
 
 // This function does some IO
 // log :: a -> a
 function log(content) {
-  console.log(...arguments);
-  return content;
+    console.log(...arguments);
+    return content;
 }
 
 // This function does some IO
 // cleanNodeInput :: [string] -> [string]
 function cleanNodeInput(args) {
-  return drop(2, args);
+    return drop(2, args);
 }
 
 

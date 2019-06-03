@@ -1,30 +1,30 @@
 const request = require('request');
 const {
-  equals,
-  forEach,
-  keys,
-  prop
+    equals,
+    forEach,
+    keys,
+    prop
 } = require('ramda');
 
 function getReleaseAppData(data, errorCallback, callback) {
-  const options = {
-    url: 'https://release.spryker.com/migration-analysis',
-    method: 'POST',
-    body: data,
-    json: true
-  };
+    const options = {
+        url: 'https://release.spryker.com/migration-analysis',
+        method: 'POST',
+        body: data,
+        json: true
+    };
 
-  return request(options, (error, response, body) => {
-    if (error || equals(prop('code', body), 404) || equals(prop('code', body), 500)) {
+    return request(options, (error, response, body) => {
+        if (error || equals(prop('code', body), 404) || equals(prop('code', body), 500)) {
 
-      return errorCallback(error);
+            return errorCallback(error);
 
-    } else {
+        } else {
 
-      return callback(prop('result', body));
+            return callback(prop('result', body));
 
-    }
-  });
+        }
+    });
 }
 
 

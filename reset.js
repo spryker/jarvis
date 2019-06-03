@@ -2,8 +2,8 @@ const { log } = require('./utils.js');
 const { updateConfigFile } = require('./file-system.js');
 
 const resetObject = {
-  "lastCallToReleaseApp": null,
-  "previousProjects": []
+    "lastCallToReleaseApp": null,
+    "previousProjects": []
 };
 
 updateConfigFile(resetObject);
