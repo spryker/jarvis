@@ -4,6 +4,8 @@ const inquirer = require('inquirer');
 const moment = require('moment');
 const {
     adjust,
+    and,
+    always,
     append,
     assoc,
     compose,
@@ -79,19 +81,24 @@ function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
     log(`Welcome back project ${projectName}! I hope your project is not too outdated...`);
     log('First let me check if my information about Spryker Features and Modules are up to date.');
 
-    if (lastApiCallLessThanADay(prop('lastCallToReleaseApp', config))) {
+    if (and(lastApiCallLessThanADay(prop('lastCallToReleaseApp', config)), isLastProjectBack(projectName, prop('lastProjectUsed', config)))) {
         log('Yes, they are. Please follow me.');
 
         return run();
 
     } else {
+        const newConfig = assoc('lastProjectUsed', projectName, config);
 
         log('No, they are not. Let me refresh them. This is take less than 1 minute I hope...');
 
-        updateLastApiCall(config);
+        updateLastApiCall(newConfig);
 
         return runWithApiCall(projectName, ...map(prop('data'), composerFiles));
     }
+}
+
+function isLastProjectBack(projectName, lastProjectUsed) {
+    return equals(projectName, lastProjectUsed);
 }
 
 function lastApiCallLessThanADay(date) {
@@ -177,14 +184,10 @@ function application(args) {
                 );
 
                 if (isNil(previousProjectsWithSameName)) {
-                    const newConfig = assoc(
-                        'previousProjects',
-                        append(
-                            assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles)), answers),
-                            prop('previousProjects', config)
-                        ),
-                        config
-                    );
+                    const newConfig = evolve({
+                        previousProjects: append(assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles)), answers)),
+                        lastProjectUsed: always(prop('projectName', answers))
+                    }, config);
 
                     updateConfigFile(newConfig);
 

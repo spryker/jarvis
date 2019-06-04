@@ -3,7 +3,8 @@ const { updateConfigFile } = require('./file-system.js');
 
 const resetObject = {
     "lastCallToReleaseApp": null,
-    "previousProjects": []
+    "previousProjects": [],
+    "lastProjectUsed": null
 };
 
 updateConfigFile(resetObject);
