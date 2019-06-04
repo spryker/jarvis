@@ -51,7 +51,6 @@ function getComposerData(path) {
 
 function writeReleaseAppData(data) {
     const p = prop(__, data);
-    log(keys(data));
     const files = [{
         path: './dist/release-app-data/release-feature.js',
         data: JSON.stringify(p('features')),
