@@ -6,8 +6,10 @@ const {
     compose,
     concat,
     forEach,
+    keys,
     prop
 } = require('ramda');
+const { log } = require('./utils.js');
 
 function updateConfigFile(data) {
     fs.writeFileSync('config.json', JSON.stringify(data), 'utf8');
@@ -49,6 +51,7 @@ function getComposerData(path) {
 
 function writeReleaseAppData(data) {
     const p = prop(__, data);
+    log(keys(data));
     const files = [{
         path: './dist/release-app-data/release-feature.js',
         data: JSON.stringify(p('features')),
@@ -68,6 +71,21 @@ function writeReleaseAppData(data) {
         path: './dist/release-app-data/recommended-features.js',
         data: JSON.stringify(p('recommendedFeatures')),
         stringStart: 'const recommendedFeatures = ',
+        stringEnd: ';'
+    }, {
+        path: './dist/release-app-data/detected-features.js',
+        data: JSON.stringify(p('detectedFeatures')),
+        stringStart: 'const detectedFeatures = ',
+        stringEnd: ';'
+    }, {
+        path: './dist/release-app-data/onboarding.js',
+        data: JSON.stringify(p('onboarding')),
+        stringStart: 'const onboarding = ',
+        stringEnd: ';'
+    }, {
+        path: './dist/release-app-data/current-version.js',
+        data: JSON.stringify(p('currentVersion')),
+        stringStart: 'const currentVersion = ',
         stringEnd: ';'
     }];
 
