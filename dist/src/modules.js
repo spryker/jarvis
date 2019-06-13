@@ -46,14 +46,6 @@ function onlyLastVersionInAMajor(listOfPreviousVersions, newVersion) {
     ])(newVersion);
 }
 
-function versionToNumber(version) {
-    const major = R.multiply(semVerMajor(version), 1000000);
-    const minor = R.multiply(semVerMinor(version), 1000);
-    const patch = semVerPatched(version);
-
-    return R.sum([major, minor, patch]);
-}
-
 function migrationGuideAvailable(guideUrl) {
     return R.ifElse(
         R.isNil,
@@ -166,7 +158,7 @@ function templateForPackage(data) {
               ${templateMajorOrMinorAvailable(data)}
             </div>
             <div class="card-footer">
-              <a href="#spryker-jarvis">Get back to the summary☝️</a>
+              <a href="#spryker-jarvis">Get back to the summary ☝️</a>
             </div>
           </div>`;
 }

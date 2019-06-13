@@ -60,6 +60,14 @@ function isNextPatched(last, newVersion) {
     return semVerPatched(newVersion) > semVerPatched(last) ? true : false;
 }
 
+function versionToNumber(version) {
+    const major = R.multiply(semVerMajor(version), 1000000);
+    const minor = R.multiply(semVerMinor(version), 1000);
+    const patch = semVerPatched(version);
+
+    return R.sum([major, minor, patch]);
+}
+
 // Used to generate random DOM id
 // r :: Number
 function r() {
