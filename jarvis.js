@@ -45,9 +45,13 @@ function run(newReleaseData = undefined) {
     const app = express();
     const port = 7777;
 
+    const config = getConfig();
+
     if (isNotNil(newReleaseData)) {
-        updateLastApiCall(getConfig());
-        writeReleaseAppData(newReleaseData);
+        updateLastApiCall(config);
+        writeReleaseAppData(prop('lastProjectUsed', config), newReleaseData);
+    } else {
+        writeReleaseAppData(prop('lastProjectUsed', config));
     }
 
     // Static files css/html/js

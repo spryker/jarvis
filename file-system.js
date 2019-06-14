@@ -6,6 +6,7 @@ const {
     compose,
     concat,
     forEach,
+    isNil,
     keys,
     prop
 } = require('ramda');
@@ -49,8 +50,10 @@ function getComposerData(path) {
     }];
 }
 
-function writeReleaseAppData(data) {
-    const p = prop(__, data);
+function writeReleaseAppData(currentProject, data = undefined) {
+    const newData = data || JSON.parse(fs.readFileSync(`./tmp/${currentProject}.json`, 'utf8'));
+    const p = prop(__, newData);
+
     const files = [{
         path: './dist/release-app-data/release-feature.js',
         data: JSON.stringify(p('features')),
@@ -86,9 +89,15 @@ function writeReleaseAppData(data) {
         data: JSON.stringify(p('currentVersion')),
         stringStart: 'const currentVersion = ',
         stringEnd: ';'
+    }, {
+        path: `./tmp/${currentProject}.json`,
+        data: JSON.stringify(newData),
+        stringStart: '',
+        stringEnd: ''
     }];
 
     return writeFiles(files);
+
 }
 
 // This function does some IO

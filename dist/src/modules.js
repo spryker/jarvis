@@ -83,26 +83,26 @@ function templateMajorOrMinorAvailable(data) {
                 )(data);
 
                 return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
-                  <div class="links">
-                    ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
-                    <a
-                      rel="noopener"
-                      href="https://github.com/${packageName}/releases/tag/${R.prop('name', cur)}"
-                      target="_blank"
-                      class="btn btn-secondary"
-                    >Github changelog</a>
-                    <a
-                      rel="noopener"
-                      href="https://github.com/${packageName}/compare/${currentVersion}...${R.prop('name', cur)}"
-                      target="_blank"
-                      class="btn btn-info"
-                    >Compare the versions</a>
-                  </div>
-                  <div class="alert alert-warning" role="alert">⚠️ The information below are only useful if you use/extend/customize the <code>${moduleName}</code> namespace.</div>
-                    <h2>Changes between <em>v${currentVersion}</em> and <em>v${R.prop('name', cur)}</em></h2>
-                    <section>${descriptionForAllVersions}</section>
-                    ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
-                </div>`;
+                          <div class="links">
+                            ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
+                            <a
+                              rel="noopener"
+                              href="https://github.com/${packageName}/releases/tag/${R.prop('name', cur)}"
+                              target="_blank"
+                              class="btn btn-secondary"
+                            >Github changelog</a>
+                            <a
+                              rel="noopener"
+                              href="https://github.com/${packageName}/compare/${currentVersion}...${R.prop('name', cur)}"
+                              target="_blank"
+                              class="btn btn-info"
+                            >Compare the versions</a>
+                          </div>
+                          <div class="alert alert-warning" role="alert">⚠️ The information below are only useful if you use/extend/customize the <code>${moduleName}</code> namespace.</div>
+                            <h2>Changes between <em>v${currentVersion}</em> and <em>v${R.prop('name', cur)}</em></h2>
+                            <section>${descriptionForAllVersions}</section>
+                            ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
+                        </div>`;
             }))(majorsAvailable);
     }
 
@@ -124,12 +124,12 @@ function templateMajorOrMinorAvailable(data) {
         return R.compose(
             R.join(''),
             mapIndexed((cur, index) => `<a
-                                    class="nav-item nav-link ${isActive(index)}"
-                                    id="nav-${properName('.', 'name', cur)}-tab"
-                                    data-toggle="tab" href="#nav-${properName('.', 'name', cur)}"
-                                    role="tab" aria-controls="nav-home"
-                                    aria-selected="true">Version: ${R.prop('name', cur)}
-                                  </a>`)
+                                          class="nav-item nav-link ${isActive(index)}"
+                                          id="nav-${properName('.', 'name', cur)}-tab"
+                                          data-toggle="tab" href="#nav-${properName('.', 'name', cur)}"
+                                          role="tab" aria-controls="nav-home"
+                                          aria-selected="true">Version: ${R.prop('name', cur)}
+                                        </a>`)
         )(listOfVersions);
     }
 
@@ -140,25 +140,25 @@ function templateMajorOrMinorAvailable(data) {
     const relevantMajorVersions = onlyRelevantMajorVersions(data);
 
     return `<nav>
-            <div class="nav nav-tabs" id="nav-tab-modules" role="tablist" style="margin-bottom: 1rem;">
-                ${navigationForTabs(relevantMajorVersions)}
-            </div>
-          </nav>
-          <div class="tab-content" id="nav-tabContent-modules">
-            ${tabsForModule(relevantMajorVersions)}
-          </div>`;
+              <div class="nav nav-tabs" id="nav-tab-modules" role="tablist" style="margin-bottom: 1rem;">
+                  ${navigationForTabs(relevantMajorVersions)}
+              </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent-modules">
+              ${tabsForModule(relevantMajorVersions)}
+            </div>`;
 }
 
 function templateForPackage(data) {
     return `<div class="card margin-bottom">
-            <div class="card-body" id="${R.path(['package', 'identifier'], data)}">
-              <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
-              <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
-              <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
-              ${templateMajorOrMinorAvailable(data)}
-            </div>
-            <div class="card-footer">
-              <a href="#spryker-jarvis">Get back to the summary ☝️</a>
-            </div>
-          </div>`;
+              <div class="card-body" id="${R.path(['package', 'identifier'], data)}">
+                <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
+                <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
+                <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
+                ${templateMajorOrMinorAvailable(data)}
+              </div>
+              <div class="card-footer">
+                <a href="#spryker-jarvis">Get back to the summary ☝️</a>
+              </div>
+            </div>`;
 }

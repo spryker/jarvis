@@ -101,29 +101,29 @@ function templatePassNextArchitectureChanges(architectureChange) {
 
 function templateForModuleToUpdateArchitectureChange(data) {
     return `<div class="card margin-bottom">
-              <div class="card-body">
-                <h3 class="card-title">${R.prop('name', data)}</h3>
-                <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
-                <p class="card-text">Required version <span class="badge badge-primary">${R.path(['version', 'after'], data)}</span></p>
-                <div class="links">
-                    <a
-                      rel="noopener"
-                      href="https://github.com/${R.prop('package', data)}/releases/tag/${R.path(['version', 'after'], data)}"
-                      target="_blank"
-                      class="btn btn-secondary"
-                    >Github changelog</a>
-                    <a
-                      rel="noopener"
-                      href="https://github.com/${R.prop('package', data)}/compare/${R.prop('installedVersion', data)}...${R.path(['version', 'after'], data)}"
-                      target="_blank"
-                      class="btn btn-info"
-                    >Compare the versions</a>
-                  </div>
-                <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.prop('changelog', data)) ? '' : converter.makeHtml((R.prop('changelog', data)))}</h6>
-              </div>
-              <div class="card-footer">
-                <a href="#spryker-jarvis">Get back to the top ☝️</a>
-              </div>
+                <div class="card-body">
+                    <h3 class="card-title">${R.prop('name', data)}</h3>
+                    <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
+                    <p class="card-text">Required version <span class="badge badge-primary">${R.path(['version', 'after'], data)}</span></p>
+                    <div class="links">
+                        <a
+                          rel="noopener"
+                          href="https://github.com/${R.prop('package', data)}/releases/tag/${R.path(['version', 'after'], data)}"
+                          target="_blank"
+                          class="btn btn-secondary"
+                        >Github changelog</a>
+                        <a
+                          rel="noopener"
+                          href="https://github.com/${R.prop('package', data)}/compare/${R.prop('installedVersion', data)}...${R.path(['version', 'after'], data)}"
+                          target="_blank"
+                          class="btn btn-info"
+                        >Compare the versions</a>
+                    </div>
+                    <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.prop('changelog', data)) ? '' : converter.makeHtml((R.prop('changelog', data)))}</h6>
+                </div>
+                <div class="card-footer">
+                    <a href="#spryker-jarvis">Get back to the top ☝️</a>
+                </div>
             </div>`;
 }
 
@@ -176,18 +176,18 @@ function templateForSummaryElement(listOfElements) {
             const id = r();
 
             return `<div class="card">
-                      <div class="card-header" id="heading-${id}">
-                          <button class="btn btn-link ${shouldBeCollapsed(index)}" type="button" data-toggle="collapse" data-target="#summary-${id}" aria-expanded="${isActiveBool(index)}" aria-controls="summary-${id}">
-                            ${textForBoxTitle(isMajor, cur)}
-                          </button>
-                      </div>
-                      <div id="summary-${id}" class="collapse ${isShow(index)}" aria-labelledby="heading-${id}" data-parent="#summary-table">
-                        <div class="card-body">
-                          <div class="card-columns">
-                            ${R.join('',R.map(templateForEachGroupOfMigration, cur))}
-                          </div>
+                        <div class="card-header" id="heading-${id}">
+                            <button class="btn btn-link ${shouldBeCollapsed(index)}" type="button" data-toggle="collapse" data-target="#summary-${id}" aria-expanded="${isActiveBool(index)}" aria-controls="summary-${id}">
+                                ${textForBoxTitle(isMajor, cur)}
+                            </button>
                         </div>
-                      </div>
+                        <div id="summary-${id}" class="collapse ${isShow(index)}" aria-labelledby="heading-${id}" data-parent="#summary-table">
+                            <div class="card-body">
+                                <div class="card-columns">
+                                    ${R.join('',R.map(templateForEachGroupOfMigration, cur))}
+                                </div>
+                            </div>
+                        </div>
                     </div>`;
         })
     )(listOfElements);
@@ -205,14 +205,14 @@ function templateForEachGroupOfMigration(listOfModules) {
     const isMajor = R.gt(R.path(['nextVersionsCount', 'major'], R.head(listOfModules)), 0);
 
     return `<div class="card margin-bottom">
-              <div class="card-header">
-                <b>${textForBoxTitle(isMajor, R.length(listOfModules), R.head(listOfModules))}</b>
-              </div>
-              <div class="card-body">
-                <ul class="list-unstyled">
-                  ${R.join('', R.map(cur => `<li><a href=#${R.path(['package', 'identifier'], cur)}><code>${R.prop('module', cur)}</code></a></li>`, listOfModules))}
-                <ul>
-              </div>
+                <div class="card-header">
+                    <b>${textForBoxTitle(isMajor, R.length(listOfModules), R.head(listOfModules))}</b>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        ${R.join('', R.map(cur => `<li><a href=#${R.path(['package', 'identifier'], cur)}><code>${R.prop('module', cur)}</code></a></li>`, listOfModules))}
+                    <ul>
+                </div>
             </div>`;
 }
 
@@ -244,20 +244,20 @@ function templateSaveMigrationToNewRelease(nextTargets) {
 function templateNeedMigrationToNewRelease(data) {
     return function(nextTargets) {
         return `<section id="product-release">
-                  <h2>Your next target is the Product Release: ${R.prop('productRelease',R.head(nextTargets))}</h2>
-                  <p>You have the following Spryker Features to migrate.</p>
-                  <div id="listOfProductReleases">${templateForProductRelease(R.head(nextTargets))}</div>
+                    <h2>Your next target is the Product Release: ${R.prop('productRelease',R.head(nextTargets))}</h2>
+                    <p>You have the following Spryker Features to migrate.</p>
+                    <div id="listOfProductReleases">${templateForProductRelease(R.head(nextTargets))}</div>
                 </section>
                 <section>${logicForOnlyModules(data)}</section>
                 <section>
-                  <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
-                  ${missingSprykerFeatures(R.prop('releaseFeatures', data), R.prop('myComposerJSON', data))}
+                    <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
+                    ${missingSprykerFeatures(R.prop('releaseFeatures', data), R.prop('myComposerJSON', data))}
                 </section>`;
     }
 }
 
 function templateUpToDateWithProductRelease() {
-    return '<div class="alert alert-success" role="alert">🎉 Bravo! You are already up to date with Spryker! 🥳</div>';
+    return '<div class="alert alert-success margin-top-2" role="alert">🎉 Bravo! You are already up to date with Spryker! 🥳 Just run <code>composer update</code> to get the latest patches and minors.</div>';
 }
 
 function sprykerFeaturesToMigrate(data, currentProductRelease) {
