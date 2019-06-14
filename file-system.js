@@ -8,6 +8,9 @@ const {
     forEach,
     isNil,
     keys,
+    lensProp,
+    map,
+    over,
     prop
 } = require('ramda');
 const { log } = require('./utils.js');
@@ -27,11 +30,19 @@ function getCurrentVersion() {
 }
 
 function updateLastApiCall(config) {
-    const newConfig = assoc('lastCallToReleaseApp', moment.utc(), config);
+    const date = moment.utc();
+    const newConfig = compose(
+        over(lensProp('previousProjects'), map(cur => {
+            if (prop('projectName', cur) === prop('lastProjectUsed', config)) {
+                return assoc('lastCallToReleaseApp', date, cur);
+            } else {
+                return cur;
+            }
+        })),
+        assoc('lastCallToReleaseApp', date)
+    )(config);
 
-    updateConfigFile(newConfig);
-
-    return newConfig;
+    return updateConfigFile(newConfig);
 }
 
 // This function does some IO
@@ -51,8 +62,10 @@ function getComposerData(path) {
 }
 
 function writeReleaseAppData(currentProject, data = undefined) {
-    const newData = data || JSON.parse(fs.readFileSync(`./tmp/${currentProject}.json`, 'utf8'));
+    const newData = isNil(data) ? JSON.parse(fs.readFileSync(`./tmp/${currentProject}.json`, 'utf8')) : data;
     const p = prop(__, newData);
+
+    log(currentProject, isNil(data) ? data : keys(data), keys(newData));
 
     const files = [{
         path: './dist/release-app-data/release-feature.js',

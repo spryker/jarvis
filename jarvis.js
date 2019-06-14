@@ -20,7 +20,9 @@ const {
     isNil,
     last,
     length,
+    lensPath,
     map,
+    over,
     path,
     prop,
     propEq
@@ -85,13 +87,17 @@ function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
     log(`Welcome back project ${projectName}! I hope your project is not too outdated...`);
     log('First let me check if my information about Spryker Features and Modules are up to date.');
 
-    if (and(lastApiCallLessThanADay(prop('lastCallToReleaseApp', config)), isLastProjectBack(projectName, prop('lastProjectUsed', config)))) {
+    const project = findPreviousProject(projectName, config);
+    const newConfig = assoc('lastProjectUsed', projectName, config);
+
+    if (lastApiCallLessThanADay(prop('lastCallToReleaseApp', project))) {
         log('Yes, they are. Please follow me.');
+
+        updateConfigFile(newConfig);
 
         return run();
 
     } else {
-        const newConfig = assoc('lastProjectUsed', projectName, config);
 
         log('No, they are not. Let me refresh them. This is take less than 1 minute I hope...');
 
@@ -179,42 +185,62 @@ function application(args) {
 
     } else {
 
-        return inquirer.prompt([projectNameQuestionList, projectNameQuestionInput])
-            .then(answers => {
-                // Take the folder path and read/write the composer files
-                const previousProjectsWithSameName = find(
-                    propEq('projectName', prop('projectName', answers)),
-                    prop('previousProjects', config)
+        return inquirer.prompt([projectNameQuestionList, projectNameQuestionInput]).then(answers => {
+            // Take the folder path and read/write the composer files
+            const project = findPreviousProject(prop('projectName', answers), config);
+
+            if (isNil(project)) {
+                const newConfig = evolve({
+                    previousProjects: append(
+                        compose(
+                            assoc('lastCallToReleaseApp', null),
+                            assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles)))
+                        )(answers)
+                    ),
+                    lastProjectUsed: always(prop('projectName', answers))
+                }, config);
+
+                updateConfigFile(newConfig);
+
+                return runWithApiCall(prop('lastProjectUsed', newConfig), ...map(prop('data'), composerFiles));
+
+            } else {
+                const projectIndex = findPreviousProjectIndex(prop('projectName', project), config);
+                const newConfig = over(
+                    lensPath(['previousProjects', projectIndex]),
+                    assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles))),
+                    config
                 );
 
-                if (isNil(previousProjectsWithSameName)) {
-                    const newConfig = evolve({
-                        previousProjects: append(assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles)), answers)),
-                        lastProjectUsed: always(prop('projectName', answers))
-                    }, config);
+                updateConfigFile(newConfig);
 
-                    updateConfigFile(newConfig);
+                if (path(['data', 'content-hash'], last(JSONcomposerFiles) === prop('composerLockHash', project))) {
 
-                    return runWithApiCall(prop('projectName', answers), ...map(prop('data'), composerFiles));
+                    return checkLastApiCallAndRunApp(prop('lastProjectUsed', newConfig), newConfig, composerFiles);
 
                 } else {
-                    const projectIndex = findIndex(propEq('projectName', prop('projectName', answers)), prop('previousProjects', config));
-                    const newConfig = assoc(
-                        'previousProjects',
-                        adjust(
-                            projectIndex,
-                            () => assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles)), answers),
-                            prop('previousProjects', config)
-                        ),
-                        config
-                    );
 
-                    updateConfigFile(newConfig);
+                    return runWithApiCall(prop('lastProjectUsed', newConfig), ...map(prop('data'), composerFiles));
 
-                    return checkLastApiCallAndRunApp(prop('projectName', answers), newConfig, composerFiles);
                 }
-            });
+
+            }
+        });
     }
+}
+
+function findPreviousProject(projectName, config) {
+    return find(
+        propEq('projectName', projectName),
+        prop('previousProjects', config)
+    );
+}
+
+function findPreviousProjectIndex(projectName, config) {
+    return findIndex(
+        propEq('projectName', projectName),
+        prop('previousProjects', config)
+    );
 }
 
 application(process.argv);
