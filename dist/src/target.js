@@ -85,13 +85,11 @@ function templateUpToDateWithArchitectureChanges(modulesWithTheirCount, data) {
 }
 
 function templatePassNextArchitectureChanges(architectureChange) {
-    log(architectureChange);
     const majorsToOvercome = R.compose(
         R.filter(R.propEq('type', 'major')),
         R.prop('modules')
     )(architectureChange);
 
-    log(majorsToOvercome);
     return R.ifElse(
         isNotEmpty,
         m => `<h2>You need to migrate the following modules to enjoy the full power of Spryker!</h2>
