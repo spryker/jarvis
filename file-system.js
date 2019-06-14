@@ -64,9 +64,6 @@ function getComposerData(path) {
 function writeReleaseAppData(currentProject, data = undefined) {
     const newData = isNil(data) ? JSON.parse(fs.readFileSync(`./tmp/${currentProject}.json`, 'utf8')) : data;
     const p = prop(__, newData);
-
-    log(currentProject, isNil(data) ? data : keys(data), keys(newData));
-
     const files = [{
         path: './dist/release-app-data/release-feature.js',
         data: JSON.stringify(p('features')),
