@@ -100,6 +100,11 @@ function writeReleaseAppData(currentProject, data = undefined) {
         stringStart: 'const currentVersion = ',
         stringEnd: ';'
     }, {
+        path: './dist/release-app-data/product-releases.js',
+        data: JSON.stringify(p('productReleases')),
+        stringStart: 'const productReleases = ',
+        stringEnd: ';'
+    }, {
         path: `./tmp/${currentProject}.json`,
         data: JSON.stringify(newData),
         stringStart: '',

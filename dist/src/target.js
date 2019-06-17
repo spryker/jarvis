@@ -2,6 +2,8 @@ function stepsToHitTarget(data) {
     const releaseModulesLens = R.lensProp('releaseModules');
     const newData = R.over(releaseModulesLens, R.map(cur => R.assoc('identifier', r(), cur)), data);
 
+    log(data);
+
     return R.ifElse(
         d => useSprykerFeatures(R.prop('myComposerJSON', d)),
         logicForProductReleases,
@@ -27,8 +29,8 @@ function logicForProductReleases(data) {
 
 function logicForOnlyModules(data) {
     return R.cond([
-        [isNotEmpty, l => templatePassNextArchitectureChanges(R.head(l))],
-        [R.T, d => templateUpToDateWithArchitectureChanges(modulesWithTheirCount(d), d)]
+        //[isNotEmpty, l => templatePassNextArchitectureChanges(R.head(l))],
+        [R.T, () => templateUpToDateWithArchitectureChanges(modulesWithTheirCount(data), data)]
     ])(findNextTargetForArchitectureChanges(R.prop('architectureChanges', data), R.prop('myComposerLOCK', data)));
 }
 
@@ -94,8 +96,9 @@ function templatePassNextArchitectureChanges(architectureChange) {
         isNotEmpty,
         m => `<h2>You need to migrate the following modules to enjoy the full power of Spryker!</h2>
             ${R.join('',R.map(templateForModuleToUpdateArchitectureChange, R.prop('modules', architectureChange)))}`,
-        m => `<h2>👍 Congrats! You can enjoy the next Spryker architecture Change 👏</h2>
-              <div class="alert alert-success">You just need to run <code>composer update</code> and you are good to go!</div>`
+        m => `<h2>👍 You can enjoy the next Spryker architecture Change with just one command 👏</h2>
+              <div class="alert alert-success">You just need to run <code>composer update</code> and you are good to go!</div>
+              ${R.join('',R.map(templateForModuleToUpdateArchitectureChange, R.prop('modules', architectureChange)))}`
     )(majorsToOvercome);
 }
 

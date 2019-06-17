@@ -18,6 +18,7 @@ const {
     head,
     isEmpty,
     isNil,
+    keys,
     last,
     length,
     lensPath,
@@ -48,6 +49,8 @@ function run(newReleaseData = undefined) {
     const port = 7777;
 
     const config = getConfig();
+
+    log(keys(newReleaseData));
 
     if (isNotNil(newReleaseData)) {
         updateLastApiCall(config);

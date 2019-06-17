@@ -8,7 +8,7 @@ function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLo
         R.join(''),
         R.ifElse(
             R.isEmpty,
-            () => templateUpToDate('All your Spryker modules are up to date or you do not use any outside of the Spryker features!'),
+            () => ([templateUpToDate('All your Spryker modules are up to date or you do not use any outside of the Spryker features!')]),
             R.map(templateForPackage)
         ),
         c => migrateModuleToLastVersionInMajor(c, currentComposerLock, currentModules)
