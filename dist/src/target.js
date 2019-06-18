@@ -88,7 +88,7 @@ function hasRequiredVersionForPackage(composerLock) {
 function reduceToApplicableTargets(data) {
     function isProjectOverProductRelease(productRelease) {
         return R.compose(
-            // If at least one Spryker Feature is totally covered, then the project must pass over it 
+            // If at least one Spryker Feature is not totally covered, then the project must pass over it 
             R.ifElse(
                 pr => R.gt(R.length(pr), 0),
                 R.F,
@@ -111,23 +111,40 @@ function reduceToApplicableTargets(data) {
     }
 
     function isProjectOverArchitectureChange(architectureChange) {
-        return true;
+        return R.compose(
+            // If at least one Spryker module major is not totally covered, then the project must pass over it 
+            R.ifElse(
+                ac => R.gt(R.length(ac), 0),
+                R.F,
+                R.T
+            ),
+            R.filter(R.equals(false)),
+            R.map(R.compose(
+                hasRequiredVersionForPackage(R.prop('myComposerLOCK', data)),
+                p => R.assoc('requiredVersion', `^${R.path(['version', 'after'], p)}`, p)
+            )),
+            R.filter(R.propEq('type', 'major')),
+            R.prop('modules')
+        )(architectureChange);
     }
 
     return R.over(
         R.lensProp('targets'),
-        R.reduce((prev, cur) => R.compose(
-            R.ifElse(
-                R.equals(true),
-                R.always(prev),
-                R.always(R.append(cur, prev))
-            ),
-            R.ifElse(
-                t => R.equals('productRelease', R.prop('targetType', t)),
-                isProjectOverProductRelease,
-                isProjectOverArchitectureChange
-            )
-        )(cur), []),
+        R.compose(
+            R.reverse,
+            R.reduce((prev, cur) => R.compose(
+                R.ifElse(
+                    R.equals(true),
+                    R.always(prev),
+                    R.always(R.append(cur, prev))
+                ),
+                R.ifElse(
+                    t => R.equals('productRelease', R.prop('targetType', t)),
+                    isProjectOverProductRelease,
+                    isProjectOverArchitectureChange
+                )
+            )(cur), [])
+        ),
         data);
 }
 
