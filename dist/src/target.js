@@ -1,14 +1,134 @@
 function stepsToHitTarget(data) {
-    const releaseModulesLens = R.lensProp('releaseModules');
-    const newData = R.over(releaseModulesLens, R.map(cur => R.assoc('identifier', r(), cur)), data);
+    const newData = R.compose(
+        R.evolve({
+            targets: R.sort(R.descend(R.prop('release_date')))
+        }),
+        d => R.assoc('targets', R.concat(R.prop('architectureChanges', d), R.prop('productReleases', d)), d),
+        R.evolve({
+            architectureChanges: R.map(R.compose(
+                a => R.assoc('release_date', R.prop('created', a), a),
+                R.assoc('targetType', 'architectureChange')
+            )),
+            productReleases: R.map(R.compose(
+                R.over(
+                    R.lensProp('feature_versions'),
+                    R.compose(
+                        R.map(R.compose(
+                            R.evolve({
+                                data: {
+                                    composer: {
+                                        require: R.compose(
+                                            // Keep only modules from Spryker organisations
+                                            R.flatten,
+                                            R.map(cur => {
+                                                if (R.head(R.split('/', R.prop('package', cur))) === 'spryker-feature') {
 
-    log(data);
+                                                    return R.compose(
+                                                        // Retrieve the required modules of this version
+                                                        R.compose(
+                                                            R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), onlyModulesForOrgs())),
+                                                            R.map(reconstruct(['package', 'requiredVersion'])),
+                                                            R.toPairs,
+                                                            R.path(['data', 'composer', 'require'])
+                                                        ),
+                                                        // Find the right version of this feature
+                                                        feature => R.find(R.propEq('name', R.tail(R.prop('requiredVersion', cur))), R.prop('feature_versions', feature)),
+                                                        // Find feature inside the Release app data
+                                                        p => R.find(R.propEq('package', R.prop('package', p)), R.prop('releaseFeatures', data))
+                                                    )(cur);
 
-    return R.ifElse(
-        d => useSprykerFeatures(R.prop('myComposerJSON', d)),
-        logicForProductReleases,
-        logicForOnlyModules
+                                                } else {
+
+                                                    return cur;
+
+                                                }
+                                            }),
+                                            R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), modulesForOrgs()) && R.prop('package', cur) !== 'spryker-feature/spryker-core'),
+                                            // Transform required modules from object to an Array of objects
+                                            R.map(reconstruct(['package', 'requiredVersion'])),
+                                            R.toPairs
+                                        )
+                                    }
+                                }
+                            })
+                        )),
+                        R.filter(cur => R.path(['data', 'composer', 'name'], cur) !== 'spryker-feature/spryker-core')
+                    )
+                ),
+                R.assoc('targetType', 'productRelease')
+            )),
+            releaseModules: R.map(cur => R.assoc('identifier', r(), cur))
+        }),
+    )(data);
+
+    return R.compose(
+        log,
+        reduceToApplicableTargets
     )(newData);
+}
+
+function hasRequiredVersionForPackage(composerLock) {
+    return function(packageAndRequiredVersion) {
+        return R.compose(
+            R.ifElse(
+                R.isNil,
+                R.T,
+                p => R.compose(
+                    rv => R.gte(versionToNumber(R.prop('version', p)), versionToNumber(rv)),
+                    p => R.tail(R.prop('requiredVersion', p))
+                )(packageAndRequiredVersion)
+            ),
+            R.find(
+                R.propEq('name', R.prop('package', packageAndRequiredVersion))
+            )
+        )(R.prop('packages', composerLock));
+    }
+}
+
+function reduceToApplicableTargets(data) {
+    function isProjectOverProductRelease(productRelease) {
+        return R.compose(
+            // If at least one Spryker Feature is totally covered, then the project must pass over it 
+            R.ifElse(
+                pr => R.gt(R.length(pr), 0),
+                R.F,
+                R.T
+            ),
+            pr => R.reduce((prev, cur) => R.compose(
+                // Keep only the modules that do not match the required versions 
+                R.ifElse(
+                    p => R.gt(R.length(p), 0),
+                    R.always(R.append(cur, prev)),
+                    R.always(prev)
+                ),
+                R.filter(R.equals(false)),
+                // Check if project has the required version for each of them
+                R.map(hasRequiredVersionForPackage(R.prop('myComposerLOCK', data))),
+                // Get required modules for the Spryker Feature
+                R.path(['data', 'composer', 'require'])
+            )(cur), [], R.prop('feature_versions', pr))
+        )(productRelease);
+    }
+
+    function isProjectOverArchitectureChange(architectureChange) {
+        return true;
+    }
+
+    return R.over(
+        R.lensProp('targets'),
+        R.reduce((prev, cur) => R.compose(
+            R.ifElse(
+                R.equals(true),
+                R.always(prev),
+                R.always(R.append(cur, prev))
+            ),
+            R.ifElse(
+                t => R.equals('productRelease', R.prop('targetType', t)),
+                isProjectOverProductRelease,
+                isProjectOverArchitectureChange
+            )
+        )(cur), []),
+        data);
 }
 
 function logicForProductReleases(data) {

@@ -13,14 +13,27 @@
     <body class="container">
         <section>
             <h1 id="spryker-jarvis">Spryker Jarvis <span class="badge badge-secondary">Alpha</span></h1>
-            <dl>
-                <dt>What is the mission of Spryker Jarvis?</dt>
-                <dd>To help you understand what is needed to keep your Spryker project up to date with our Product releases.</dd>
-                <dt>To who Spryker Jarvis is useful?</dt>
-                <dd>Developer, IT Manager, Product Owner/Manager that wants to understand the migration path for their Spryker project.</dd>
-            </dl>
-            <div class="alert alert-warning" role="alert">
-                ⚠️ I am merely a tool to help you migrate your Spryker project, you are still responsible of your Spryker project when using my services.
+            <div class="accordion" id="explain-jarvis">
+                <div class="card">
+                    <div class="card-header" id="explain-jarvis-1-header">
+                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#explain-jarvis-1" aria-expanded="false" aria-controls="explain-jarvis-1">
+                            What is Jarvis? 🤔
+                        </button>
+                    </div>
+                    <div id="explain-jarvis-1" class="collapse" aria-labelledby="explain-jarvis-1-header" data-parent="#explain-jarvis">
+                        <div class="card-body">
+                            <dl>
+                                <dt>What is the mission of Spryker Jarvis?</dt>
+                                <dd>To help you understand what is needed to keep your Spryker project up to date with our Product releases.</dd>
+                                <dt>To who Spryker Jarvis is useful?</dt>
+                                <dd>Developer, IT Manager, Product Owner/Manager that wants to understand the migration path for their Spryker project.</dd>
+                            </dl>
+                            <div class="alert alert-warning" role="alert">
+                                ⚠️ I am merely a tool to help you migrate your Spryker project, you are still responsible of your Spryker project when using my services.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
         <section id="next-target"></section>
@@ -59,7 +72,8 @@
             productReleases,
             releaseFeatures,
             releaseModules,
-            recommendedFeatures
+            recommendedFeatures,
+            targets: null
         });
 
         </script>

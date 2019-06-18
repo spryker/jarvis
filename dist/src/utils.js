@@ -129,16 +129,22 @@ const templateUpToDate = content => `<div class="alert alert-primary" role="aler
 
 const properName = (sep, prop, name) => R.join(`${R.prop('identifier', name)}`, R.split(sep, R.prop(prop, name)));
 
-function keepOnlyModulesFromOrgs(composer) {
-    const modulesForOrgs = ['spryker', 'spryker-feature', 'spryker-shop', 'spryker-eco'];
+function modulesForOrgs() {
+    return ['spryker', 'spryker-feature', 'spryker-shop', 'spryker-eco'];
+}
 
+function onlyModulesForOrgs() {
+    return ['spryker', 'spryker-shop'];
+}
+
+function keepOnlyModulesFromOrgs(composer) {
     return R.compose(
         R.sortBy(R.prop(0)),
         R.filter(cur => R.contains(R.compose(
             R.head,
             R.split('/'),
             R.nth(0)
-        )(cur), modulesForOrgs) ? true : false),
+        )(cur), modulesForOrgs()) ? true : false),
         R.toPairs,
         R.prop('require')
     )(composer);
