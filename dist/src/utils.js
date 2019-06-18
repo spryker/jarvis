@@ -127,7 +127,7 @@ const semVerPatched = version => Number(R.nth(2, R.split('.', version)));
 
 const templateUpToDate = content => `<div class="alert alert-primary" role="alert">${content}</div>`;
 
-const properName = (sep, prop, name) => R.join(`${R.prop('identifier', name)}`, R.split(sep, R.prop(prop, name)));
+const properName = (sep, prop, name) => R.join(`${R.prop('identifier', name)}`, R.split(sep, R.path(prop, name)));
 
 function modulesForOrgs() {
     return ['spryker', 'spryker-feature', 'spryker-shop', 'spryker-eco'];

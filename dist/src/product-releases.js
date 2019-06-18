@@ -204,52 +204,68 @@ function isNewFeature(listOfVersions) {
 
 function templateForProductRelease(productRelease) {
     function leftPills(listOfMod) {
-        return R.join('', mapIndexed((cur, index) => `<a
-                                                    class="nav-link ${isActive(index)}
-                                                    id="v-pills-${properName('/', 'package', cur)}-tab"
-                                                    data-toggle="pill"
-                                                    href="#v-pills-${properName('/', 'package', cur)}"
-                                                    role="tab"
-                                                    aria-controls="v-pills-${properName('/', 'package', cur)}"
-                                                    aria-selected="true">${R.prop('name', cur)}
-                                                  </a>`, listOfMod));
+        return R.compose(
+            R.join(''),
+            mapIndexed((cur, index) => `<a
+                                            class="nav-link ${isActive(index)}
+                                            id="v-pills-${properName('/', ['data', 'composer','name'], cur)}-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-${properName('/', ['data', 'composer','name'], cur)}"
+                                            role="tab"
+                                            aria-controls="v-pills-${properName('/', ['data', 'composer','name'], cur)}"
+                                            aria-selected="true">${R.path(['data', 'composer','name'], cur)}
+                                        </a>`)
+        )(listOfMod);
     }
 
     function rightPills(listOfMod) {
-        return R.join('', mapIndexed((cur, index) => {
-            return `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', 'package', cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', 'package', cur)}-tab">
-                <div class="row">
-                  <div class="col-12">
-                    <h4>Upgraded dependencies</h4>
-                    <div class="row">
-                      ${dependenciesUpgraded(R.path(['feature_versions', 'data','diff'], cur))}
-                    </div>
-                  </div>
-                  <div class="col-12">
-                    <h4>Dependencies removed</h4>
-                    <div class="row">
-                      ${dependenciesRemoved(R.path(['feature_versions', 'data','diff'], cur))}
-                    </div>
-                  </div>
-                </div>
-              </div>`;
-        }, listOfMod));
+        return R.compose(
+            R.join(''),
+            mapIndexed((cur, index) => `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', ['data', 'composer','name'], cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', ['data', 'composer','name'], cur)}-tab">
+                                            <div class="row">
+                                              <div class="col-12">
+                                                <h4>Upgraded dependencies</h4>
+                                                <div class="row">
+                                                  ${dependenciesUpgraded(R.path(['data','diff'], cur))}
+                                                </div>
+                                              </div>
+                                              <div class="col-12">
+                                                <h4>Dependencies removed</h4>
+                                                <div class="row">
+                                                  ${dependenciesRemoved(R.path(['data','diff'], cur))}
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>`)
+        )(listOfMod);
     }
 
-    log()
-
-    return `<div class="row">
-            <div class="col-3">
-              <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                ${leftPills(R.prop('features', productRelease))}
-              </div>
-            </div>
-            <div class="col-9">
-              <div class="tab-content" id="v-pills-tabContent">
-                ${rightPills(R.prop('features', productRelease))}
-              </div>
-            </div>
-          </div>`;
+    return R.compose(
+        pr => `<div class="row">
+                <div class="col-3">
+                  <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    ${leftPills(pr)}
+                  </div>
+                </div>
+                <div class="col-9">
+                  <div class="tab-content" id="v-pills-tabContent">
+                    ${rightPills(pr)}
+                  </div>
+                </div>
+              </div>`,
+        R.filter(cur => isNotEmpty(R.path(['data', 'diff'], cur), 0)),
+        R.map(
+            R.over(
+                R.lensPath(['data', 'diff']),
+                R.compose(
+                    R.filter(cur => isNotNil(R.path(['beforeAfter', 'before'], cur))),
+                    R.map(reconstruct(['package', 'beforeAfter'])),
+                    R.toPairs
+                )
+            )
+        ),
+        R.prop('feature_versions')
+    )(productRelease);
 }
 
 function dependenciesRemoved(listOfDependencies) {

@@ -7,13 +7,15 @@ function stepsToHitTarget(data) {
         R.evolve({
             architectureChanges: R.map(R.compose(
                 a => R.assoc('release_date', R.prop('created', a), a),
-                R.assoc('targetType', 'architectureChange')
+                R.assoc('targetType', 'architectureChange'),
+                a => R.assoc('identifier', r(), a)
             )),
             productReleases: R.map(R.compose(
                 R.over(
                     R.lensProp('feature_versions'),
                     R.compose(
                         R.map(R.compose(
+                            pr => R.assoc('identifier', r(), pr),
                             R.evolve({
                                 data: {
                                     composer: {
@@ -62,7 +64,11 @@ function stepsToHitTarget(data) {
     )(data);
 
     return R.compose(
-        log,
+        R.cond([
+            [d => R.isEmpty(R.prop('targets', d)), templateUpToDateWithProductRelease],
+            [d => R.equals(R.path(['targets', 0, 'targetType'], d), 'productRelease'), logicForProductReleases],
+            [d => R.equals(R.path(['targets', 0, 'targetType'], d), 'architectureChange'), logicForOnlyModules]
+        ]),
         reduceToApplicableTargets
     )(newData);
 }
@@ -149,26 +155,21 @@ function reduceToApplicableTargets(data) {
 }
 
 function logicForProductReleases(data) {
-    const p = R.prop(R.__, data);
-    const sprykerFeatures = getSprykerFeatures(p('myComposerJSON'));
-    const nextTargets = R.compose(
-        feature => sprykerFeaturesToMigrate(data, R.prop('requiredVersion', feature)),
-        R.evolve({ requiredVersion: R.tail }),
-        reconstruct(['feature', 'requiredVersion'])
-    )(R.head(sprykerFeatures));
-
-    return R.cond([
-        [R.isEmpty, templateUpToDateWithProductRelease],
-        [t => R.isEmpty(R.prop('features', R.head(t))), templateSaveMigrationToNewRelease],
-        [R.T, templateNeedMigrationToNewRelease(data)]
-    ])(nextTargets);
+    return templateNeedMigrationToNewRelease(data);
 }
 
 function logicForOnlyModules(data) {
-    return R.cond([
-        //[isNotEmpty, l => templatePassNextArchitectureChanges(R.head(l))],
-        [R.T, () => templateUpToDateWithArchitectureChanges(modulesWithTheirCount(data), data)]
-    ])(findNextTargetForArchitectureChanges(R.prop('architectureChanges', data), R.prop('myComposerLOCK', data)));
+    const p = R.prop(R.__, data);
+    const modulesWithTheirCount = R.compose(
+        R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur))
+    )(migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules')));
+    log(data);
+    return `<h2>Your next target is the architecture change: <em>${R.path(['targets', 0, 'title'], data)}</em></h2>
+            <p>${R.path(['targets', 0, 'description'], data)}</p>
+            ${migrationGuideAvailable(R.path(['targets', 0, 'guide_url'], data))}
+            <div class="margin-top-2">${templateForTable(modulesWithTheirCount)}</div>
+            <h3>The following modules are outdated</h3>
+            <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
 }
 
 function findNextTargetForArchitectureChanges(architectureChanges, myComposerLOCK) {
@@ -376,24 +377,21 @@ function featuresToMigrateIsEmpty(productRelease) {
 }
 
 function templateSaveMigrationToNewRelease(nextTargets) {
-    return `<h2>👍 Congrats! You can safely migrate to Spryker Product Release ${R.prop('productRelease',R.head(nextTargets))} 👏</h2>
+    return `<h2>👍 Congrats! You can safely migrate to Spryker Product Release ${R.prop('version',R.head(nextTargets))} 👏</h2>
             <p>No migrations are needed to use this new Product Release.</p>
             <div class="alert alert-success">Switch all your <code>spryker-feature/xxx</code> package to the version <code>~${R.prop('productRelease',R.head(nextTargets))}</code></div>`;
 }
 
 function templateNeedMigrationToNewRelease(data) {
-    return function(nextTargets) {
-        return `<section id="product-release">
-                    <h2>Your next target is the Product Release: ${R.prop('productRelease',R.head(nextTargets))}</h2>
-                    <p>You have the following Spryker Features to migrate.</p>
-                    <div id="listOfProductReleases">${templateForProductRelease(R.head(nextTargets))}</div>
-                </section>
-                <section>${logicForOnlyModules(data)}</section>
-                <section>
-                    <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
-                    ${missingSprykerFeatures(R.prop('releaseFeatures', data), R.prop('myComposerJSON', data))}
-                </section>`;
-    }
+    return `<section id="product-release">
+                <h2>Your next target is the Product Release: ${R.path(['targets', 0, 'version'], data)}</h2>
+                <p>You have the following Spryker Features to migrate.</p>
+                <div id="listOfProductReleases">${templateForProductRelease(R.path(['targets', 0], data))}</div>
+            </section>
+            <section>
+                <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
+                ${missingSprykerFeatures(R.prop('releaseFeatures', data), R.prop('recommendedFeatures', data))}
+            </section>`;
 }
 
 function templateUpToDateWithProductRelease() {
