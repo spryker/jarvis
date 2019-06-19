@@ -65,7 +65,7 @@ function stepsToHitTarget(data) {
 
     return R.compose(
         R.cond([
-            [d => R.isEmpty(R.prop('targets', d)), templateUpToDateWithProductRelease],
+            [d => R.isEmpty(R.prop('targets', d)), logicForOnlyModules],
             [d => R.equals(R.path(['targets', 0, 'targetType'], d), 'productRelease'), logicForProductReleases],
             [d => R.equals(R.path(['targets', 0, 'targetType'], d), 'architectureChange'), logicForOnlyModules]
         ]),
@@ -115,7 +115,6 @@ function reduceToApplicableTargets(data) {
                     )(p),
                     R.always(prev)
                 ),
-                log,
                 R.filter(cur => isNextMajor(R.prop('installedVersion', R.last(cur)), R.tail(R.prop('requiredVersion', R.last(cur))))),
                 R.filter(cur => R.equals(false, R.head(cur))),
                 // Check if project has the required version for each of them
