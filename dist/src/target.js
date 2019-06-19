@@ -15,7 +15,7 @@ function stepsToHitTarget(data) {
                     R.lensProp('feature_versions'),
                     R.compose(
                         R.map(R.compose(
-                            pr => R.assoc('identifier', r(), pr),
+                            f => R.assoc('identifier', r(), f),
                             R.evolve({
                                 data: {
                                     composer: {
@@ -69,7 +69,8 @@ function stepsToHitTarget(data) {
             [d => R.equals(R.path(['targets', 0, 'targetType'], d), 'productRelease'), logicForProductReleases],
             [d => R.equals(R.path(['targets', 0, 'targetType'], d), 'architectureChange'), logicForOnlyModules]
         ]),
-        reduceToApplicableTargets
+        log,
+        reduceToApplicableTargets,
     )(newData);
 }
 
@@ -78,11 +79,14 @@ function hasRequiredVersionForPackage(composerLock) {
         return R.compose(
             R.ifElse(
                 R.isNil,
-                R.T,
-                p => R.compose(
-                    rv => R.gte(versionToNumber(R.prop('version', p)), versionToNumber(rv)),
-                    p => R.tail(R.prop('requiredVersion', p))
-                )(packageAndRequiredVersion)
+                R.always([true]),
+                R.compose(
+                    pv => [
+                        R.gte(versionToNumber(R.prop('installedVersion', pv)), versionToNumber(R.tail(R.prop('requiredVersion', pv)))),
+                        pv
+                    ],
+                    pv => R.assoc('installedVersion', R.prop('version', pv), packageAndRequiredVersion)
+                )
             ),
             R.find(
                 R.propEq('name', R.prop('package', packageAndRequiredVersion))
@@ -97,22 +101,29 @@ function reduceToApplicableTargets(data) {
             // If at least one Spryker Feature is not totally covered, then the project must pass over it 
             R.ifElse(
                 pr => R.gt(R.length(pr), 0),
-                R.F,
-                R.T
+                p => [false, p],
+                R.always([true])
             ),
-            pr => R.reduce((prev, cur) => R.compose(
+            R.reduce((prev, cur) => R.compose(
                 // Keep only the modules that do not match the required versions 
                 R.ifElse(
                     p => R.gt(R.length(p), 0),
-                    R.always(R.append(cur, prev)),
+                    p => R.compose(
+                        p => R.append(p, prev),
+                        p => R.assocPath(['data', 'composer', 'require'], p, cur),
+                        R.map(R.last)
+                    )(p),
                     R.always(prev)
                 ),
-                R.filter(R.equals(false)),
+                log,
+                R.filter(cur => isNextMajor(R.prop('installedVersion', R.last(cur)), R.tail(R.prop('requiredVersion', R.last(cur))))),
+                R.filter(cur => R.equals(false, R.head(cur))),
                 // Check if project has the required version for each of them
                 R.map(hasRequiredVersionForPackage(R.prop('myComposerLOCK', data))),
                 // Get required modules for the Spryker Feature
                 R.path(['data', 'composer', 'require'])
-            )(cur), [], R.prop('feature_versions', pr))
+            )(cur), []),
+            R.prop('feature_versions')
         )(productRelease);
     }
 
@@ -121,10 +132,11 @@ function reduceToApplicableTargets(data) {
             // If at least one Spryker module major is not totally covered, then the project must pass over it 
             R.ifElse(
                 ac => R.gt(R.length(ac), 0),
-                R.F,
-                R.T
+                p => [false, p],
+                R.always([true])
             ),
-            R.filter(R.equals(false)),
+            R.map(R.last),
+            R.filter(cur => R.equals(false, R.head(cur))),
             R.map(R.compose(
                 hasRequiredVersionForPackage(R.prop('myComposerLOCK', data)),
                 p => R.assoc('requiredVersion', `^${R.path(['version', 'after'], p)}`, p)
@@ -140,22 +152,34 @@ function reduceToApplicableTargets(data) {
             R.reverse,
             R.reduce((prev, cur) => R.compose(
                 R.ifElse(
-                    R.equals(true),
+                    a => R.equals(true, R.head(a)),
                     R.always(prev),
-                    R.always(R.append(cur, prev))
+                    a => R.ifElse(
+                        b => R.equals('productRelease', R.prop('targetType', cur)),
+                        () => R.append(R.assoc('feature_versions', R.last(a), cur), prev),
+                        () => R.append(R.assoc('modules', R.last(a), cur), prev),
+                    )(a)
                 ),
                 R.ifElse(
                     t => R.equals('productRelease', R.prop('targetType', t)),
                     isProjectOverProductRelease,
                     isProjectOverArchitectureChange
                 )
-            )(cur), [])
-        ),
-        data);
+            )(cur), []),
+        )
+    )(data);
 }
 
 function logicForProductReleases(data) {
-    return templateNeedMigrationToNewRelease(data);
+    return `<section id="product-release">
+                <h2>Your next target is the Product Release: ${R.path(['targets', 0, 'version'], data)}</h2>
+                <p>You have the following Spryker Features to migrate.</p>
+                <div id="listOfProductReleases">${templateForProductRelease(R.path(['targets', 0], data))}</div>
+            </section>
+            <section>
+                <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
+                ${missingSprykerFeatures(R.prop('releaseFeatures', data), R.prop('recommendedFeatures', data))}
+            </section>`;
 }
 
 function logicForOnlyModules(data) {
@@ -163,9 +187,9 @@ function logicForOnlyModules(data) {
     const modulesWithTheirCount = R.compose(
         R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur))
     )(migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules')));
-    log(data);
+
     return `<h2>Your next target is the architecture change: <em>${R.path(['targets', 0, 'title'], data)}</em></h2>
-            <p>${R.path(['targets', 0, 'description'], data)}</p>
+            <p>${converter.makeHtml(R.path(['targets', 0, 'description'], data))}</p>
             ${migrationGuideAvailable(R.path(['targets', 0, 'guide_url'], data))}
             <div class="margin-top-2">${templateForTable(modulesWithTheirCount)}</div>
             <h3>The following modules are outdated</h3>
@@ -380,18 +404,6 @@ function templateSaveMigrationToNewRelease(nextTargets) {
     return `<h2>👍 Congrats! You can safely migrate to Spryker Product Release ${R.prop('version',R.head(nextTargets))} 👏</h2>
             <p>No migrations are needed to use this new Product Release.</p>
             <div class="alert alert-success">Switch all your <code>spryker-feature/xxx</code> package to the version <code>~${R.prop('productRelease',R.head(nextTargets))}</code></div>`;
-}
-
-function templateNeedMigrationToNewRelease(data) {
-    return `<section id="product-release">
-                <h2>Your next target is the Product Release: ${R.path(['targets', 0, 'version'], data)}</h2>
-                <p>You have the following Spryker Features to migrate.</p>
-                <div id="listOfProductReleases">${templateForProductRelease(R.path(['targets', 0], data))}</div>
-            </section>
-            <section>
-                <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
-                ${missingSprykerFeatures(R.prop('releaseFeatures', data), R.prop('recommendedFeatures', data))}
-            </section>`;
 }
 
 function templateUpToDateWithProductRelease() {
