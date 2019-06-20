@@ -82,7 +82,7 @@ function templateMajorOrMinorAvailable(data) {
                     R.path(['package', 'module_versions'])
                 )(data);
 
-                return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', 'name', cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', 'name', cur)}-tab">
+                return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', ['name'], cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', ['name'], cur)}-tab">
                           <div class="links">
                             ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
                             <a
@@ -125,8 +125,8 @@ function templateMajorOrMinorAvailable(data) {
             R.join(''),
             mapIndexed((cur, index) => `<a
                                           class="nav-item nav-link ${isActive(index)}"
-                                          id="nav-${properName('.', 'name', cur)}-tab"
-                                          data-toggle="tab" href="#nav-${properName('.', 'name', cur)}"
+                                          id="nav-${properName('.', ['name'], cur)}-tab"
+                                          data-toggle="tab" href="#nav-${properName('.', ['name'], cur)}"
                                           role="tab" aria-controls="nav-home"
                                           aria-selected="true">Version: ${R.prop('name', cur)}
                                         </a>`)

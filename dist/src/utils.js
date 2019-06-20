@@ -18,6 +18,7 @@ function render(selector, content) {
 }
 
 const isNotNil = R.complement(R.isNil);
+
 const isNotEmpty = R.complement(R.isEmpty);
 
 // Used to parse Module markdown and proce HTML
@@ -114,7 +115,9 @@ function majorAvailableForModule(mod) {
 const mapIndexed = R.addIndex(R.map);
 
 const isActive = index => index === 0 ? 'active' : '';
+
 const isActiveBool = index => index === 0 ? 'true' : 'false';
+
 const shouldBeCollapsed = index => index === 0 ? '' : 'collapsed';
 
 const isShow = index => index === 0 ? 'show' : '';
@@ -127,18 +130,24 @@ const semVerPatched = version => Number(R.nth(2, R.split('.', version)));
 
 const templateUpToDate = content => `<div class="alert alert-primary" role="alert">${content}</div>`;
 
-const properName = (sep, prop, name) => R.join(`${R.prop('identifier', name)}`, R.split(sep, R.prop(prop, name)));
+const properName = (sep, prop, name) => R.join(`${R.prop('identifier', name)}`, R.split(sep, R.path(prop, name)));
+
+function modulesForOrgs() {
+    return ['spryker', 'spryker-feature', 'spryker-shop', 'spryker-eco'];
+}
+
+function onlyModulesForOrgs() {
+    return ['spryker', 'spryker-shop'];
+}
 
 function keepOnlyModulesFromOrgs(composer) {
-    const modulesForOrgs = ['spryker', 'spryker-feature', 'spryker-shop', 'spryker-eco'];
-
     return R.compose(
         R.sortBy(R.prop(0)),
         R.filter(cur => R.contains(R.compose(
             R.head,
             R.split('/'),
             R.nth(0)
-        )(cur), modulesForOrgs) ? true : false),
+        )(cur), modulesForOrgs()) ? true : false),
         R.toPairs,
         R.prop('require')
     )(composer);
@@ -201,9 +210,9 @@ function migrationGuideExist(version, packageName) {
         R.cond([
             [p => R.isNil(p), R.always('')],
             [p => R.equals('n/a', R.prop('guide_url', p)), R.always('<div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>')],
-            [R.T, p => `<a rel="noopener" href="${R.prop('guide_url', p)}" target="_blank" class="btn btn-warning">Migration guide</a>`]
+            [R.T, p => `<a rel="noopener" href="${R.prop('guide_url', p)}" target="_blank" class="btn btn-warning">Migration guide for version ${R.prop('name', p)}</a>`]
         ]),
-        R.head,
+        R.last,
         keepOnlyVersionsInMajor(version),
         R.prop('module_versions'),
         p => R.find(R.propEq('package', p), releaseModules)

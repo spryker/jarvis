@@ -6,9 +6,26 @@
     margin-top: 2rem;
 }
 
+.margin-bottom-2 {
+    margin-bottom: 2rem;
+}
+
 .section-in-release,
 .features-not-used {
     margin: 2rem 0rem;
+}
+
+#explain-jarvis {
+    border: 1px solid rgba(0, 0, 0, .125);
+}
+
+#explain-jarvis>.card {
+    border: 0;
+}
+
+.dependencies-upgraded .card,
+.dependencies-removed .card {
+    margin-bottom: 0.5rem;
 }
 
 h1 {

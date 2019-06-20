@@ -50,8 +50,6 @@ function run(newReleaseData = undefined) {
 
     const config = getConfig();
 
-    log(keys(newReleaseData));
-
     if (isNotNil(newReleaseData)) {
         updateLastApiCall(config);
         writeReleaseAppData(prop('lastProjectUsed', config), newReleaseData);
