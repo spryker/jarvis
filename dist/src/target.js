@@ -8,6 +8,27 @@ function stepsToHitTarget(data) {
             architectureChanges: R.map(R.compose(
                 a => R.assoc('release_date', R.prop('created', a), a),
                 R.assoc('targetType', 'architectureChange'),
+                a => R.over(
+                    R.lensProp('feature_versions'),
+                    R.compose(
+                        R.filter(cur => isNotEmpty(R.prop('modules', cur))),
+                        R.map(R.over(
+                            R.lensProp('modules'),
+                            R.compose(
+                                R.filter(cur => R.prop('type', cur) !== 'patch' && isNotNil(R.prop('installedVersion', cur))),
+                                R.map(R.compose(
+                                    m => R.assoc('installedVersion', R.prop('version', R.find(
+                                        cur => R.prop('name', cur) === R.prop('package', m),
+                                        R.path(['myComposerLOCK', 'packages'], data))), m),
+                                    m => R.assoc('requiredVersion', `^${R.path(['version', 'after'], m)}`, m)
+                                )),
+                                R.innerJoin(R.eqBy(R.prop('package')), R.prop('modules', a))
+                            )
+                        ))
+                    ), a),
+                a => R.assoc(
+                    'feature_versions',
+                    R.prop('detectedFeatures', data), a),
                 a => R.assoc('identifier', r(), a)
             )),
             productReleases: R.map(R.compose(
@@ -60,15 +81,13 @@ function stepsToHitTarget(data) {
                 R.assoc('targetType', 'productRelease')
             )),
             releaseModules: R.map(cur => R.assoc('identifier', r(), cur))
-        }),
-    )(data);
+        }), )(data);
 
     return R.compose(
         R.cond([
             [d => R.isEmpty(R.prop('targets', d)), logicForOnlyModules],
             [R.T, logicForProductReleases]
         ]),
-        log,
         reduceToApplicableTargets,
     )(newData);
 }
@@ -170,7 +189,15 @@ function reduceToApplicableTargets(data) {
 
 function logicForProductReleases(data) {
     return `<section id="product-release">
-                <h2>Your next target is the Product Release: ${R.path(['targets', 0, 'version'], data)}</h2>
+                ${R.ifElse(
+                    R.equals('productRelease'),
+                    () => `<h2>Your next target is the Product Release: ${R.path(['targets', 0, 'version'], data)}</h2>`,
+                    () => `<h2>Your next target is the architecture change: <em>${R.path(['targets', 0, 'title'], data)}</em></h2>
+                            <div class="margin-bottom-2">
+                                <p>${converter.makeHtml(R.path(['targets', 0, 'description'], data))}</p>
+                                ${migrationGuideAvailable(R.path(['targets', 0, 'guide_url'], data))}
+                            </div>`
+                )(R.path(['targets', 0, 'targetType'],data))}
                 <p>You have the following Spryker Features to migrate.</p>
                 <div id="listOfProductReleases">${templateForProductRelease(R.path(['targets', 0], data))}</div>
             </section>

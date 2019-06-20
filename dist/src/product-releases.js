@@ -208,12 +208,28 @@ function templateForProductRelease(productRelease) {
             R.join(''),
             mapIndexed((cur, index) => `<a
                                             class="nav-link ${isActive(index)}
-                                            id="v-pills-${properName('/', ['feature', 'package'], cur)}-tab"
+                                            id="v-pills-${R.ifElse(
+                                                cur => R.isNil(R.path(['feature', 'package'], cur)),
+                                                cur => properName('/', ['package'], cur),
+                                                cur => properName('/', ['feature', 'package'], cur)
+                                            )(cur)}-tab"
                                             data-toggle="pill"
-                                            href="#v-pills-${properName('/', ['feature', 'package'], cur)}"
+                                            href="#v-pills-${R.ifElse(
+                                                cur => R.isNil(R.path(['feature', 'package'], cur)),
+                                                cur => properName('/', ['package'], cur),
+                                                cur => properName('/', ['feature', 'package'], cur)
+                                            )(cur)}"
                                             role="tab"
-                                            aria-controls="v-pills-${properName('/', ['feature', 'package'], cur)}"
-                                            aria-selected="true">${R.path(['feature', 'name'], cur)}
+                                            aria-controls="v-pills-${R.ifElse(
+                                                cur => R.isNil(R.path(['feature', 'package'], cur)),
+                                                cur => properName('/', ['package'], cur),
+                                                cur => properName('/', ['feature', 'package'], cur)
+                                            )(cur)}"
+                                            aria-selected="true">${R.ifElse(
+                                                cur => R.isNil(R.path(['feature', 'name'], cur)),
+                                                R.prop('name'),
+                                                R.path(['feature', 'name'])
+                                            )(cur)}
                                         </a>`)
         )(listOfMod);
     }
@@ -221,12 +237,29 @@ function templateForProductRelease(productRelease) {
     function rightPills(listOfMod) {
         return R.compose(
             R.join(''),
-            mapIndexed((cur, index) => `<div class="tab-pane fade ${isShow(index)} ${isActive(index)}" id="v-pills-${properName('/', ['data', 'composer','name'], cur)}" role="tabpanel" aria-labelledby="v-pills-${properName('/', ['data', 'composer','name'], cur)}-tab">
+            mapIndexed((cur, index) => `<div
+                                            class="tab-pane fade ${isShow(index)} ${isActive(index)}"
+                                            id="v-pills-${R.ifElse(
+                                                cur => R.isNil(R.path(['data', 'composer','name'], cur)),
+                                                cur => properName('/', ['package'], cur),
+                                                cur => properName('/', ['data', 'composer','name'], cur)
+                                            )(cur)}"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-${R.ifElse(
+                                                cur => R.isNil(R.path(['data', 'composer','name'], cur)),
+                                                cur => properName('/', ['package'], cur),
+                                                cur => properName('/', ['data', 'composer','name'], cur)
+                                            )(cur)}-tab"
+                                            >
                                             <div class="row">
                                                 <div class="col-12">
                                                     <h4>Upgraded dependencies</h4>
                                                     <div class="row dependencies-upgraded">
-                                                        ${dependenciesUpgraded(R.path(['data', 'composer', 'require'], cur))}
+                                                        ${R.ifElse(
+                                                            cur => R.isNil(R.path(['data', 'composer','require'], cur)),
+                                                            cur => dependenciesUpgraded(R.path(['modules'], cur)),
+                                                            cur => dependenciesUpgraded(R.path(['data', 'composer', 'require'], cur))
+                                                        )(cur)}
                                                     </div>
                                                 </div>
                                                 <div class="col-12">
@@ -253,6 +286,22 @@ function templateForProductRelease(productRelease) {
                         </div>
                     </div>
                 </div>`,
+        R.ifElse(
+            R.propEq('targetType', 'architectureChange'),
+            logicArchitectureChangeBeforeTemplate,
+            logicProductReleaseBeforeTemplate
+        )
+    )(productRelease);
+}
+
+function logicArchitectureChangeBeforeTemplate(target) {
+    return R.compose(
+        R.prop('feature_versions')
+    )(target);
+}
+
+function logicProductReleaseBeforeTemplate(target) {
+    return R.compose(
         R.filter(cur => isNotEmpty(R.path(['data', 'composer', 'require'], cur))),
         R.map(R.over(
             R.lensPath(['data', 'composer', 'require']),
@@ -260,7 +309,7 @@ function templateForProductRelease(productRelease) {
         )),
         R.ifElse(
             R.isEmpty,
-            R.always(R.prop('feature_versions', productRelease)),
+            R.always(R.prop('feature_versions', target)),
             R.identity
         ),
         R.filter(cur => isNotEmpty(R.path(['data', 'diff'], cur), 0)),
@@ -275,7 +324,7 @@ function templateForProductRelease(productRelease) {
             )
         ),
         R.prop('feature_versions')
-    )(productRelease);
+    )(target);
 }
 
 function dependenciesUpgraded(listOfDependencies = []) {
@@ -294,7 +343,11 @@ function dependenciesUpgraded(listOfDependencies = []) {
                                             <dt>Version upgraded</dt>
                                             <dd><span class="badge badge-primary">${R.prop('installedVersion', cur)} -> ${R.tail(R.prop('requiredVersion', cur))}</span></dd>
                                         </dl>
-                                        ${migrationGuideExist(R.tail(R.prop('requiredVersion', cur)), R.prop('package', cur))}
+                                        ${R.ifElse(
+                                            R.propEq('type','major'),
+                                            cur => migrationGuideExist(R.tail(R.prop('requiredVersion', cur)), R.prop('package', cur)),
+                                            R.always('')
+                                        )(cur)}
                                         <a
                                             rel="noopener"
                                             href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.prop('requiredVersion', cur))}"

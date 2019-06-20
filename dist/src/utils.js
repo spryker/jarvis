@@ -18,6 +18,7 @@ function render(selector, content) {
 }
 
 const isNotNil = R.complement(R.isNil);
+
 const isNotEmpty = R.complement(R.isEmpty);
 
 // Used to parse Module markdown and proce HTML
@@ -114,7 +115,9 @@ function majorAvailableForModule(mod) {
 const mapIndexed = R.addIndex(R.map);
 
 const isActive = index => index === 0 ? 'active' : '';
+
 const isActiveBool = index => index === 0 ? 'true' : 'false';
+
 const shouldBeCollapsed = index => index === 0 ? '' : 'collapsed';
 
 const isShow = index => index === 0 ? 'show' : '';
@@ -207,9 +210,9 @@ function migrationGuideExist(version, packageName) {
         R.cond([
             [p => R.isNil(p), R.always('')],
             [p => R.equals('n/a', R.prop('guide_url', p)), R.always('<div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>')],
-            [R.T, p => `<a rel="noopener" href="${R.prop('guide_url', p)}" target="_blank" class="btn btn-warning">Migration guide</a>`]
+            [R.T, p => `<a rel="noopener" href="${R.prop('guide_url', p)}" target="_blank" class="btn btn-warning">Migration guide for version ${R.prop('name', p)}</a>`]
         ]),
-        R.head,
+        R.last,
         keepOnlyVersionsInMajor(version),
         R.prop('module_versions'),
         p => R.find(R.propEq('package', p), releaseModules)
