@@ -69,6 +69,7 @@ function run(newReleaseData = undefined) {
     app.listen(port, () => {
         log(`I am listening on the URL http://localhost:${port}/`);
         log('When your migration will be over, could you share your feedback with us about Spryker Jarvis? https://spryker.typeform.com/to/Qzw9lg');
+        log('');
     });
 
     return app;
@@ -81,18 +82,22 @@ function runWithApiCall(projectName, composerJson, composerLock) {
 function failedToRetrieveReleaseAppData(data) {
     log('I am sorry to announce that something went wrong, I could not retrieve any information from Spryker...');
     log('Please verify that you are connected to the Internet. If yes, please send an email to support@spryker.com to notify them that you could not use my services today.');
+    log('');
+
     return data;
 }
 
 function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
     log(`Welcome back project ${projectName}! I hope your project is not too outdated...`);
     log('First let me check if my information about Spryker Features and Modules are up to date.');
+    log('');
 
     const project = findPreviousProject(projectName, config);
     const newConfig = assoc('lastProjectUsed', projectName, config);
 
     if (lastApiCallLessThanADay(prop('lastCallToReleaseApp', project))) {
         log('Yes, they are. Please follow me.');
+        log('');
 
         updateConfigFile(newConfig);
 
@@ -101,6 +106,7 @@ function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
     } else {
 
         log('No, they are not. Let me refresh them. This is take less than 1 minute I hope...');
+        log('');
 
         updateLastApiCall(newConfig);
 
@@ -122,6 +128,11 @@ function lastApiCallLessThanADay(date) {
 
 function application(args) {
     log('Welcome, my name is Spryker Jarvis. Today I will help you to migrate your Spryker project!');
+    log('');
+    log('As part of my services, I will store your composer.json and composer.lock files.');
+    log('Those will allow my colleagues at Spryker to provide better tooling and support in the future.');
+    log('If you do not agree with this, please hit Cmd + c or Ctr + c to cancel my services.');
+    log('');
 
     const config = getConfig();
     const NOT_IN_THIS_LIST = 'Not in this list';
