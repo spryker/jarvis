@@ -12,10 +12,12 @@ const {
     concat,
     equals,
     evolve,
+    F,
     find,
     findIndex,
     gt,
     head,
+    ifElse,
     isEmpty,
     isNil,
     keys,
@@ -31,7 +33,8 @@ const {
 const {
     cleanNodeInput,
     isNotNil,
-    log
+    log,
+    versionToNumber
 } = require('./utils.js');
 const {
     getComposerFilesFromPath,
@@ -49,10 +52,18 @@ function run(newReleaseData = undefined) {
     const port = 7777;
 
     const config = getConfig();
+    const currentVersion = getCurrentVersion();
 
     if (isNotNil(newReleaseData)) {
-        updateLastApiCall(config);
-        writeReleaseAppData(prop('lastProjectUsed', config), newReleaseData);
+        if (versionToNumber(currentVersion) !== versionToNumber(prop('currentVersion', newReleaseData))) {
+            log('It looks like you do not use the latest version of Spryker Jarvis...');
+            log(`You are currently using version ${currentVersion}. The latest version available is version ${prop('currentVersion', newReleaseData)}.`);
+            return;
+
+        } else {
+            updateLastApiCall(config);
+            writeReleaseAppData(prop('lastProjectUsed', config), newReleaseData);
+        }
     } else {
         writeReleaseAppData(prop('lastProjectUsed', config));
     }
@@ -95,20 +106,17 @@ function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
     const project = findPreviousProject(projectName, config);
     const newConfig = assoc('lastProjectUsed', projectName, config);
 
+    updateConfigFile(newConfig);
+
     if (lastApiCallLessThanADay(prop('lastCallToReleaseApp', project))) {
         log('Yes, they are. Please follow me.');
         log('');
 
-        updateConfigFile(newConfig);
-
         return run();
 
     } else {
-
         log('No, they are not. Let me refresh them. This is take less than 1 minute I hope...');
         log('');
-
-        updateLastApiCall(newConfig);
 
         return runWithApiCall(projectName, ...map(prop('data'), composerFiles));
     }
@@ -119,11 +127,11 @@ function isLastProjectBack(projectName, lastProjectUsed) {
 }
 
 function lastApiCallLessThanADay(date) {
-    if (isNil(date)) {
-        return false;
-    } else {
-        return moment().subtract(1, 'days') <= moment(date);
-    }
+    return ifElse(
+        isNil,
+        F,
+        date => moment().subtract(1, 'days') <= moment(date)
+    )(date);
 }
 
 function application(args) {

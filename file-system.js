@@ -16,9 +16,11 @@ const {
 const { log } = require('./utils.js');
 
 function updateConfigFile(data) {
-    fs.writeFileSync('config.json', JSON.stringify(data), 'utf8');
+    const newData = assoc('currentVersion', getCurrentVersion(), data);
 
-    return data;
+    fs.writeFileSync('config.json', JSON.stringify(newData), 'utf8');
+
+    return newData;
 }
 
 function getConfig() {
@@ -32,13 +34,15 @@ function getCurrentVersion() {
 function updateLastApiCall(config) {
     const date = moment.utc();
     const newConfig = compose(
-        over(lensProp('previousProjects'), map(cur => {
-            if (prop('projectName', cur) === prop('lastProjectUsed', config)) {
-                return assoc('lastCallToReleaseApp', date, cur);
-            } else {
-                return cur;
-            }
-        })),
+        over(
+            lensProp('previousProjects'),
+            map(cur => {
+                if (prop('projectName', cur) === prop('lastProjectUsed', config)) {
+                    return assoc('lastCallToReleaseApp', date, cur);
+                } else {
+                    return cur;
+                }
+            })),
         assoc('lastCallToReleaseApp', date)
     )(config);
 
