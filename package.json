@@ -4,7 +4,9 @@
   "description": "Spryker Jarvis",
   "main": "jarvis.js",
   "scripts": {
-    "jarvis-reset": "node reset.js"
+    "jarvis-reset": "node reset.js",
+    "clean-browser": "npx eslint /dist/src/*.js",
+    "clean-node": "npx eslint *.js"
   },
   "repository": {
     "type": "git",
@@ -23,5 +25,8 @@
     "moment": "^2.24.0",
     "ramda": "^0.26.1",
     "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0"
   }
 }

@@ -3,8 +3,6 @@ const compression = require('compression');
 const inquirer = require('inquirer');
 const moment = require('moment');
 const {
-    adjust,
-    and,
     always,
     append,
     assoc,
@@ -20,7 +18,6 @@ const {
     ifElse,
     isEmpty,
     isNil,
-    keys,
     last,
     length,
     lensPath,
@@ -120,10 +117,6 @@ function checkLastApiCallAndRunApp(projectName, config, composerFiles) {
 
         return runWithApiCall(projectName, ...map(prop('data'), composerFiles));
     }
-}
-
-function isLastProjectBack(projectName, lastProjectUsed) {
-    return equals(projectName, lastProjectUsed);
 }
 
 function lastApiCallLessThanADay(date) {

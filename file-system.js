@@ -7,13 +7,11 @@ const {
     concat,
     forEach,
     isNil,
-    keys,
     lensProp,
     map,
     over,
     prop
 } = require('ramda');
-const { log } = require('./utils.js');
 
 function updateConfigFile(data) {
     const newData = assoc('currentVersion', getCurrentVersion(), data);
