@@ -1,11 +1,11 @@
 {
   "name": "jarvis",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Spryker Jarvis",
   "main": "jarvis.js",
   "scripts": {
     "jarvis-reset": "node reset.js",
-    "clean-browser": "npx eslint dist/src/*.js",
+    "clean-browser": "npx jshint dist/src/*.js",
     "clean-node": "npx eslint *.js"
   },
   "repository": {

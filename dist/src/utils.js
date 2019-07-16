@@ -1,3 +1,38 @@
+/* globals
+    releaseModules
+*/
+
+/* exported
+    cleanDescription,
+    converter,
+    findInstalledVersion,
+    findPackageForModule,
+    isActive,
+    isNextMajor,
+    isNextMinor,
+    isNotEmpty,
+    isNotNil,
+    isShow,
+    keepOnlyModulesFromOrgs,
+    log,
+    majorAvailable,
+    mapIndexed,
+    migrationGuideExist,
+    minorAvailable,
+    onlyModulesForOrgs,
+    properName,
+    r,
+    reconstruct,
+    render,
+    semVerMajor,
+    semVerMinor,
+    semVerPatched,
+    sortStrings,
+    specificTypeOfModules,
+    templateUpToDate,
+    versionToNumber
+*/
+
 ////////////
 // Utils //
 //////////
@@ -21,7 +56,7 @@ const isNotNil = R.complement(R.isNil);
 
 const isNotEmpty = R.complement(R.isEmpty);
 
-// Used to parse Module markdown and proce HTML
+// Used to parse Module markdown and process HTML
 const converter = new showdown.Converter();
 
 // Check if the new version is a major
@@ -77,16 +112,12 @@ function r() {
         .substring(7);
 }
 
-const nextMajorLink = version => `migrate-to-version-${R.concat(R.head(R.split('.', version)), '-0-0')}`;
-
 // cleanDescription :: String -> String
 const cleanDescription = description => R.compose(
     R.join('.<br>'),
     R.split('.'),
     R.trim
 )(description);
-
-const migrationLinkForModule = (packageName, version) => `https://documentation.spryker.com/module_migration_guides/mg-${R.last(R.split('/', packageName))}.htm#${nextMajorLink(version)}`;
 
 function majorAvailable(mod) {
     const installedVersion = R.split('.', R.prop('installedVersion', mod));
@@ -105,20 +136,9 @@ function majorAvailable(mod) {
     }
 }
 
-function majorAvailableForModule(mod) {
-    const installedVersionMajor = R.head(R.split('.', R.prop('version', mod)));
-    const lastVersionAvailableMajor = R.head(R.split('.', R.path(['package', 'version'], mod)));
-
-    return lastVersionAvailableMajor > installedVersionMajor ? true : false;
-}
-
 const mapIndexed = R.addIndex(R.map);
 
 const isActive = index => index === 0 ? 'active' : '';
-
-const isActiveBool = index => index === 0 ? 'true' : 'false';
-
-const shouldBeCollapsed = index => index === 0 ? '' : 'collapsed';
 
 const isShow = index => index === 0 ? 'show' : '';
 
@@ -168,8 +188,6 @@ const specificTypeOfModules = types => moduleList => R.filter(cur => R.includes(
 
 const findPackageForModule = currentList => mod => R.find(R.propEq('package', R.prop('module', mod)), currentList);
 
-const findModuleForModule = currentList => mod => R.find(R.propEq('package', R.prop('name', mod)), currentList);
-
 const reconstruct = keys => values => R.zipObj(keys, values);
 
 const findInstalledVersion = composerLock => moduleList => R.map(
@@ -203,7 +221,7 @@ const keepOnlyVersionsInMajor = version => listOfVersion => {
     } else {
         return R.filter(cur => isNotNil(R.prop('guide_url', cur)) && R.prop('name', cur) >= `${semVerMajor(version)}.0.0` && R.prop('name', cur) <= version, listOfVersion);
     }
-}
+};
 
 function migrationGuideExist(version, packageName) {
     return R.compose(

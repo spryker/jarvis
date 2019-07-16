@@ -1,3 +1,28 @@
+/* globals
+    converter:false,
+    isNextMajor:false,
+    isNextMinor:false,
+    isNextPatched:false,
+    isNotEmpty:false,
+    isNotNil:false,
+    isShow:false,
+    mapIndexed:false,
+    migrateModuleToLastVersionInMajor:false,
+    migrationGuideAvailable:false,
+    missingSprykerFeatures:false,
+    modulesForOrgs:false,
+    onlyModulesForOrgs:false,
+    r:false,
+    reconstruct:false,
+    templateForProductRelease:false,
+    templateToDisplayDetailsOfEachModule:false,
+    versionToNumber:false
+*/
+
+/* exported
+    stepsToHitTarget
+*/
+
 function stepsToHitTarget(data) {
     const newData = R.compose(
         R.evolve({
@@ -81,14 +106,15 @@ function stepsToHitTarget(data) {
                 R.assoc('targetType', 'productRelease')
             )),
             releaseModules: R.map(cur => R.assoc('identifier', r(), cur))
-        }), )(data);
+        })
+    )(data);
 
     return R.compose(
         R.cond([
             [d => R.isEmpty(R.prop('targets', d)), logicForOnlyModules],
             [R.T, logicForProductReleases]
         ]),
-        reduceToApplicableTargets,
+        reduceToApplicableTargets
     )(newData);
 }
 
@@ -110,7 +136,7 @@ function hasRequiredVersionForPackage(composerLock) {
                 R.propEq('name', R.prop('package', packageAndRequiredVersion))
             )
         )(R.prop('packages', composerLock));
-    }
+    };
 }
 
 function reduceToApplicableTargets(data) {
@@ -172,9 +198,9 @@ function reduceToApplicableTargets(data) {
                     a => R.equals(true, R.head(a)),
                     R.always(prev),
                     a => R.ifElse(
-                        b => R.equals('productRelease', R.prop('targetType', cur)),
+                        () => R.equals('productRelease', R.prop('targetType', cur)),
                         () => R.append(R.assoc('feature_versions', R.last(a), cur), prev),
-                        () => R.append(R.assoc('modules', R.last(a), cur), prev),
+                        () => R.append(R.assoc('modules', R.last(a), cur), prev)
                     )(a)
                 ),
                 R.ifElse(
@@ -182,7 +208,7 @@ function reduceToApplicableTargets(data) {
                     isProjectOverProductRelease,
                     isProjectOverArchitectureChange
                 )
-            )(cur), []),
+            )(cur), [])
         )
     )(data);
 }
@@ -221,102 +247,6 @@ function logicForOnlyModules(data) {
             <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
 }
 
-function findNextTargetForArchitectureChanges(architectureChanges, myComposerLOCK) {
-    return R.compose(
-        R.filter(cur => isNotEmpty(R.prop('modules', cur))),
-        R.map(R.over(R.lensProp('modules'), R.filter(R.propEq('compliant', false)))),
-        R.reduce((prev, cur) => {
-            return R.append(compliantWithArchitectureChange(myComposerLOCK, cur), prev);
-        }, [])
-    )(architectureChanges);
-}
-
-function compliantWithArchitectureChange(myComposerLOCK, architectureChange) {
-    const modulesLens = R.lensProp('modules');
-
-    return R.over(modulesLens, R.map(cur => {
-        const hasIt = R.find(R.propEq('name', R.prop('package', cur)), R.prop('packages', myComposerLOCK));
-
-        if (R.isNil(hasIt)) {
-            return R.compose(
-                R.assoc('installedVersion', undefined),
-                R.assoc('compliant', true)
-            )(cur);
-        } else if (versionToNumber(R.prop('version', hasIt)) >= versionToNumber(R.path(['version', 'after'], cur))) {
-            return R.compose(
-                R.assoc('installedVersion', R.prop('version', hasIt)),
-                R.assoc('compliant', true)
-            )(cur);
-        } else {
-            return R.compose(
-                R.assoc('installedVersion', R.prop('version', hasIt)),
-                R.assoc('compliant', false)
-            )(cur);
-        }
-    }), architectureChange);
-}
-
-function modulesWithTheirCount(data) {
-    const p = R.prop(R.__, data);
-
-    return R.compose(
-        R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur))
-    )(migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules')));
-}
-
-function templateUpToDateWithArchitectureChanges(modulesWithTheirCount, data) {
-    const p = R.prop(R.__, data);
-
-    return `<h2>Here is a summary of your Spryker modules current state 👇</h2>
-            <div>${templateForTable(modulesWithTheirCount)}</div>
-            <h3>The following modules are outdated</h3>
-            <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
-}
-
-function templatePassNextArchitectureChanges(architectureChange) {
-    const majorsToOvercome = R.compose(
-        R.filter(R.propEq('type', 'major')),
-        R.prop('modules')
-    )(architectureChange);
-
-    return R.ifElse(
-        isNotEmpty,
-        m => `<h2>You need to migrate the following modules to enjoy the full power of Spryker!</h2>
-            ${R.join('',R.map(templateForModuleToUpdateArchitectureChange, R.prop('modules', architectureChange)))}`,
-        m => `<h2>👍 You can enjoy the next Spryker architecture Change with just one command 👏</h2>
-              <div class="alert alert-success">You just need to run <code>composer update</code> and you are good to go!</div>
-              ${R.join('',R.map(templateForModuleToUpdateArchitectureChange, R.prop('modules', architectureChange)))}`
-    )(majorsToOvercome);
-}
-
-function templateForModuleToUpdateArchitectureChange(data) {
-    return `<div class="card margin-bottom">
-                <div class="card-body">
-                    <h3 class="card-title">${R.prop('name', data)}</h3>
-                    <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
-                    <p class="card-text">Required version <span class="badge badge-primary">${R.path(['version', 'after'], data)}</span></p>
-                    <div class="links">
-                        <a
-                          rel="noopener"
-                          href="https://github.com/${R.prop('package', data)}/releases/tag/${R.path(['version', 'after'], data)}"
-                          target="_blank"
-                          class="btn btn-secondary"
-                        >Github changelog</a>
-                        <a
-                          rel="noopener"
-                          href="https://github.com/${R.prop('package', data)}/compare/${R.prop('installedVersion', data)}...${R.path(['version', 'after'], data)}"
-                          target="_blank"
-                          class="btn btn-info"
-                        >Compare the versions</a>
-                    </div>
-                    <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.prop('changelog', data)) ? '' : converter.makeHtml((R.prop('changelog', data)))}</h6>
-                </div>
-                <div class="card-footer">
-                    <a href="#spryker-jarvis">Get back to the top ☝️</a>
-                </div>
-            </div>`;
-}
-
 function groupWithLevel(level) {
     return function(a, b) {
         return R.groupWith((a, b) => {
@@ -325,7 +255,7 @@ function groupWithLevel(level) {
 
             return R.equals(countForA, countForB);
         })(a, b);
-    }
+    };
 }
 
 function templateForTable(listOfModules) {
@@ -353,11 +283,14 @@ function count(list) {
 function templateForSummaryElement(listOfElements) {
     function textForBoxTitle(isMajor, listOfElements) {
         if (isMajor) {
-            return `Major versions are available for the following <span class="badge badge-dark">${count(listOfElements)}</span> module(s)`
+            return `Major versions are available for the following <span class="badge badge-dark">${count(listOfElements)}</span> module(s)`;
         } else {
-            return `Minor versions are available for the following <span class="badge badge-dark">${count(listOfElements)}</span> module(s)`
+            return `Minor versions are available for the following <span class="badge badge-dark">${count(listOfElements)}</span> module(s)`;
         }
     }
+
+    const isActiveBool = index => index === 0 ? 'true' : 'false';
+    const shouldBeCollapsed = index => index === 0 ? '' : 'collapsed';
 
     return R.compose(
         R.join(''),
@@ -386,9 +319,9 @@ function templateForSummaryElement(listOfElements) {
 function templateForEachGroupOfMigration(listOfModules) {
     function textForBoxTitle(isMajor, count, mod) {
         if (isMajor) {
-            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${R.path(['nextVersionsCount', 'major'], mod)}</span> major version(s).`
+            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${R.path(['nextVersionsCount', 'major'], mod)}</span> major version(s).`;
         } else {
-            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${R.path(['nextVersionsCount', 'minor'], mod)}</span> minor version(s).`
+            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${R.path(['nextVersionsCount', 'minor'], mod)}</span> minor version(s).`;
         }
     }
 
@@ -416,30 +349,4 @@ function countVersionsForModule(mod) {
         [version => isNextPatched(R.prop('latestVersion', prev), R.prop('name', version)), version => R.evolve({ patch: R.inc, latestVersion: R.always(R.prop('name', version)) }, prev)],
         [R.T, () => prev]
     ])(cur), { major: 0, minor: 0, patch: 0, latestVersion: R.prop('installedVersion', mod) }, versions);
-}
-
-function featuresToMigrateIsEmpty(productRelease) {
-    return R.compose(
-        R.isEmpty,
-        R.prop('features')
-    )(productRelease);
-}
-
-function templateSaveMigrationToNewRelease(nextTargets) {
-    return `<h2>👍 Congrats! You can safely migrate to Spryker Product Release ${R.prop('version',R.head(nextTargets))} 👏</h2>
-            <p>No migrations are needed to use this new Product Release.</p>
-            <div class="alert alert-success">Switch all your <code>spryker-feature/xxx</code> package to the version <code>~${R.prop('productRelease',R.head(nextTargets))}</code></div>`;
-}
-
-function templateUpToDateWithProductRelease() {
-    return '<div class="alert alert-success margin-top-2" role="alert">🎉 Bravo! You are already up to date with Spryker! 🥳 Just run <code>composer update</code> to get the latest patches and minors.</div>';
-}
-
-function sprykerFeaturesToMigrate(data, currentProductRelease) {
-    const p = R.prop(R.__, data);
-    const featuresUsedInProject = featuresFromComposer(p('myComposerLOCK'), p('myComposerJSON'));
-    const productReleasesAvailable = featuresForProductReleases(currentProductRelease, p('releaseFeatures'));
-    const featuresToMigratePerProductRelease = R.map(keepForEachProductReleaseUsedFeatures(featuresUsedInProject), productReleasesAvailable);
-
-    return featuresToMigratePerProductRelease;
 }

@@ -1,7 +1,32 @@
+/* globals
+    cleanDescription:false,
+    converter:false,
+    findInstalledVersion:false,
+    findPackageForModule:false,
+    isActive:false,
+    isNextMajor:false,
+    isNextMinor:false,
+    isNextPatched:false,
+    keepOnlyModulesFromOrgs:false,
+    majorAvailable:false,
+    mapIndexed:false,
+    minorAvailable:false,
+    properName:false,
+    r:false,
+    reconstruct:false,
+    specificTypeOfModules:false,
+    templateUpToDate:false,
+    versionToNumber:false
+*/
+
+/* exported
+    templateToDisplayDetailsOfEachModule
+*/
+
+
 //////////////////////////////////////////////////////////////
 // Migration Analysis for Modules outside Spryker Features //
 ////////////////////////////////////////////////////////////
-
 
 function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
     return R.compose(
@@ -61,7 +86,7 @@ function onlyRelevantMajorVersions(data) {
     return R.compose(
         R.map(cur => R.assoc('identifier', r(), cur)),
         R.tail,
-        R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }]),
+        R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
     )(allVersions);
 }
 
