@@ -214,7 +214,26 @@ function reduceToApplicableTargets(data) {
 }
 
 function logicForProductReleases(data) {
-    return `<section id="product-release">
+    return `${R.compose(
+                    R.ifElse(
+                        R.lt(1),
+                        nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
+                                        <h4 class="alert-heading">Be brave! The journey is not over yet!</h4>
+                                        <p>You still have <span class="badge badge-light">${nbTargets}</span> milestones to cover. When the last milestone will be covered, your Spryker project will be up to date.</p>
+                                        <hr>
+                                        <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
+                                    </div>`,
+                        nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
+                                        <h4 class="alert-heading">You are almose there!</h4>
+                                        <p>You only have <span class="badge badge-light">${nbTargets}</span> milestone to cover. When this milestone will be covered, your Spryker project will be up to date.</p>
+                                        <hr>
+                                        <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
+                                    </div>`
+                    ),
+                    R.length,
+                    R.prop('targets')
+                )(data)}
+            <section id="product-release">
                 ${R.ifElse(
                     R.equals('productRelease'),
                     () => `<h2>Your next target is the Product Release: ${R.path(['targets', 0, 'version'], data)}</h2>`,
@@ -239,10 +258,7 @@ function logicForOnlyModules(data) {
         R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur))
     )(migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules')));
 
-    return `<h2>Your next target is the architecture change: <em>${R.path(['targets', 0, 'title'], data)}</em></h2>
-            <p>${converter.makeHtml(R.path(['targets', 0, 'description'], data))}</p>
-            ${migrationGuideAvailable(R.path(['targets', 0, 'guide_url'], data))}
-            <div class="margin-top-2">${templateForTable(modulesWithTheirCount)}</div>
+    return `<div class="margin-top-2">${templateForTable(modulesWithTheirCount)}</div>
             <h3>The following modules are outdated</h3>
             <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
 }
