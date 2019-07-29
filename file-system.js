@@ -5,7 +5,9 @@ const {
     assoc,
     compose,
     concat,
+    equals,
     forEach,
+    ifElse,
     isNil,
     lensProp,
     map,
@@ -19,6 +21,18 @@ function updateConfigFile(data) {
     fs.writeFileSync('config.json', JSON.stringify(newData), 'utf8');
 
     return newData;
+}
+
+function updateOnlyModuleFile(bool) {
+    const newData = ifElse(
+        equals(false),
+        () => `const onlyModules = false;`,
+        () => `const onlyModules = true;`
+    )(bool)
+
+    fs.writeFileSync('dist/release-app-data/only-modules.js', newData, 'utf8');
+
+    return bool;
 }
 
 function getConfig() {
@@ -140,4 +154,5 @@ exports.getCurrentVersion = getCurrentVersion;
 exports.getComposerFilesFromPath = getComposerFilesFromPath;
 exports.updateConfigFile = updateConfigFile;
 exports.updateLastApiCall = updateLastApiCall;
+exports.updateOnlyModuleFile = updateOnlyModuleFile;
 exports.writeReleaseAppData = writeReleaseAppData;

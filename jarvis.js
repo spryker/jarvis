@@ -39,6 +39,7 @@ const {
     getCurrentVersion,
     updateConfigFile,
     updateLastApiCall,
+    updateOnlyModuleFile,
     writeReleaseAppData
 } = require('./file-system.js');
 const { getReleaseAppData } = require('./api-call.js');
@@ -178,6 +179,16 @@ function application(args) {
     const composerFiles = compose(
         getComposerFilesFromPath,
         head,
+        cleanNodeInput
+    )(args);
+    // Define if user will use the Features view or Only Modules view
+    compose(
+        ifElse(
+            equals('--no-features'),
+            () => updateOnlyModuleFile(true),
+            () => updateOnlyModuleFile(false)
+        ),
+        last,
         cleanNodeInput
     )(args);
     const JSONcomposerFiles = map(cur => {

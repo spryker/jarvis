@@ -111,7 +111,7 @@ function stepsToHitTarget(data) {
 
     return R.compose(
         R.cond([
-            [d => R.isEmpty(R.prop('targets', d)), logicForOnlyModules],
+            [d => R.isEmpty(R.prop('targets', d)) || R.equals(R.prop('onlyModules', d), true), logicForOnlyModules],
             [R.T, logicForProductReleases]
         ]),
         reduceToApplicableTargets
