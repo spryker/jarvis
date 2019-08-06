@@ -119,9 +119,22 @@ const cleanDescription = description => R.compose(
     R.trim
 )(description);
 
+function versionFromStringToArrayOfNumber(version) {
+    return R.compose(
+        R.map(cur => Number(cur)),
+        R.split('.')
+    )(version);
+}
+
 function majorAvailable(mod) {
-    const installedVersion = R.split('.', R.prop('installedVersion', mod));
-    const lastVersionAvailable = R.split('.', R.path(['package', 'version'], mod));
+    const installedVersion = R.compose(
+        versionFromStringToArrayOfNumber,
+        R.prop('installedVersion')
+    )(mod);
+    const lastVersionAvailable = R.compose(
+        versionFromStringToArrayOfNumber,
+        R.path(['package', 'version'])
+    )(mod);
 
     // version = 0.x.z
     if (R.nth(0, installedVersion) === '0' && R.nth(0, lastVersionAvailable) === '0') {
