@@ -8,7 +8,7 @@ Spryker Jarvis helps projects to keep up on Spryker updates, migrate to the late
 1. Fork/Clone/Download this repo
 2. Install nodejs & npm in case you do not have them already installed on your machine 
 3. Open a terminal inside the folder and run `npm install` and then `node jarvis.js <path to your spryker project folder>`
-4. Open `http://localhost:3000` inside your browser and enjoy your migration analysis
+4. Open `http://localhost:7777` inside your browser and enjoy your migration analysis
 
 If you want to reset the local configuration, run `npm run jarvis-reset`
 
