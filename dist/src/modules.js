@@ -7,6 +7,7 @@
     isNextMajor:false,
     isNextMinor:false,
     isNextPatched:false,
+    isNotNil:false,
     keepOnlyModulesFromOrgs:false,
     majorAvailable:false,
     mapIndexed:false,
@@ -43,7 +44,7 @@ function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLo
 function migrateModuleToLastVersionInMajor(currentComposer, currentComposerLock, currentModules) {
     return R.compose(
         // "spryker-eco/loggly" is the only module that is not part of the release app
-        R.filter(cur => R.prop('module', cur) !== 'spryker-eco/loggly' && R.prop('upToDate', cur) === false && (minorAvailable(cur) || majorAvailable(cur)) && R.prop('requiredVersion', cur) !== '*'),
+        R.filter(cur => isNotNil(R.prop('package', cur)) && R.prop('module', cur) !== 'spryker-eco/loggly' && R.prop('upToDate', cur) === false && (minorAvailable(cur) || majorAvailable(cur)) && R.prop('requiredVersion', cur) !== '*'),
         c => prepareModules(c, currentComposerLock, currentModules)
     )(currentComposer);
 }
