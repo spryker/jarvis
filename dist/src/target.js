@@ -16,6 +16,8 @@
     reconstruct:false,
     templateForProductRelease:false,
     templateToDisplayDetailsOfEachModule:false,
+    topsort:false,
+    transformTarget:false
     versionToNumber:false
 */
 
@@ -25,6 +27,11 @@
 
 function stepsToHitTarget(data) {
     const newData = R.compose(
+        d => R.assoc('topsort', R.ifElse(
+            d => R.isEmpty(R.prop('targets', d)) || R.equals(R.prop('onlyModules', d), true),
+            topsortForModules,
+            topsortForFeatures
+        )(d), d),
         R.evolve({
             targets: R.sort(R.descend(R.prop('release_date')))
         }),
@@ -116,6 +123,35 @@ function stepsToHitTarget(data) {
         ]),
         reduceToApplicableTargets
     )(newData);
+}
+
+function topsortForFeatures(data) {
+    return R.compose(
+        log,
+        d => transformTarget(R.path(['targets', 0], d))
+    )(data);
+}
+
+function topsortForModules(data) {
+    return R.compose(
+        topsort,
+        R.reduce(R.concat, []),
+        R.map(moduleToTopsort),
+        modulesWithTheirCount
+    )(data);
+}
+
+function moduleToTopsort(mod) {
+    return R.compose(
+        m => R.map(cur => [R.head(m), cur], R.last(m)),
+        R.adjust(1, R.compose(
+            R.map(R.prop('package')),
+            R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), modulesForOrgs()) && R.prop('package', cur) !== 'spryker-feature/spryker-core'),
+            R.map(reconstruct(['package', 'requiredVersion'])),
+            R.toPairs,
+            R.path(['dependencies', 'require']))),
+        m => ([R.prop('module', m), R.find(R.propEq('name', R.prop('installedVersion', m)), R.path(['package', 'module_versions'], m))])
+    )(mod);
 }
 
 function hasRequiredVersionForPackage(composerLock) {
@@ -215,24 +251,24 @@ function reduceToApplicableTargets(data) {
 
 function logicForProductReleases(data) {
     return `${R.compose(
-                    R.ifElse(
-                        R.lt(1),
-                        nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
-                                        <h4 class="alert-heading">Be brave! The journey is not over yet!</h4>
-                                        <p>You still have <span class="badge badge-light">${nbTargets}</span> milestones to cover. When the last milestone will be covered, your Spryker project will be up to date.</p>
-                                        <hr>
-                                        <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
-                                    </div>`,
-                        nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
-                                        <h4 class="alert-heading">You are almose there!</h4>
-                                        <p>You only have <span class="badge badge-light">${nbTargets}</span> milestone to cover. When this milestone will be covered, your Spryker project will be up to date.</p>
-                                        <hr>
-                                        <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
-                                    </div>`
-                    ),
-                    R.length,
-                    R.prop('targets')
-                )(data)}
+                R.ifElse(
+                    R.lt(1),
+                    nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
+                                    <h4 class="alert-heading">Be brave! The journey is not over yet!</h4>
+                                    <p>You still have <span class="badge badge-light">${nbTargets}</span> milestones to cover. When the last milestone will be covered, your Spryker project will be up to date.</p>
+                                    <hr>
+                                    <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
+                                </div>`,
+                    nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
+                                    <h4 class="alert-heading">You are almose there!</h4>
+                                    <p>You only have <span class="badge badge-light">${nbTargets}</span> milestone to cover. When this milestone will be covered, your Spryker project will be up to date.</p>
+                                    <hr>
+                                    <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
+                                </div>`
+                ),
+                R.length,
+                R.prop('targets')
+            )(data)}
             <section id="product-release">
                 ${R.ifElse(
                     R.equals('productRelease'),
@@ -252,13 +288,35 @@ function logicForProductReleases(data) {
             </section>`;
 }
 
+function modulesWithTheirCount(data) {
+    return R.compose(
+        R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur)),
+        d => migrateModuleToLastVersionInMajor(R.prop('myComposerJSON', d), R.prop('myComposerLOCK', d), R.prop('releaseModules', d))
+    )(data)
+}
+
 function logicForOnlyModules(data) {
     const p = R.prop(R.__, data);
-    const modulesWithTheirCount = R.compose(
-        R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur))
-    )(migrateModuleToLastVersionInMajor(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules')));
 
-    return `<div class="margin-top-2">${templateForTable(modulesWithTheirCount)}</div>
+    return `<div class="margin-top-2">${templateForTable(modulesWithTheirCount(data))}</div>
+            <section>
+                <div class="accordion margin-top-2 solo-accordion" id="modules-migration-order">
+                    <div class="card">
+                        <div class="card-header" id="modules-migration-order-header">
+                            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#modules-migration-order-body" aria-expanded="false" aria-controls="modules-migration-order-body">
+                                Click here to discover in which order you should migrate your modules!
+                            </button>
+                        </div>
+                        <div id="modules-migration-order-body" class="collapse" aria-labelledby="modules-migration-order-1-header" data-parent="#modules-migration-order">
+                            <div class="card-body">
+                                <ol>
+                                    ${R.join('', R.map(cur => `<li><code>${cur}</code></li>`,R.prop('topsort', data)))}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
             <h3>The following modules are outdated</h3>
             <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
 }

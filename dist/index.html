@@ -13,14 +13,14 @@
     <body class="container">
         <section>
             <h1 id="spryker-jarvis">Spryker Jarvis <span class="badge badge-secondary">Alpha</span></h1>
-            <div class="accordion" id="explain-jarvis">
+            <div class="accordion solo-accordion" id="explain-jarvis">
                 <div class="card">
-                    <div class="card-header" id="explain-jarvis-1-header">
-                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#explain-jarvis-1" aria-expanded="false" aria-controls="explain-jarvis-1">
+                    <div class="card-header" id="explain-jarvis-header">
+                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#explain-jarvis-body" aria-expanded="false" aria-controls="explain-jarvis-body">
                             What is Jarvis? 🤔
                         </button>
                     </div>
-                    <div id="explain-jarvis-1" class="collapse" aria-labelledby="explain-jarvis-1-header" data-parent="#explain-jarvis">
+                    <div id="explain-jarvis-body" class="collapse" aria-labelledby="explain-jarvis-header" data-parent="#explain-jarvis">
                         <div class="card-body">
                             <dl>
                                 <dt>What is the mission of Spryker Jarvis?</dt>
@@ -43,6 +43,7 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.26.1/ramda.min.js"></script>
+        <script type="text/javascript" src="lib/topsort.js"></script>
         <!-- Load your composer.json and composer.lock files -->
         <script type="text/javascript" src="my-composer-files/composerJSON.js"></script> <!-- Should expose myComposerJSON property -->
         <script type="text/javascript" src="my-composer-files/composerLOCK.js"></script> <!-- Should expose myComposerLOCK property -->
@@ -75,7 +76,8 @@
             releaseFeatures,
             releaseModules,
             recommendedFeatures,
-            targets: null
+            targets: null,
+            topsort: null
         });
 
         </script>

@@ -14,7 +14,8 @@
 
 /* exported
     missingSprykerFeatures,
-    templateForProductRelease
+    templateForProductRelease,
+    transformTarget
 */
 
 /////////////////////////////////////////////
@@ -151,6 +152,41 @@ function templateForProductRelease(productRelease) {
             logicProductReleaseBeforeTemplate
         )
     )(productRelease);
+}
+
+function transformTarget(target) {
+    return R.ifElse(
+        R.propEq('targetType', 'architectureChange'),
+        logicArchitectureChangeBeforeTemplate,
+        logicProductReleaseForTopsort
+    )(target);
+}
+
+function logicProductReleaseForTopsort(target) {
+    return R.compose(
+        R.filter(cur => isNotEmpty(R.path(['data', 'composer', 'require'], cur))),
+        R.map(R.over(
+            R.lensPath(['data', 'composer', 'require']),
+            R.filter(cur => R.isNil(R.prop('installedVersion', cur)) || isNextMajor(R.prop('installedVersion', cur), R.tail(R.prop('requiredVersion', cur))))
+        )),
+        R.ifElse(
+            R.isEmpty,
+            R.always(R.prop('feature_versions', target)),
+            R.identity
+        ),
+        R.filter(cur => isNotEmpty(R.path(['data', 'diff'], cur), 0)),
+        R.map(
+            R.over(
+                R.lensPath(['data', 'diff']),
+                R.compose(
+                    R.filter(cur => isNotNil(R.path(['beforeAfter', 'before'], cur))),
+                    R.map(reconstruct(['package', 'beforeAfter'])),
+                    R.toPairs
+                )
+            )
+        ),
+        R.prop('feature_versions')
+    )(target);
 }
 
 function logicArchitectureChangeBeforeTemplate(target) {
