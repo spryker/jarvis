@@ -137,6 +137,7 @@ function topsortForModules(data) {
         topsort,
         R.reduce(R.concat, []),
         R.map(moduleToTopsort),
+        R.filter(R.propEq('upToDate', false)),
         modulesWithTheirCount
     )(data);
 }
