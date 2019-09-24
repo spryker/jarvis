@@ -155,6 +155,11 @@ function templateForProductRelease(productRelease) {
 
 function logicArchitectureChangeBeforeTemplate(target) {
     return R.compose(
+        R.filter(cur => isNotEmpty(R.prop('modules', cur))),
+        R.map(R.over(
+            R.lensPath(['modules']),
+            R.filter(cur => isNextMajor(R.prop('installedVersion', cur), R.tail(R.prop('requiredVersion', cur))))
+        )),
         R.prop('feature_versions')
     )(target);
 }
@@ -163,7 +168,7 @@ function logicProductReleaseBeforeTemplate(target) {
     return R.compose(
         R.filter(cur => isNotEmpty(R.path(['data', 'composer', 'require'], cur))),
         R.map(R.over(
-            R.lensPath(['data', 'composer', 'require']),
+            R.lensProp(['data', 'composer', 'require']),
             R.filter(cur => isNextMajor(R.prop('installedVersion', cur), R.tail(R.prop('requiredVersion', cur))))
         )),
         R.ifElse(
