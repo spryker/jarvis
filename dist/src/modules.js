@@ -29,13 +29,13 @@
 // Migration Analysis for Modules outside Spryker Features //
 ////////////////////////////////////////////////////////////
 
-function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
+function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules, topoData) {
     return R.compose(
         R.join(''),
         R.ifElse(
             R.isEmpty,
             () => ([templateUpToDate('All your Spryker modules are up to date or you do not use any outside of the Spryker features!')]),
-            R.map(templateForPackage)
+            R.map(templateForPackage(topoData))
         ),
         c => migrateModuleToLastVersionInMajor(c, currentComposerLock, currentModules)
     )(currentComposer);
@@ -91,7 +91,7 @@ function onlyRelevantMajorVersions(data) {
     )(allVersions);
 }
 
-function templateMajorOrMinorAvailable(data) {
+function templateMajorOrMinorAvailable(topoData, data) {
     function tabsForModule(majorsAvailable) {
         return R.compose(
             R.join(''),
@@ -175,16 +175,18 @@ function templateMajorOrMinorAvailable(data) {
             </div>`;
 }
 
-function templateForPackage(data) {
-    return `<div class="card margin-bottom">
-              <div class="card-body" id="${R.path(['package', 'identifier'], data)}">
-                <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
-                <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
-                <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
-                ${templateMajorOrMinorAvailable(data)}
-              </div>
-              <div class="card-footer">
-                <a href="#spryker-jarvis">Get back to the summary ☝️</a>
-              </div>
-            </div>`;
+function templateForPackage(topoData) {
+    return function(data) {
+        return `<div class="card margin-bottom">
+                  <div class="card-body" id="${R.path(['package', 'identifier'], data)}">
+                    <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
+                    <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
+                    <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
+                    ${templateMajorOrMinorAvailable(topoData, data)}
+                  </div>
+                  <div class="card-footer">
+                    <a href="#spryker-jarvis">Get back to the summary ☝️</a>
+                  </div>
+                </div>`;
+    }
 }

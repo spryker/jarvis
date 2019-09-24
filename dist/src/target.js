@@ -27,7 +27,7 @@
 
 function stepsToHitTarget(data) {
     const newData = R.compose(
-        d => R.assoc('topsort', R.ifElse(
+        d => R.assoc('topoData', R.ifElse(
             d => R.isEmpty(R.prop('targets', d)) || R.equals(R.prop('onlyModules', d), true),
             topsortForModules,
             topsortForFeatures
@@ -311,7 +311,7 @@ function logicForOnlyModules(data) {
                         <div id="modules-migration-order-body" class="collapse" aria-labelledby="modules-migration-order-1-header" data-parent="#modules-migration-order">
                             <div class="card-body">
                                 <ol>
-                                    ${R.join('', R.map(cur => `<li><code>${cur}</code></li>`,R.prop('topsort', data)))}
+                                    ${R.join('', R.map(cur => `<li><code>${cur}</code></li>`,R.prop('topoData', data)))}
                                 </ol>
                             </div>
                         </div>
@@ -319,7 +319,7 @@ function logicForOnlyModules(data) {
                 </div>
             </section>
             <h3>The following modules are outdated</h3>
-            <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'))}</div>`;
+            <div>${templateToDisplayDetailsOfEachModule(p('myComposerJSON'), p('myComposerLOCK'), p('releaseModules'), p('topoData'))}</div>`;
 }
 
 function groupWithLevel(level) {
