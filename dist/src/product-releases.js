@@ -168,7 +168,7 @@ function logicProductReleaseBeforeTemplate(target) {
     return R.compose(
         R.filter(cur => isNotEmpty(R.path(['data', 'composer', 'require'], cur))),
         R.map(R.over(
-            R.lensProp(['data', 'composer', 'require']),
+            R.lensPath(['data', 'composer', 'require']),
             R.filter(cur => isNextMajor(R.prop('installedVersion', cur), R.tail(R.prop('requiredVersion', cur))))
         )),
         R.ifElse(
