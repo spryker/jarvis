@@ -28,7 +28,7 @@ function updateOnlyModuleFile(bool) {
         equals(false),
         () => `const onlyModules = false;`,
         () => `const onlyModules = true;`
-    )(bool)
+    )(bool);
 
     fs.writeFileSync('dist/release-app-data/only-modules.js', newData, 'utf8');
 
