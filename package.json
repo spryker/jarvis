@@ -1,6 +1,6 @@
 {
   "name": "jarvis",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "Spryker Jarvis",
   "main": "jarvis.js",
   "scripts": {
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/spryker-sdk/jarvis.git"
+    "url": "git+https://github.com/spryker/jarvis.git"
   },
   "author": "Jeremy Fourna <jeremy.fourna@spryker.com>",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/spryker-sdk/jarvis/issues"
+    "url": "https://github.com/spryker/jarvis/issues"
   },
-  "homepage": "https://github.com/spryker-sdk/jarvis#readme",
+  "homepage": "https://github.com/spryker/jarvis#readme",
   "dependencies": {
     "compression": "^1.7.4",
     "express": "^4.16.4",

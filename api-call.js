@@ -6,7 +6,7 @@ const {
 
 function getReleaseAppData(data, errorCallback, callback) {
     const options = {
-        url: 'https://release.spryker.com/migration-analysis',
+        url: 'https://api.release.spryker.com/migration-analysis.json',
         method: 'POST',
         body: data,
         json: true
