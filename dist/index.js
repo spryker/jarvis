@@ -1,6 +1,8 @@
 /* globals
-	stepsToHitTarget:false,
-	render:false
+	logicForOnlyModules:false,
+	logicForMissingFeatures:false,
+	logicForProductReleases:false,
+	prepareData:false
 */
 
 /* exported
@@ -13,5 +15,13 @@
 
 
 function nextTarget(el, data) {
-    return render(el, stepsToHitTarget(data));
+    return R.compose(
+        d => render(el, d),
+        R.cond([
+            [d => R.isEmpty(d.target) || d.onlyModules === true, logicForOnlyModules],
+            [d => d.missingFeatures === true, logicForMissingFeatures],
+            [R.T, logicForProductReleases]
+        ]),
+        prepareData
+    )(data);
 }

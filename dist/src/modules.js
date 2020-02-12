@@ -179,7 +179,7 @@ function templateForPackage(data) {
     return `<div class="card margin-bottom">
               <div class="card-body" id="${R.path(['package', 'identifier'], data)}">
                 <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
-                <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
+                <h6 class="card-subtitle text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
                 <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
                 ${templateMajorOrMinorAvailable(data)}
               </div>

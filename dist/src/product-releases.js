@@ -33,7 +33,7 @@ function missingSprykerFeatures(currentFeatures, currentComposer) {
                 R.concat('<dl>'),
                 cur => R.concat(cur, '</dl>'),
                 R.join(''),
-                R.map(templateForMissingFeatures),
+                R.map(templateForFeaturesNotUsed),
                 R.sortBy(R.prop('name'))
             )
         ),
@@ -46,7 +46,7 @@ function missingSprykerFeatures(currentFeatures, currentComposer) {
     )(currentComposer);
 }
 
-function templateForMissingFeatures(feature) {
+function templateForFeaturesNotUsed(feature) {
     const p = R.prop(R.__, feature);
 
     return `<dt><a rel="noopener" href="https://github.com/${p('package')}" target="_blank">${p('name')}</a> ${isNewFeature(p('feature_versions'))}</dt>

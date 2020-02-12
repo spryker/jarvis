@@ -20,11 +20,14 @@
 */
 
 /* exported
-    stepsToHitTarget
+    prepareData,
+    logicForProductReleases,
+    logicForOnlyModules
 */
 
-function stepsToHitTarget(data) {
-    const newData = R.compose(
+function prepareData(data) {
+    return R.compose(
+        reduceToApplicableTargets,
         R.evolve({
             targets: R.sort(R.descend(R.prop('release_date')))
         }),
@@ -105,17 +108,27 @@ function stepsToHitTarget(data) {
                 ),
                 R.assoc('targetType', 'productRelease')
             )),
-            releaseModules: R.map(cur => R.assoc('identifier', r(), cur))
+            releaseModules: R.map(cur => R.assoc('identifier', r(), cur)),
+            detectedFeatures: R.map(R.evolve({
+                modules_included: R.compose(
+                    R.map(reconstruct(['package', 'currentVersion'])),
+                    R.toPairs
+                ),
+                modules_missing: R.compose(
+                    R.map(reconstruct(['package', 'currentVersion'])),
+                    R.toPairs
+                ),
+                feature_versions: R.map(R.over(
+                    R.lensPath(['data', 'composer', 'require']),
+                    R.compose(
+                        R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), modulesForOrgs()) && R.prop('package', cur) !== 'spryker-feature/spryker-core'),
+                        R.map(reconstruct(['package', 'requiredVersion'])),
+                        R.toPairs
+                    )
+                ))
+            }))
         })
     )(data);
-
-    return R.compose(
-        R.cond([
-            [d => R.isEmpty(R.prop('targets', d)) || R.equals(R.prop('onlyModules', d), true), logicForOnlyModules],
-            [R.T, logicForProductReleases]
-        ]),
-        reduceToApplicableTargets
-    )(newData);
 }
 
 function hasRequiredVersionForPackage(composerLock) {

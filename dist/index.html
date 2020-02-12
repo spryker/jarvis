@@ -38,9 +38,9 @@
         </section>
         <section id="next-target"></section>
         <!-- Libraries -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.26.1/ramda.min.js"></script>
         <!-- Load your composer.json and composer.lock files -->
@@ -56,9 +56,11 @@
         <script type="text/javascript" src="release-app-data/current-version.js"></script> <!-- Expose currentVersion property -->
         <script type="text/javascript" src="release-app-data/product-releases.js"></script> <!-- Expose productReleases property -->
         <script type="text/javascript" src="release-app-data/only-modules.js"></script> <!-- Expose onlyModules property -->
+        <script type="text/javascript" src="release-app-data/missing-features.js"></script> <!-- Expose missingFeatures property -->
         <!-- Where the magic happen -->
         <script type="text/javascript" src="src/utils.js"></script>
         <script type="text/javascript" src="src/modules.js"></script>
+        <script type="text/javascript" src="src/missing-features.js"></script>
         <script type="text/javascript" src="src/product-releases.js"></script>
         <script type="text/javascript" src="src/target.js"></script>
         <script type="text/javascript" src="index.js"></script>
@@ -67,6 +69,7 @@
             architectureChanges,
             currentVersion,
             detectedFeatures,
+            missingFeatures,
             myComposerJSON,
             myComposerLOCK,
             onboarding,
