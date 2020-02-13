@@ -78,8 +78,7 @@ function prepareData(data) {
                                                         // Retrieve the required modules of this version
                                                         R.compose(
                                                             R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), onlyModulesForOrgs())),
-                                                            R.map(reconstruct(['package', 'requiredVersion'])),
-                                                            R.toPairs,
+                                                            packageAndRequiredVersion,
                                                             R.path(['data', 'composer', 'require'])
                                                         ),
                                                         // Find the right version of this feature
@@ -96,34 +95,26 @@ function prepareData(data) {
                                             }),
                                             R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), modulesForOrgs()) && R.prop('package', cur) !== 'spryker-feature/spryker-core'),
                                             // Transform required modules from object to an Array of objects
-                                            R.map(reconstruct(['package', 'requiredVersion'])),
-                                            R.toPairs
+                                            packageAndRequiredVersion
                                         )
                                     }
                                 }
                             })
                         )),
-                        R.filter(cur => R.path(['data', 'composer', 'name'], cur) !== 'spryker-feature/spryker-core')
+                        R.filter(cur => cur.data.composer.name !== 'spryker-feature/spryker-core')
                     )
                 ),
                 R.assoc('targetType', 'productRelease')
             )),
             releaseModules: R.map(cur => R.assoc('identifier', r(), cur)),
             detectedFeatures: R.map(R.evolve({
-                modules_included: R.compose(
-                    R.map(reconstruct(['package', 'currentVersion'])),
-                    R.toPairs
-                ),
-                modules_missing: R.compose(
-                    R.map(reconstruct(['package', 'currentVersion'])),
-                    R.toPairs
-                ),
+                modules_included: packageAndCurrentVersion,
+                modules_missing: packageAndCurrentVersion,
                 feature_versions: R.map(R.over(
                     R.lensPath(['data', 'composer', 'require']),
                     R.compose(
                         R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), modulesForOrgs()) && R.prop('package', cur) !== 'spryker-feature/spryker-core'),
-                        R.map(reconstruct(['package', 'requiredVersion'])),
-                        R.toPairs
+                        packageAndRequiredVersion
                     )
                 ))
             }))
@@ -228,24 +219,24 @@ function reduceToApplicableTargets(data) {
 
 function logicForProductReleases(data) {
     return `${R.compose(
-                    R.ifElse(
-                        R.lt(1),
-                        nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
-                                        <h4 class="alert-heading">Be brave! The journey is not over yet!</h4>
-                                        <p>You still have <span class="badge badge-light">${nbTargets}</span> milestones to cover. When the last milestone will be covered, your Spryker project will be up to date.</p>
-                                        <hr>
-                                        <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
-                                    </div>`,
-                        nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
-                                        <h4 class="alert-heading">You are almose there!</h4>
-                                        <p>You only have <span class="badge badge-light">${nbTargets}</span> milestone to cover. When this milestone will be covered, your Spryker project will be up to date.</p>
-                                        <hr>
-                                        <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
-                                    </div>`
-                    ),
-                    R.length,
-                    R.prop('targets')
-                )(data)}
+                R.ifElse(
+                    R.lt(1),
+                    nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
+                                    <h4 class="alert-heading">Be brave! The journey is not over yet!</h4>
+                                    <p>You still have <span class="badge badge-light">${nbTargets}</span> milestones to cover. When the last milestone will be covered, your Spryker project will be up to date.</p>
+                                    <hr>
+                                    <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
+                                </div>`,
+                    nbTargets => `<div class="margin-top-2 alert alert-primary" role="alert">
+                                    <h4 class="alert-heading">You are almose there!</h4>
+                                    <p>You only have <span class="badge badge-light">${nbTargets}</span> milestone to cover. When this milestone will be covered, your Spryker project will be up to date.</p>
+                                    <hr>
+                                    <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
+                                </div>`
+                ),
+                R.length,
+                R.prop('targets')
+            )(data)}
             <section id="product-release">
                 ${R.ifElse(
                     R.equals('productRelease'),
@@ -257,7 +248,7 @@ function logicForProductReleases(data) {
                             </div>`
                 )(R.path(['targets', 0, 'targetType'],data))}
                 <p>You have the following Spryker Features to migrate.</p>
-                <div id="listOfProductReleases">${templateForProductRelease(R.path(['targets', 0], data))}</div>
+                <div id="listOfProductReleases">${templateForProductRelease(data.targets[0])}</div>
             </section>
             <section>
                 <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
@@ -287,26 +278,33 @@ function groupWithLevel(level) {
     };
 }
 
-function templateForTable(listOfModules) {
-    const groupingByMajor = R.compose(
+function groupingByMajor(listOfModules) {
+    return R.compose(
         groupWithLevel('major'),
         R.sortWith([R.descend(R.path(['nextVersionsCount', 'major']))]),
         R.filter(cur => R.gt(R.path(['nextVersionsCount', 'major'], cur), 0))
     )(listOfModules);
-    const groupingByMinor = R.compose(
+}
+
+function groupingByMinor(listOfModules) {
+    return R.compose(
         groupWithLevel('minor'),
         R.sortWith([R.descend(R.path(['nextVersionsCount', 'minor']))]),
         R.filter(cur => R.gt(R.path(['nextVersionsCount', 'minor'], cur), 0) && R.equals(R.path(['nextVersionsCount', 'major'], cur), 0))
     )(listOfModules);
-    const finalList = R.filter(isNotEmpty, [groupingByMajor, groupingByMinor]);
+}
 
+function templateForTable(listOfModules) {
     return `<div class="accordion" id="summary-table">
-            ${templateForSummaryElement(finalList)}
+            ${R.compose(
+                templateForSummaryElement,
+                lom => R.filter(isNotEmpty, [groupingByMajor(lom), groupingByMinor(lom)])
+            )(listOfModules)}
           </div>`;
 }
 
 function count(list) {
-    return R.reduce((prev, cur) => R.add(prev, R.length(cur)), 0, list);
+    return R.reduce((prev, cur) => prev + cur.length, 0, list);
 }
 
 function templateForSummaryElement(listOfElements) {
@@ -318,13 +316,15 @@ function templateForSummaryElement(listOfElements) {
         }
     }
 
-    const isActiveBool = index => index === 0 ? 'true' : 'false';
-    const shouldBeCollapsed = index => index === 0 ? '' : 'collapsed';
-
     return R.compose(
         R.join(''),
         mapIndexed((cur, index) => {
-            const isMajor = R.gt(R.path(['nextVersionsCount', 'major'], R.head(R.head(cur))), 0);
+            const isMajor = R.compose(
+                n => n > 0,
+                R.path(['nextVersionsCount', 'major']),
+                R.head,
+                R.head
+            )(cur);
             const id = r();
 
             return `<div class="card">
@@ -348,34 +348,34 @@ function templateForSummaryElement(listOfElements) {
 function templateForEachGroupOfMigration(listOfModules) {
     function textForBoxTitle(isMajor, count, mod) {
         if (isMajor) {
-            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${R.path(['nextVersionsCount', 'major'], mod)}</span> major version(s).`;
+            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${mod.nextVersionsCount.major}</span> major version(s).`;
         } else {
-            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${R.path(['nextVersionsCount', 'minor'], mod)}</span> minor version(s).`;
+            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${mod.nextVersionsCount.minor}</span> minor version(s).`;
         }
     }
 
-    const isMajor = R.gt(R.path(['nextVersionsCount', 'major'], R.head(listOfModules)), 0);
+    const isMajor = listOfModules[0].nextVersionsCount.major > 0;
 
     return `<div class="card margin-bottom">
                 <div class="card-header">
-                    <b>${textForBoxTitle(isMajor, R.length(listOfModules), R.head(listOfModules))}</b>
+                    <b>${textForBoxTitle(isMajor, listOfModules.length, listOfModules[0])}</b>
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled">
-                        ${R.join('', R.map(cur => `<li><a href=#${R.path(['package', 'identifier'], cur)}><code>${R.prop('module', cur)}</code></a></li>`, listOfModules))}
+                        ${R.join('', R.map(cur => `<li><a href=#${R.path(['package', 'identifier'], cur)}><code>${cur.module}</code></a></li>`, listOfModules))}
                     <ul>
                 </div>
             </div>`;
 }
 
 function countVersionsForModule(mod) {
-    const versions = R.reverse(R.path(['package', 'module_versions'], mod));
-
     return R.reduce((prev, cur) => R.cond([
-        [version => R.lte(versionToNumber(R.prop('name', version)), versionToNumber(R.prop('latestVersion', prev))), () => prev],
-        [version => isNextMajor(R.prop('latestVersion', prev), R.prop('name', version)), version => R.evolve({ major: R.inc, minor: R.always(0), patch: R.always(0), latestVersion: R.always(R.prop('name', version)) }, prev)],
-        [version => isNextMinor(R.prop('latestVersion', prev), R.prop('name', version)), version => R.evolve({ minor: R.inc, patch: R.always(0), latestVersion: R.always(R.prop('name', version)) }, prev)],
-        [version => isNextPatched(R.prop('latestVersion', prev), R.prop('name', version)), version => R.evolve({ patch: R.inc, latestVersion: R.always(R.prop('name', version)) }, prev)],
-        [R.T, () => prev]
-    ])(cur), { major: 0, minor: 0, patch: 0, latestVersion: R.prop('installedVersion', mod) }, versions);
+            [version => versionToNumber(version.name) <= versionToNumber(prev.latestVersion), () => prev],
+            [version => isNextMajor(prev.latestVersion, version.name), version => R.evolve({ major: R.inc, minor: R.always(0), patch: R.always(0), latestVersion: R.always(version.name) }, prev)],
+            [version => isNextMinor(prev.latestVersion, version.name), version => R.evolve({ minor: R.inc, patch: R.always(0), latestVersion: R.always(version.name) }, prev)],
+            [version => isNextPatched(prev.latestVersion, version.name), version => R.evolve({ patch: R.inc, latestVersion: R.always(version.name) }, prev)],
+            [R.T, () => prev]
+        ])(cur), { major: 0, minor: 0, patch: 0, latestVersion: mod.installedVersion },
+        R.reverse(mod.package.module_versions)
+    );
 }

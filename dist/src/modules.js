@@ -29,6 +29,8 @@
 // Migration Analysis for Modules outside Spryker Features //
 ////////////////////////////////////////////////////////////
 
+const templateUpToDate = content => `<div class="alert alert-primary" role="alert">${content}</div>`;
+
 function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
     return R.compose(
         R.join(''),
@@ -139,7 +141,7 @@ function templateMajorOrMinorAvailable(data) {
                 s => R.concat(s, '</ul></dd>'),
                 s => R.concat('<h2>You might also be interested in the following modules</h2><dd><ul>', s),
                 R.join(''),
-                R.map(mod => `<li><a rel="noopener" href="https://github.com/${R.head(mod)}}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
+                R.map(mod => `<li><a rel="noopener" href="https://github.com/${mod[0]}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
                 R.toPairs
             )(o),
             () => ''

@@ -27,8 +27,8 @@ function templateForMissingFeatures(data) {
                             R.always(''),
                             fv => {
                                 return `<div class="alert alert-success" role="alert">
-                                          We identified that your can safely replace those module by this Spryker feature with the version <a href="https://github.com/${fv.data.composer.name}/releases/tag/${fv.name}" target="_blank">${fv.name}</a>.<br>
-                                          Please follow our <a href="${fv.guide_url}" target="_blank">feature integration guide</a> during this process.
+                                          We identified that your can safely replace those module by this Spryker feature with the version <a rel="noopener" href="https://github.com/${fv.data.composer.name}/releases/tag/${fv.name}" target="_blank">${fv.name}</a>.<br>
+                                          Please follow our <a rel="noopener" href="${fv.guide_url}" target="_blank">feature integration guide</a> during this process.
                                         </div>`;
                             }
                         )(compatibleFeatureVersions(cur))}
@@ -44,6 +44,9 @@ function templateForMissingFeatures(data) {
                                     </div>`,
                             templateMissingModulesInMissingFeature
                         )(cur.modules_missing)}
+                    </div>
+                    <div class="card-footer">
+                        <a href="#spryker-jarvis">Get back to the top ☝️</a>
                     </div>
                 </div>`;
     }, data.detectedFeatures));

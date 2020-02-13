@@ -66,7 +66,7 @@ function templateForProductRelease(productRelease) {
         return R.compose(
             R.join(''),
             mapIndexed((cur, index) => `<a
-                                            class="nav-link ${isActive(index)}
+                                            class="nav-link ${isActive(index)}"
                                             id="v-pills-${R.ifElse(
                                                 cur => R.isNil(R.path(['feature', 'package'], cur)),
                                                 cur => properName('/', ['package'], cur),
@@ -156,9 +156,15 @@ function templateForProductRelease(productRelease) {
 function logicArchitectureChangeBeforeTemplate(target) {
     return R.compose(
         R.filter(cur => isNotEmpty(R.prop('modules', cur))),
-        R.map(R.over(
-            R.lensPath(['modules']),
-            R.filter(cur => isNextMajor(R.prop('installedVersion', cur), R.tail(R.prop('requiredVersion', cur))))
+        R.map(R.compose(
+            R.over(
+                R.lensPath(['modules']),
+                R.compose(
+                    R.filter(cur => isNextMajor(cur.installedVersion, R.tail(cur.requiredVersion))),
+                    R.map(cur => R.assoc('identifier', r(), cur))
+                )
+            ),
+            fv => R.assoc('identifier', r(), fv)
         )),
         R.prop('feature_versions')
     )(target);
