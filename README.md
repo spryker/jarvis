@@ -1,7 +1,7 @@
 # Spryker Jarvis - Migration Tool
 Spryker Jarvis helps projects to keep up on Spryker updates, migrate to the latest versions and integrate new features.
 
-:warning: :rotating_light: Alpha version - Spryker internal! :rotating_light: :warning:
+:warning: :rotating_light: Beta version :rotating_light: :warning:
 
 ## Installation & Usage
 
@@ -11,6 +11,14 @@ Spryker Jarvis helps projects to keep up on Spryker updates, migrate to the late
 4. Open `http://localhost:7777` inside your browser and enjoy your migration analysis
 
 If you want to reset the local configuration, run `npm run jarvis-reset`
+
+### Different views
+
+Spryker Jarvis comes with 3 views:
+
+* `node jarvis.js <path to your spryker project folder>` allows you to migrate your project from Product Release to Product Release
+* `node jarvis.js <path to your spryker project folder> --no-features` allows you to see for each module how outdated you are
+* `node jarvis.js <path to your spryker project folder> --missing-features` allows you to migrate your project to the Spryker feature repository	
 
 ## Disclaimer
 
