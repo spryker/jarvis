@@ -1,6 +1,6 @@
 {
   "name": "jarvis",
-  "version": "0.3.11",
+  "version": "0.4.0",
   "description": "Spryker Jarvis",
   "main": "jarvis.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "express": "^4.16.4",
     "inquirer": "^6.3.1",
     "moment": "^2.24.0",
-    "ramda": "^0.26.1",
+    "ramda": "^0.27.0",
     "request": "^2.88.0"
   },
   "devDependencies": {

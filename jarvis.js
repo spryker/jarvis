@@ -8,6 +8,7 @@ const {
     assoc,
     compose,
     concat,
+    cond,
     equals,
     evolve,
     F,
@@ -25,7 +26,8 @@ const {
     over,
     path,
     prop,
-    propEq
+    propEq,
+    T
 } = require('ramda');
 const {
     cleanNodeInput,
@@ -39,6 +41,7 @@ const {
     getCurrentVersion,
     updateConfigFile,
     updateLastApiCall,
+    updateMissingFeaturesFile,
     updateOnlyModuleFile,
     writeReleaseAppData
 } = require('./file-system.js');
@@ -181,13 +184,25 @@ function application(args) {
         head,
         cleanNodeInput
     )(args);
-    // Define if user will use the Features view or Only Modules view
+    // Define if user will use the Features view or Only Modules view or Missing Features view
     compose(
-        ifElse(
-            equals('--no-features'),
-            () => updateOnlyModuleFile(true),
-            () => updateOnlyModuleFile(false)
-        ),
+        cond([
+            [equals('--no-features'), () => {
+                updateOnlyModuleFile(true);
+                updateMissingFeaturesFile(false);
+                return;
+            }],
+            [equals('--missing-features'), () => {
+                updateOnlyModuleFile(false);
+                updateMissingFeaturesFile(true);
+                return;
+            }],
+            [T, () => {
+                updateOnlyModuleFile(false);
+                updateMissingFeaturesFile(false);
+                return;
+            }]
+        ]),
         last,
         cleanNodeInput
     )(args);

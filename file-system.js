@@ -35,6 +35,18 @@ function updateOnlyModuleFile(bool) {
     return bool;
 }
 
+function updateMissingFeaturesFile(bool) {
+    const newData = ifElse(
+        equals(false),
+        () => `const missingFeatures = false;`,
+        () => `const missingFeatures = true;`
+    )(bool);
+
+    fs.writeFileSync('dist/release-app-data/missing-features.js', newData, 'utf8');
+
+    return bool;
+}
+
 function getConfig() {
     return JSON.parse(fs.readFileSync('config.json', 'utf8'));
 }
@@ -154,5 +166,6 @@ exports.getCurrentVersion = getCurrentVersion;
 exports.getComposerFilesFromPath = getComposerFilesFromPath;
 exports.updateConfigFile = updateConfigFile;
 exports.updateLastApiCall = updateLastApiCall;
+exports.updateMissingFeaturesFile = updateMissingFeaturesFile;
 exports.updateOnlyModuleFile = updateOnlyModuleFile;
 exports.writeReleaseAppData = writeReleaseAppData;

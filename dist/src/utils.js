@@ -151,19 +151,33 @@ function majorAvailable(mod) {
 
 const mapIndexed = R.addIndex(R.map);
 
-const isActive = index => index === 0 ? 'active' : '';
+function isSomething(trueVal, falseVal, index) {
+    return index === 0 ? trueVal : falseVal;
+}
 
-const isShow = index => index === 0 ? 'show' : '';
+const isActive = index => isSomething('active', '', index);
 
-const semVerMajor = version => Number(R.nth(0, R.split('.', version)));
+const isShow = index => isSomething('show', '', index);
 
-const semVerMinor = version => Number(R.nth(1, R.split('.', version)));
+const isActiveBool = index => isSomething('true', 'false', index);
 
-const semVerPatched = version => Number(R.nth(2, R.split('.', version)));
+const shouldBeCollapsed = index => isSomething('', 'collapsed', index);
 
-const templateUpToDate = content => `<div class="alert alert-primary" role="alert">${content}</div>`;
+function semVer(index, version) {
+    return Number(R.nth(index, R.split('.', version)));
+}
 
-const properName = (sep, prop, name) => R.join(`${R.prop('identifier', name)}`, R.split(sep, R.path(prop, name)));
+const semVerMajor = version => semVer(0, version);
+
+const semVerMinor = version => semVer(1, version);
+
+const semVerPatched = version => semVer(2, version);
+
+const properName = (sep, prop, name) => R.compose(
+    R.join(name.identifier),
+    R.split(sep),
+    R.path(prop)
+)(name);
 
 function modulesForOrgs() {
     return ['spryker', 'spryker-feature', 'spryker-shop', 'spryker-eco'];
@@ -199,17 +213,27 @@ const getModuleOrg = R.compose(
 
 const specificTypeOfModules = types => moduleList => R.filter(cur => R.includes(getModuleOrg(cur), types), moduleList);
 
-const findPackageForModule = currentList => mod => R.find(R.propEq('package', R.prop('module', mod)), currentList);
+const findPackageForModule = currentList => mod => R.find(R.propEq('package', mod.module), currentList);
 
 const reconstruct = keys => values => R.zipObj(keys, values);
 
-const findInstalledVersion = composerLock => moduleList => R.map(
-    R.compose(
-        cur => R.append(R.prop('require', R.find(R.propEq('name', R.nth(0, cur)), getNameAndVersionFromInstalledModules(composerLock))), cur),
-        cur => R.append(R.prop('version', R.find(R.propEq('name', R.nth(0, cur)), getNameAndVersionFromInstalledModules(composerLock))), cur)
-    ),
-    moduleList
-);
+function findInstalledVersion(composerLock) {
+    const namesAndVersions = getNameAndVersionFromInstalledModules(composerLock);
+
+    return function(moduleList) {
+        function propToAppend(prop, cur) {
+            return R.append(R.prop(prop, R.find(R.propEq('name', cur[0]), namesAndVersions)), cur)
+        }
+
+        return R.map(
+            R.compose(
+                cur => propToAppend('require', cur),
+                cur => propToAppend('version', cur)
+            ),
+            moduleList
+        );
+    }
+}
 
 // sortStrings :: (String, String) => Number
 function sortStrings(a, b) {
@@ -239,13 +263,28 @@ const keepOnlyVersionsInMajor = version => listOfVersion => {
 function migrationGuideExist(version, packageName) {
     return R.compose(
         R.cond([
-            [p => R.isNil(p), R.always('')],
-            [p => R.equals('n/a', R.prop('guide_url', p)), R.always('<div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>')],
-            [R.T, p => `<a rel="noopener" href="${R.prop('guide_url', p)}" target="_blank" class="btn btn-warning">Migration guide for version ${R.prop('name', p)}</a>`]
+            [R.isNil, R.always('')],
+            [p => 'n/a' === p.guide_url, R.always('<div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>')],
+            [R.T, p => `<a rel="noopener" href="${p.guide_url}" target="_blank" class="btn btn-warning">Migration guide for version ${p.name}</a>`]
         ]),
         R.last,
         keepOnlyVersionsInMajor(version),
         R.prop('module_versions'),
         p => R.find(R.propEq('package', p), releaseModules)
     )(packageName);
+}
+
+function objectToArray(nameForKey, nameForVal, object) {
+    return R.compose(
+        R.map(reconstruct([nameForKey, nameForVal])),
+        R.toPairs
+    )(object);
+}
+
+function packageAndCurrentVersion(object) {
+    return objectToArray('package', 'currentVersion', object);
+}
+
+function packageAndRequiredVersion(object) {
+    return objectToArray('package', 'requiredVersion', object);
 }

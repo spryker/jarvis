@@ -29,6 +29,8 @@
 // Migration Analysis for Modules outside Spryker Features //
 ////////////////////////////////////////////////////////////
 
+const templateUpToDate = content => `<div class="alert alert-primary" role="alert">${content}</div>`;
+
 function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
     return R.compose(
         R.join(''),
@@ -139,7 +141,7 @@ function templateMajorOrMinorAvailable(data) {
                 s => R.concat(s, '</ul></dd>'),
                 s => R.concat('<h2>You might also be interested in the following modules</h2><dd><ul>', s),
                 R.join(''),
-                R.map(mod => `<li><a rel="noopener" href="https://github.com/${R.head(mod)}}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
+                R.map(mod => `<li><a rel="noopener" href="https://github.com/${mod[0]}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
                 R.toPairs
             )(o),
             () => ''
@@ -179,7 +181,7 @@ function templateForPackage(data) {
     return `<div class="card margin-bottom">
               <div class="card-body" id="${R.path(['package', 'identifier'], data)}">
                 <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
-                <h6 class="card-subtitle mb-2 text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
+                <h6 class="card-subtitle text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
                 <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
                 ${templateMajorOrMinorAvailable(data)}
               </div>
