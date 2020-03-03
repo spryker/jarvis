@@ -1,5 +1,6 @@
 /* globals
     converter:false,
+    isActiveBool:false,
     isNextMajor:false,
     isNextMinor:false,
     isNextPatched:false,
@@ -12,8 +13,10 @@
     missingSprykerFeatures:false,
     modulesForOrgs:false,
     onlyModulesForOrgs:false,
+    packageAndCurrentVersion:false,
+    packageAndRequiredVersion:false,
     r:false,
-    reconstruct:false,
+    shouldBeCollapsed:false,
     templateForProductRelease:false,
     templateToDisplayDetailsOfEachModule:false,
     versionToNumber:false
@@ -143,6 +146,10 @@ function hasRequiredVersionForPackage(composerLock) {
     };
 }
 
+function findModuleByPackageName(packageName, releaseModules) {
+    return R.find(R.propEq('package', packageName), releaseModules);
+}
+
 function reduceToApplicableTargets(data) {
     function isProjectOverProductRelease(productRelease) {
         return R.compose(
@@ -158,7 +165,17 @@ function reduceToApplicableTargets(data) {
                     p => R.gt(R.length(p), 0),
                     p => R.compose(
                         p => R.append(p, prev),
-                        p => R.assocPath(['data', 'composer', 'require'], p, cur),
+                        R.compose(
+                            p => R.over(
+                                R.lensPath(['data', 'composer', 'require']),
+                                R.map(cur => R.assoc('guide_url', R.compose(
+                                    R.prop('guide_url'),
+                                    m => R.find(R.propEq('name', R.tail(cur.requiredVersion)), m.module_versions),
+                                    p => findModuleByPackageName(p.package, data.releaseModules)
+                                )(cur), cur)),
+                                p),
+                            p => R.assocPath(['data', 'composer', 'require'], p, cur)
+                        ),
                         R.map(R.last)
                     )(p),
                     R.always(prev)

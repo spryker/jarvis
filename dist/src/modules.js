@@ -16,7 +16,6 @@
     r:false,
     reconstruct:false,
     specificTypeOfModules:false,
-    templateUpToDate:false,
     versionToNumber:false
 */
 
@@ -29,7 +28,9 @@
 // Migration Analysis for Modules outside Spryker Features //
 ////////////////////////////////////////////////////////////
 
-const templateUpToDate = content => `<div class="alert alert-primary" role="alert">${content}</div>`;
+function templateUpToDate(content) {
+    return `<div class="alert alert-primary" role="alert">${content}</div>`;
+}
 
 function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
     return R.compose(

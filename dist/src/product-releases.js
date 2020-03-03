@@ -1,7 +1,9 @@
 /* globals
+    conditionsForGuideURL:false,
     isNotEmpty:false,
     isActive:false,
     isNextMajor:false,
+    isNotEmpty:false,
     isNotNil:false,
     isShow:false,
     keepOnlyModulesFromOrgs:false,
@@ -9,6 +11,7 @@
     migrationGuideExist:false,
     properName:false,
     reconstruct:false,
+    r:false,
     specificTypeOfModules:false
 */
 
@@ -213,11 +216,10 @@ function dependenciesUpgraded(listOfDependencies = []) {
                                             <dt>Version upgraded</dt>
                                             <dd><span class="badge badge-primary">${R.prop('installedVersion', cur)} -> ${R.tail(R.prop('requiredVersion', cur))}</span></dd>
                                         </dl>
-                                        ${R.ifElse(
-                                            R.propEq('type','major'),
-                                            cur => migrationGuideExist(R.tail(R.prop('requiredVersion', cur)), R.prop('package', cur)),
-                                            R.always('')
-                                        )(cur)}
+                                        ${R.cond([
+                                            [R.propEq('type','major'), cur => migrationGuideExist(R.tail(R.prop('requiredVersion', cur)), R.prop('package', cur))],
+                                            [R.T, conditionsForGuideURL]
+                                        ])(cur)}
                                         <a
                                             rel="noopener"
                                             href="https://github.com/${R.prop('package', cur)}/releases/tag/${R.tail(R.prop('requiredVersion', cur))}"

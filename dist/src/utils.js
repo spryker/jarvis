@@ -4,10 +4,12 @@
 
 /* exported
     cleanDescription,
+    conditionsForGuideURL,
     converter,
     findInstalledVersion,
     findPackageForModule,
     isActive,
+    isActiveBool,
     isNextMajor,
     isNextMinor,
     isNotEmpty,
@@ -20,6 +22,8 @@
     migrationGuideExist,
     minorAvailable,
     onlyModulesForOrgs,
+    packageAndCurrentVersion,
+    packageAndRequiredVersion,
     properName,
     r,
     reconstruct,
@@ -27,6 +31,7 @@
     semVerMajor,
     semVerMinor,
     semVerPatched,
+    shouldBeCollapsed,
     sortStrings,
     specificTypeOfModules,
     templateUpToDate,
@@ -57,7 +62,7 @@ const isNotNil = R.complement(R.isNil);
 const isNotEmpty = R.complement(R.isEmpty);
 
 // Used to parse Module markdown and process HTML
-const converter = new showdown.Converter();
+const converter = new showdown.Converter({ simplifiedAutoLink: true });
 
 // Check if the new version is a major
 function isNextMajor(last, newVersion) {
@@ -222,7 +227,7 @@ function findInstalledVersion(composerLock) {
 
     return function(moduleList) {
         function propToAppend(prop, cur) {
-            return R.append(R.prop(prop, R.find(R.propEq('name', cur[0]), namesAndVersions)), cur)
+            return R.append(R.prop(prop, R.find(R.propEq('name', cur[0]), namesAndVersions)), cur);
         }
 
         return R.map(
@@ -232,7 +237,7 @@ function findInstalledVersion(composerLock) {
             ),
             moduleList
         );
-    }
+    };
 }
 
 // sortStrings :: (String, String) => Number
@@ -260,13 +265,17 @@ const keepOnlyVersionsInMajor = version => listOfVersion => {
     }
 };
 
+function conditionsForGuideURL(version) {
+    return R.cond([
+        [R.isNil, R.always('')],
+        [p => 'n/a' === p.guide_url, R.always('<div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>')],
+        [R.T, p => `<a rel="noopener" href="${p.guide_url}" target="_blank" class="btn btn-warning">Migration guide for version ${p.name || R.tail(p.requiredVersion)}</a>`]
+    ])(version);
+}
+
 function migrationGuideExist(version, packageName) {
     return R.compose(
-        R.cond([
-            [R.isNil, R.always('')],
-            [p => 'n/a' === p.guide_url, R.always('<div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>')],
-            [R.T, p => `<a rel="noopener" href="${p.guide_url}" target="_blank" class="btn btn-warning">Migration guide for version ${p.name}</a>`]
-        ]),
+        conditionsForGuideURL,
         R.last,
         keepOnlyVersionsInMajor(version),
         R.prop('module_versions'),
