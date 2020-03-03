@@ -1,5 +1,6 @@
 /* globals
     converter:false,
+    isActiveBool:false,
     isNextMajor:false,
     isNextMinor:false,
     isNextPatched:false,
@@ -12,8 +13,10 @@
     missingSprykerFeatures:false,
     modulesForOrgs:false,
     onlyModulesForOrgs:false,
+    packageAndCurrentVersion:false,
+    packageAndRequiredVersion:false,
     r:false,
-    reconstruct:false,
+    shouldBeCollapsed:false,
     templateForProductRelease:false,
     templateToDisplayDetailsOfEachModule:false,
     versionToNumber:false

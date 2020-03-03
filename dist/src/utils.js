@@ -4,10 +4,12 @@
 
 /* exported
     cleanDescription,
+    conditionsForGuideURL,
     converter,
     findInstalledVersion,
     findPackageForModule,
     isActive,
+    isActiveBool,
     isNextMajor,
     isNextMinor,
     isNotEmpty,
@@ -20,6 +22,8 @@
     migrationGuideExist,
     minorAvailable,
     onlyModulesForOrgs,
+    packageAndCurrentVersion,
+    packageAndRequiredVersion,
     properName,
     r,
     reconstruct,
@@ -27,6 +31,7 @@
     semVerMajor,
     semVerMinor,
     semVerPatched,
+    shouldBeCollapsed,
     sortStrings,
     specificTypeOfModules,
     templateUpToDate,
@@ -222,7 +227,7 @@ function findInstalledVersion(composerLock) {
 
     return function(moduleList) {
         function propToAppend(prop, cur) {
-            return R.append(R.prop(prop, R.find(R.propEq('name', cur[0]), namesAndVersions)), cur)
+            return R.append(R.prop(prop, R.find(R.propEq('name', cur[0]), namesAndVersions)), cur);
         }
 
         return R.map(
@@ -232,7 +237,7 @@ function findInstalledVersion(composerLock) {
             ),
             moduleList
         );
-    }
+    };
 }
 
 // sortStrings :: (String, String) => Number

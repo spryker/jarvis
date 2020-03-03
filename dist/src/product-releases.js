@@ -1,7 +1,9 @@
 /* globals
+    conditionsForGuideURL:false,
     isNotEmpty:false,
     isActive:false,
     isNextMajor:false,
+    isNotEmpty:false,
     isNotNil:false,
     isShow:false,
     keepOnlyModulesFromOrgs:false,
@@ -9,6 +11,7 @@
     migrationGuideExist:false,
     properName:false,
     reconstruct:false,
+    r:false,
     specificTypeOfModules:false
 */
 
