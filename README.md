@@ -24,7 +24,7 @@ Spryker Jarvis comes with 3 views:
 
 ### English
 
-Please note that the following data will be processed by Spryker Sytsems GmbH when this software is installed:
+Please note that the following data will be processed by Spryker Systems GmbH when this software is installed:
 	
 `composer.json` file
 
@@ -48,7 +48,7 @@ If you do not agree with this, this software cannot be used.
 
 ### German
 
-Bitte beachten Sie, dass mit Installation dieser Software folgende Daten von der Spryker Sytsems GmbH verarbeitet werden:
+Bitte beachten Sie, dass mit Installation dieser Software folgende Daten von der Spryker Systems GmbH verarbeitet werden:
 
 `composer.json` Datei
 
