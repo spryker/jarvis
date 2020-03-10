@@ -27,7 +27,7 @@ function templateForMissingFeatures(data) {
                             R.always(''),
                             fv => {
                                 return `<div class="alert alert-success" role="alert">
-                                          We identified that your can safely replace those module by this Spryker feature with the version <a rel="noopener" href="https://github.com/${fv.data.composer.name}/releases/tag/${fv.name}" target="_blank">${fv.name}</a>.<br>
+                                          We identified you use part or all the modules from the Spryker feature <i>${cur.name}</i>. Your project can safely replace those modules by the version <a rel="noopener" href="https://github.com/${fv.data.composer.name}/releases/tag/${fv.name}" target="_blank">${fv.name}</a> of this feature.<br>
                                           Please follow our <a rel="noopener" href="${fv.guide_url}" target="_blank">feature integration guide</a> during this process.
                                         </div>`;
                             }
@@ -39,8 +39,8 @@ function templateForMissingFeatures(data) {
                         ${R.ifElse(
                             R.isEmpty,
                             () => `<div class="alert alert-success" role="alert">
-                                        <p>You are using all the modules of this feature! To replace those modules by the Spryker feature, just run this command.</p>
-                                        <code>composer</code>
+                                        <p>You are already using all the modules of this feature! To replace those modules by the Spryker feature, please remove all of them from your <code>composer.json</code>. After this action, run this command.</p>
+                                        <code>composer require ${cur.package}:"^${cur.version}" --update-with-dependencies</code>
                                     </div>`,
                             templateMissingModulesInMissingFeature
                         )(cur.modules_missing)}
