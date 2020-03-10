@@ -34,7 +34,7 @@ const {
     isNotNil,
     log,
     versionToNumber
-} = require('./utils.js');
+} = require('server/utils.js');
 const {
     getComposerFilesFromPath,
     getConfig,
@@ -44,8 +44,8 @@ const {
     updateMissingFeaturesFile,
     updateOnlyModuleFile,
     writeReleaseAppData
-} = require('./file-system.js');
-const { getReleaseAppData } = require('./api-call.js');
+} = require('server/file-system.js');
+const { getReleaseAppData } = require('server/api-call.js');
 
 
 function run(newReleaseData = undefined) {
