@@ -7,6 +7,7 @@ const {
     concat,
     equals,
     forEach,
+    identity,
     ifElse,
     isNil,
     lensProp,
@@ -60,13 +61,11 @@ function updateLastApiCall(config) {
     const newConfig = compose(
         over(
             lensProp('previousProjects'),
-            map(cur => {
-                if (prop('projectName', cur) === prop('lastProjectUsed', config)) {
-                    return assoc('lastCallToReleaseApp', date, cur);
-                } else {
-                    return cur;
-                }
-            })),
+            map(ifElse(
+                p => p.projectName === config.lastProjectUsed,
+                assoc('lastCallToReleaseApp', date),
+                identity
+            ))),
         assoc('lastCallToReleaseApp', date)
     )(config);
 
@@ -146,10 +145,7 @@ function writeReleaseAppData(currentProject, data = undefined) {
 // This function does some IO
 // writeFiles :: [object] -> [object]
 function writeFiles(listOfFiles) {
-    forEach(cur => {
-        const p = prop(__, cur);
-        fs.writeFileSync(p('path'), `${p('stringStart')}${p('data')}${p('stringEnd')}`, 'utf8');
-    }, listOfFiles);
+    forEach(cur => fs.writeFileSync(cur.path, `${cur.stringStart}${cur.data}${cur.stringEnd}`, 'utf8'), listOfFiles);
 
     return listOfFiles;
 }
