@@ -25,7 +25,9 @@
 /* exported
     prepareData,
     logicForProductReleases,
-    logicForOnlyModules
+    logicForOnlyModules,
+    prepareDataNoFeatures,
+    prepareDataMissingFeatures
 */
 
 function prepareData(data) {
@@ -116,7 +118,201 @@ function prepareData(data) {
                 feature_versions: R.map(R.over(
                     R.lensPath(['data', 'composer', 'require']),
                     R.compose(
-                        R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), modulesForOrgs()) && R.prop('package', cur) !== 'spryker-feature/spryker-core'),
+                        R.filter(cur => R.includes(R.head(R.split('/', cur.package)), modulesForOrgs()) && cur.package !== 'spryker-feature/spryker-core'),
+                        packageAndRequiredVersion
+                    )
+                ))
+            }))
+        })
+    )(data);
+}
+
+function prepareDataNoFeatures(data) {
+    return R.compose(
+        reduceToApplicableTargets,
+        R.evolve({
+            targets: R.sort(R.descend(R.prop('release_date')))
+        }),
+        d => R.assoc('targets', R.concat(R.prop('architectureChanges', d), R.prop('productReleases', d)), d),
+        R.evolve({
+            architectureChanges: R.map(R.compose(
+                a => R.assoc('release_date', R.prop('created', a), a),
+                R.assoc('targetType', 'architectureChange'),
+                a => R.over(
+                    R.lensProp('feature_versions'),
+                    R.compose(
+                        R.filter(cur => isNotEmpty(R.prop('modules', cur))),
+                        R.map(R.over(
+                            R.lensProp('modules'),
+                            R.compose(
+                                R.filter(cur => R.prop('type', cur) !== 'patch' && isNotNil(R.prop('installedVersion', cur))),
+                                R.map(R.compose(
+                                    m => R.assoc('installedVersion', R.prop('version', R.find(
+                                        cur => R.prop('name', cur) === R.prop('package', m),
+                                        R.path(['myComposerLOCK', 'packages'], data))), m),
+                                    m => R.assoc('requiredVersion', `^${R.path(['version', 'after'], m)}`, m)
+                                )),
+                                R.innerJoin(R.eqBy(R.prop('package')), R.prop('modules', a))
+                            )
+                        ))
+                    ), a),
+                a => R.assoc(
+                    'feature_versions',
+                    R.prop('detectedFeatures', data), a),
+                a => R.assoc('identifier', r(), a)
+            )),
+            productReleases: R.map(R.compose(
+                R.over(
+                    R.lensProp('feature_versions'),
+                    R.compose(
+                        R.map(R.compose(
+                            f => R.assoc('identifier', r(), f),
+                            R.evolve({
+                                data: {
+                                    composer: {
+                                        require: R.compose(
+                                            // Keep only modules from Spryker organisations
+                                            R.flatten,
+                                            R.map(cur => {
+                                                if (R.head(R.split('/', R.prop('package', cur))) === 'spryker-feature') {
+
+                                                    return R.compose(
+                                                        // Retrieve the required modules of this version
+                                                        R.compose(
+                                                            R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), onlyModulesForOrgs())),
+                                                            packageAndRequiredVersion,
+                                                            R.path(['data', 'composer', 'require'])
+                                                        ),
+                                                        // Find the right version of this feature
+                                                        feature => R.find(R.propEq('name', R.tail(R.prop('requiredVersion', cur))), R.prop('feature_versions', feature)),
+                                                        // Find feature inside the Release app data
+                                                        p => R.find(R.propEq('package', R.prop('package', p)), R.prop('releaseFeatures', data))
+                                                    )(cur);
+
+                                                } else {
+
+                                                    return cur;
+
+                                                }
+                                            }),
+                                            R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), modulesForOrgs()) && R.prop('package', cur) !== 'spryker-feature/spryker-core'),
+                                            // Transform required modules from object to an Array of objects
+                                            packageAndRequiredVersion
+                                        )
+                                    }
+                                }
+                            })
+                        )),
+                        R.filter(cur => cur.data.composer.name !== 'spryker-feature/spryker-core')
+                    )
+                ),
+                R.assoc('targetType', 'productRelease')
+            )),
+            releaseModules: R.map(cur => R.assoc('identifier', r(), cur)),
+            detectedFeatures: R.map(R.evolve({
+                modules_included: packageAndCurrentVersion,
+                modules_missing: packageAndCurrentVersion,
+                feature_versions: R.map(R.over(
+                    R.lensPath(['data', 'composer', 'require']),
+                    R.compose(
+                        R.filter(cur => R.includes(R.head(R.split('/', cur.package)), modulesForOrgs()) && cur.package !== 'spryker-feature/spryker-core'),
+                        packageAndRequiredVersion
+                    )
+                ))
+            }))
+        })
+    )(data);
+}
+
+function prepareDataMissingFeatures(data) {
+    return R.compose(
+        reduceToApplicableTargets,
+        R.evolve({
+            targets: R.sort(R.descend(R.prop('release_date')))
+        }),
+        d => R.assoc('targets', R.concat(R.prop('architectureChanges', d), R.prop('productReleases', d)), d),
+        R.evolve({
+            architectureChanges: R.map(R.compose(
+                a => R.assoc('release_date', R.prop('created', a), a),
+                R.assoc('targetType', 'architectureChange'),
+                a => R.over(
+                    R.lensProp('feature_versions'),
+                    R.compose(
+                        R.filter(cur => isNotEmpty(R.prop('modules', cur))),
+                        R.map(R.over(
+                            R.lensProp('modules'),
+                            R.compose(
+                                R.filter(cur => R.prop('type', cur) !== 'patch' && isNotNil(R.prop('installedVersion', cur))),
+                                R.map(R.compose(
+                                    m => R.assoc('installedVersion', R.prop('version', R.find(
+                                        cur => R.prop('name', cur) === R.prop('package', m),
+                                        R.path(['myComposerLOCK', 'packages'], data))), m),
+                                    m => R.assoc('requiredVersion', `^${R.path(['version', 'after'], m)}`, m)
+                                )),
+                                R.innerJoin(R.eqBy(R.prop('package')), R.prop('modules', a))
+                            )
+                        ))
+                    ), a),
+                a => R.assoc(
+                    'feature_versions',
+                    R.prop('detectedFeatures', data), a),
+                a => R.assoc('identifier', r(), a)
+            )),
+            productReleases: R.map(R.compose(
+                R.over(
+                    R.lensProp('feature_versions'),
+                    R.compose(
+                        R.map(R.compose(
+                            f => R.assoc('identifier', r(), f),
+                            R.evolve({
+                                data: {
+                                    composer: {
+                                        require: R.compose(
+                                            // Keep only modules from Spryker organisations
+                                            R.flatten,
+                                            R.map(cur => {
+                                                if (R.head(R.split('/', R.prop('package', cur))) === 'spryker-feature') {
+
+                                                    return R.compose(
+                                                        // Retrieve the required modules of this version
+                                                        R.compose(
+                                                            R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), onlyModulesForOrgs())),
+                                                            packageAndRequiredVersion,
+                                                            R.path(['data', 'composer', 'require'])
+                                                        ),
+                                                        // Find the right version of this feature
+                                                        feature => R.find(R.propEq('name', R.tail(R.prop('requiredVersion', cur))), R.prop('feature_versions', feature)),
+                                                        // Find feature inside the Release app data
+                                                        p => R.find(R.propEq('package', R.prop('package', p)), R.prop('releaseFeatures', data))
+                                                    )(cur);
+
+                                                } else {
+
+                                                    return cur;
+
+                                                }
+                                            }),
+                                            R.filter(cur => R.includes(R.head(R.split('/', R.prop('package', cur))), modulesForOrgs()) && R.prop('package', cur) !== 'spryker-feature/spryker-core'),
+                                            // Transform required modules from object to an Array of objects
+                                            packageAndRequiredVersion
+                                        )
+                                    }
+                                }
+                            })
+                        )),
+                        R.filter(cur => cur.data.composer.name !== 'spryker-feature/spryker-core')
+                    )
+                ),
+                R.assoc('targetType', 'productRelease')
+            )),
+            releaseModules: R.map(cur => R.assoc('identifier', r(), cur)),
+            detectedFeatures: R.map(R.evolve({
+                modules_included: packageAndCurrentVersion,
+                modules_missing: packageAndCurrentVersion,
+                feature_versions: R.map(R.over(
+                    R.lensPath(['data', 'composer', 'require']),
+                    R.compose(
+                        R.filter(cur => R.includes(R.head(R.split('/', cur.package)), modulesForOrgs()) && cur.package !== 'spryker-feature/spryker-core'),
                         packageAndRequiredVersion
                     )
                 ))

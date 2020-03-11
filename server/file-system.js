@@ -27,11 +27,11 @@ function updateConfigFile(data) {
 function updateOnlyModuleFile(bool) {
     const newData = ifElse(
         equals(false),
-        () => `const onlyModules = false;`,
-        () => `const onlyModules = true;`
+        () => `const noFeatures = false;`,
+        () => `const noFeatures = true;`
     )(bool);
 
-    fs.writeFileSync('dist/release-app-data/only-modules.js', newData, 'utf8');
+    fs.writeFileSync('dist/release-app-data/no-features.js', newData, 'utf8');
 
     return bool;
 }
