@@ -28,8 +28,28 @@
 // Migration Analysis for Modules outside Spryker Features //
 ////////////////////////////////////////////////////////////
 
-function templateUpToDate(content) {
-    return `<div class="alert alert-primary" role="alert">${content}</div>`;
+function prepareDataNoFeatures(data) {
+    return R.compose(
+        data => R.assoc('modulesWithTheirCount', R.compose(
+            d => R.filter(isNotEmpty, [groupingByMajor(d), groupingByMinor(d)]),
+            R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur)),
+            d => migrateModuleToLastVersionInMajor(d.myComposerJSON, d.myComposerLOCK, d.releaseModules)
+        )(data), data),
+        R.evolve({
+            releaseModules: R.map(cur => R.assoc('identifier', r(), cur))
+        }),
+        R.pick(['myComposerJSON', 'myComposerLOCK', 'releaseModules'])
+    )(data);
+}
+
+function logicForNoFeatures(data) {
+    return `<div class="margin-top-2">
+                <div class="accordion" id="summary-table">
+                    ${templateForSummaryElement(data.modulesWithTheirCount)}
+                </div>
+            </div>
+            <h3>The following modules are outdated</h3>
+            <div>${templateToDisplayDetailsOfEachModule(data.myComposerJSON, data.myComposerLOCK, data.releaseModules)}</div>`;
 }
 
 function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
@@ -190,4 +210,8 @@ function templateForPackage(data) {
                 <a href="#spryker-jarvis">Get back to the summary ☝️</a>
               </div>
             </div>`;
+}
+
+function templateUpToDate(content) {
+    return `<div class="alert alert-primary" role="alert">${content}</div>`;
 }

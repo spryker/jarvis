@@ -1,3 +1,7 @@
+:root {
+    font-size: 100%;
+}
+
 .margin-bottom {
     margin-bottom: 1rem;
 }
@@ -16,7 +20,7 @@
 }
 
 #explain-jarvis {
-    border: 1px solid rgba(0, 0, 0, .125);
+    border: 0.0625rem solid rgba(0, 0, 0, .125);
 }
 
 #explain-jarvis>.card {
@@ -50,7 +54,7 @@ h4 {
 }
 
 .empty-result {
-    padding-left: 15px;
+    padding-left: 1rem;
 }
 
 .links {
@@ -70,6 +74,6 @@ h4 {
 }
 
 #product-release {
-    margin-top: 3rem;
+    margin-top: 1rem;
     margin-bottom: 3rem;
 }
