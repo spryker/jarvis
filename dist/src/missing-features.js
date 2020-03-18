@@ -1,10 +1,14 @@
 /* globals
     cleanDescription,
-    isNextMajor
+    isNextMajor,
+    packageAndCurrentVersion,
+    packageAndRequiredVersion,
+    modulesForOrgs
 */
 
 /* exported
-    logicForMissingFeatures
+    logicForMissingFeatures,
+    prepareDataMissingFeatures
 */
 
 function prepareDataMissingFeatures(data) {
