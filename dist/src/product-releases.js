@@ -72,18 +72,20 @@ function prepareData(data) {
                 a => R.over(
                     R.lensProp('feature_versions'),
                     R.compose(
-                        R.filter(cur => isNotEmpty(R.prop('modules', cur))),
+                        R.filter(cur => isNotEmpty(cur.modules)),
                         R.map(R.over(
                             R.lensProp('modules'),
                             R.compose(
-                                R.filter(cur => R.prop('type', cur) !== 'patch' && isNotNil(R.prop('installedVersion', cur))),
+                                R.filter(cur => cur.type !== 'patch' && isNotNil(cur.installedVersion)),
                                 R.map(R.compose(
-                                    m => R.assoc('installedVersion', R.prop('version', R.find(
-                                        cur => R.prop('name', cur) === R.prop('package', m),
-                                        R.path(['myComposerLOCK', 'packages'], data))), m),
-                                    m => R.assoc('requiredVersion', `^${R.path(['version', 'after'], m)}`, m)
+                                    m => R.assoc(
+                                        'installedVersion',
+                                        R.prop('version', R.find(cur => cur.name === m.package, data.myComposerLOCK.packages)),
+                                        m
+                                    ),
+                                    m => R.assoc('requiredVersion', `^${m.version.after}`, m)
                                 )),
-                                R.innerJoin(R.eqBy(R.prop('package')), R.prop('modules', a))
+                                R.innerJoin(R.eqBy(R.prop('package')), a.modules)
                             )
                         ))
                     ), a),
@@ -217,16 +219,15 @@ function hasRequiredVersionForPackage(composerLock) {
                 R.always([true]),
                 R.compose(
                     pv => [
-                        R.gte(versionToNumber(R.prop('installedVersion', pv)), versionToNumber(R.tail(R.prop('requiredVersion', pv)))),
+                        versionToNumber(pv.installedVersion) >= versionToNumber(R.tail(pv.requiredVersion)),
                         pv
                     ],
-                    pv => R.assoc('installedVersion', R.prop('version', pv), packageAndRequiredVersion)
+                    pv => R.assoc('installedVersion', pv.version, packageAndRequiredVersion)
                 )
             ),
-            R.find(
-                R.propEq('name', R.prop('package', packageAndRequiredVersion))
-            )
-        )(R.prop('packages', composerLock));
+            R.find(R.propEq('name', packageAndRequiredVersion.package)),
+            R.prop('packages')
+        )(composerLock);
     };
 }
 
@@ -239,35 +240,31 @@ function reduceToApplicableTargets(data) {
         return R.compose(
             // If at least one Spryker Feature is not totally covered, then the project must pass over it 
             R.ifElse(
-                pr => R.gt(R.length(pr), 0),
+                pr => pr.length > 0,
                 p => [false, p],
                 R.always([true])
             ),
             R.reduce((prev, cur) => R.compose(
                 // Keep only the modules that do not match the required versions 
                 R.ifElse(
-                    p => R.gt(R.length(p), 0),
+                    p => p.length > 0,
                     p => R.compose(
                         p => R.append(p, prev),
-                        R.compose(
-                            p => R.over(
-                                R.lensPath(['data', 'composer', 'require']),
-                                R.map(cur => R.assoc('guide_url', R.compose(
-                                    R.prop('guide_url'),
-                                    m => R.find(R.propEq('name', R.tail(cur.requiredVersion)), m.module_versions),
-                                    p => findModuleByPackageName(p.package, data.releaseModules)
-                                )(cur), cur)),
-                                p),
-                            p => R.assocPath(['data', 'composer', 'require'], p, cur)
-                        ),
+                        R.over(
+                            R.lensPath(['data', 'composer', 'require']),
+                            R.map(cur => R.assoc('guide_url', R.compose(
+                                R.prop('guide_url'),
+                                m => R.find(R.propEq('name', R.tail(cur.requiredVersion)), m.module_versions),
+                                p => findModuleByPackageName(p.package, data.releaseModules)
+                            )(cur), cur))),
+                        p => R.assocPath(['data', 'composer', 'require'], p, cur),
                         R.map(R.last)
                     )(p),
                     R.always(prev)
                 ),
-                R.filter(cur => isNextMajor(R.prop('installedVersion', R.last(cur)), R.tail(R.prop('requiredVersion', R.last(cur))))),
-                R.filter(cur => R.equals(false, R.head(cur))),
+                R.filter(cur => R.head(cur) === false && isNextMajor(R.prop('installedVersion', R.last(cur)), R.tail(R.prop('requiredVersion', R.last(cur))))),
                 // Check if project has the required version for each of them
-                R.map(hasRequiredVersionForPackage(R.prop('myComposerLOCK', data))),
+                R.map(doesItRequireThePackage),
                 // Get required modules for the Spryker Feature
                 R.path(['data', 'composer', 'require'])
             )(cur), []),
@@ -279,43 +276,43 @@ function reduceToApplicableTargets(data) {
         return R.compose(
             // If at least one Spryker module major is not totally covered, then the project must pass over it 
             R.ifElse(
-                ac => R.gt(R.length(ac), 0),
+                ac => ac.length > 0,
                 p => [false, p],
                 R.always([true])
             ),
             R.map(R.last),
-            R.filter(cur => R.equals(false, R.head(cur))),
+            R.filter(cur => R.head(cur) === false),
             R.map(R.compose(
-                hasRequiredVersionForPackage(R.prop('myComposerLOCK', data)),
-                p => R.assoc('requiredVersion', `^${R.path(['version', 'after'], p)}`, p)
+                doesItRequireThePackage,
+                p => R.assoc('requiredVersion', `^${p.version.after}`, p)
             )),
             R.filter(R.propEq('type', 'major')),
             R.prop('modules')
         )(architectureChange);
     }
 
-    return R.over(
-        R.lensProp('targets'),
-        R.compose(
+    const doesItRequireThePackage = hasRequiredVersionForPackage(data.myComposerLOCK);
+
+    return R.evolve({
+        targets: R.compose(
             R.reverse,
             R.reduce((prev, cur) => R.compose(
                 R.ifElse(
-                    a => R.equals(true, R.head(a)),
+                    a => R.head(a) === true,
                     R.always(prev),
                     a => R.ifElse(
-                        () => R.equals('productRelease', R.prop('targetType', cur)),
+                        () => cur.targetType === 'productRelease',
                         () => R.append(R.assoc('feature_versions', R.last(a), cur), prev),
                         () => R.append(R.assoc('modules', R.last(a), cur), prev)
                     )(a)
                 ),
                 R.ifElse(
-                    t => R.equals('productRelease', R.prop('targetType', t)),
+                    t => t.targetType === 'productRelease',
                     isProjectOverProductRelease,
                     isProjectOverArchitectureChange
-                )
-            )(cur), [])
+                ))(cur), [])
         )
-    )(data);
+    })(data);
 }
 
 function missingSprykerFeatures(currentFeatures, currentComposer) {
