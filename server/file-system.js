@@ -7,6 +7,7 @@ const {
     concat,
     equals,
     forEach,
+    identity,
     ifElse,
     isNil,
     lensProp,
@@ -26,11 +27,11 @@ function updateConfigFile(data) {
 function updateOnlyModuleFile(bool) {
     const newData = ifElse(
         equals(false),
-        () => `const onlyModules = false;`,
-        () => `const onlyModules = true;`
+        () => `const noFeatures = false;`,
+        () => `const noFeatures = true;`
     )(bool);
 
-    fs.writeFileSync('dist/release-app-data/only-modules.js', newData, 'utf8');
+    fs.writeFileSync('dist/release-app-data/no-features.js', newData, 'utf8');
 
     return bool;
 }
@@ -60,13 +61,11 @@ function updateLastApiCall(config) {
     const newConfig = compose(
         over(
             lensProp('previousProjects'),
-            map(cur => {
-                if (prop('projectName', cur) === prop('lastProjectUsed', config)) {
-                    return assoc('lastCallToReleaseApp', date, cur);
-                } else {
-                    return cur;
-                }
-            })),
+            map(ifElse(
+                p => p.projectName === config.lastProjectUsed,
+                assoc('lastCallToReleaseApp', date),
+                identity
+            ))),
         assoc('lastCallToReleaseApp', date)
     )(config);
 
@@ -146,10 +145,7 @@ function writeReleaseAppData(currentProject, data = undefined) {
 // This function does some IO
 // writeFiles :: [object] -> [object]
 function writeFiles(listOfFiles) {
-    forEach(cur => {
-        const p = prop(__, cur);
-        fs.writeFileSync(p('path'), `${p('stringStart')}${p('data')}${p('stringEnd')}`, 'utf8');
-    }, listOfFiles);
+    forEach(cur => fs.writeFileSync(cur.path, `${cur.stringStart}${cur.data}${cur.stringEnd}`, 'utf8'), listOfFiles);
 
     return listOfFiles;
 }

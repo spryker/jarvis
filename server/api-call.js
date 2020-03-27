@@ -1,8 +1,4 @@
 const request = require('request');
-const {
-    equals,
-    prop
-} = require('ramda');
 
 function getReleaseAppData(data, errorCallback, callback) {
     const options = {
@@ -13,13 +9,15 @@ function getReleaseAppData(data, errorCallback, callback) {
     };
 
     return request(options, (error, response, body) => {
-        if (error || equals(prop('code', body), 404) || equals(prop('code', body), 500)) {
+        const errorCode = body.code;
+
+        if (error || errorCode === 404 || errorCode === 500) {
 
             return errorCallback(error);
 
         } else {
 
-            return callback(prop('result', body));
+            return callback(body.result);
 
         }
     });

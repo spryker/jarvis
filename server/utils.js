@@ -2,10 +2,8 @@ const {
     complement,
     drop,
     isNil,
-    multiply,
     nth,
-    split,
-    sum
+    split
 } = require('ramda');
 
 // This function does some IO
@@ -21,18 +19,22 @@ function cleanNodeInput(args) {
     return drop(2, args);
 }
 
-const semVerMajor = version => Number(nth(0, split('.', version)));
+function semVer(index, version) {
+    return Number(nth(index, split('.', version)));
+}
 
-const semVerMinor = version => Number(nth(1, split('.', version)));
+const semVerMajor = version => semVer(0, version);
 
-const semVerPatched = version => Number(nth(2, split('.', version)));
+const semVerMinor = version => semVer(1, version);
+
+const semVerPatched = version => semVer(2, version);
 
 function versionToNumber(version) {
-    const major = multiply(semVerMajor(version), 1000000);
-    const minor = multiply(semVerMinor(version), 1000);
+    const major = semVerMajor(version) * 1000000;
+    const minor = semVerMinor(version) * 1000;
     const patch = semVerPatched(version);
 
-    return sum([major, minor, patch]);
+    return major + minor + patch;
 }
 
 

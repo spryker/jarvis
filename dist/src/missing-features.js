@@ -1,11 +1,34 @@
 /* globals
     cleanDescription,
-    isNextMajor
+    isNextMajor,
+    packageAndCurrentVersion,
+    packageAndRequiredVersion,
+    modulesForOrgs
 */
 
 /* exported
-    logicForMissingFeatures
+    logicForMissingFeatures,
+    prepareDataMissingFeatures
 */
+
+function prepareDataMissingFeatures(data) {
+    return R.compose(
+        R.evolve({
+            detectedFeatures: R.map(R.evolve({
+                modules_included: packageAndCurrentVersion,
+                modules_missing: packageAndCurrentVersion,
+                feature_versions: R.map(R.over(
+                    R.lensPath(['data', 'composer', 'require']),
+                    R.compose(
+                        R.filter(cur => R.includes(R.head(R.split('/', cur.package)), modulesForOrgs()) && cur.package !== 'spryker-feature/spryker-core'),
+                        packageAndRequiredVersion
+                    )
+                ))
+            }))
+        }),
+        R.pick(['detectedFeatures'])
+    )(data);
+}
 
 function logicForMissingFeatures(data) {
     return `<h2>We identified that your project could use the following Spryker features</h2>

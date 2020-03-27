@@ -1,26 +1,31 @@
 /* globals
-    cleanDescription:false,
-    converter:false,
-    findInstalledVersion:false,
-    findPackageForModule:false,
-    isActive:false,
-    isNextMajor:false,
-    isNextMinor:false,
-    isNextPatched:false,
-    isNotNil:false,
-    keepOnlyModulesFromOrgs:false,
-    majorAvailable:false,
-    mapIndexed:false,
-    minorAvailable:false,
-    properName:false,
-    r:false,
-    reconstruct:false,
-    specificTypeOfModules:false,
-    versionToNumber:false
+    cleanDescription,
+    converter,
+    findInstalledVersion,
+    findPackageForModule,
+    isActive,
+    isActiveBool,
+    isNextMajor,
+    isNextMinor,
+    isNextPatched,
+    isNotEmpty,
+    isNotNil,
+    isShow,
+    keepOnlyModulesFromOrgs,
+    majorAvailable,
+    mapIndexed,
+    minorAvailable,
+    properName,
+    r,
+    reconstruct,
+    shouldBeCollapsed,
+    specificTypeOfModules,
+    versionToNumber
 */
 
 /* exported
-    templateToDisplayDetailsOfEachModule
+    logicForNoFeatures,
+    prepareDataNoFeatures
 */
 
 
@@ -28,8 +33,132 @@
 // Migration Analysis for Modules outside Spryker Features //
 ////////////////////////////////////////////////////////////
 
-function templateUpToDate(content) {
-    return `<div class="alert alert-primary" role="alert">${content}</div>`;
+function prepareDataNoFeatures(data) {
+    return R.compose(
+        data => R.assoc('modulesWithTheirCount', R.compose(
+            d => R.filter(isNotEmpty, [groupingByMajor(d), groupingByMinor(d)]),
+            R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur)),
+            d => migrateModuleToLastVersionInMajor(d.myComposerJSON, d.myComposerLOCK, d.releaseModules)
+        )(data), data),
+        R.evolve({
+            releaseModules: R.map(cur => R.assoc('identifier', r(), cur))
+        }),
+        R.pick(['myComposerJSON', 'myComposerLOCK', 'releaseModules'])
+    )(data);
+}
+
+function templateForSummaryElement(listOfElements) {
+    function textForBoxTitle(isMajor, listOfElements) {
+        if (isMajor) {
+            return `Major versions are available for the following <span class="badge badge-dark">${count(listOfElements)}</span> module(s)`;
+        } else {
+            return `Minor versions are available for the following <span class="badge badge-dark">${count(listOfElements)}</span> module(s)`;
+        }
+    }
+
+    return R.compose(
+        R.join(''),
+        mapIndexed((cur, index) => {
+            const isMajor = R.compose(
+                n => n > 0,
+                R.path(['nextVersionsCount', 'major']),
+                R.head,
+                R.head
+            )(cur);
+            const id = r();
+
+            return `<div class="card">
+                        <div class="card-header" id="heading-${id}">
+                            <button class="btn btn-link ${shouldBeCollapsed(index)}" type="button" data-toggle="collapse" data-target="#summary-${id}" aria-expanded="${isActiveBool(index)}" aria-controls="summary-${id}">
+                                ${textForBoxTitle(isMajor, cur)}
+                            </button>
+                        </div>
+                        <div id="summary-${id}" class="collapse ${isShow(index)}" aria-labelledby="heading-${id}" data-parent="#summary-table">
+                            <div class="card-body">
+                                <div class="card-columns">
+                                    ${R.join('',R.map(templateForEachGroupOfMigration, cur))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+        })
+    )(listOfElements);
+}
+
+function groupWithLevel(level) {
+    return function(a, b) {
+        return R.groupWith((a, b) => {
+            const countForA = R.path(['nextVersionsCount', level], a);
+            const countForB = R.path(['nextVersionsCount', level], b);
+
+            return R.equals(countForA, countForB);
+        })(a, b);
+    };
+}
+
+function groupingByMajor(listOfModules) {
+    return R.compose(
+        groupWithLevel('major'),
+        R.sortWith([R.descend(R.path(['nextVersionsCount', 'major']))]),
+        R.filter(cur => R.gt(R.path(['nextVersionsCount', 'major'], cur), 0))
+    )(listOfModules);
+}
+
+function groupingByMinor(listOfModules) {
+    return R.compose(
+        groupWithLevel('minor'),
+        R.sortWith([R.descend(R.path(['nextVersionsCount', 'minor']))]),
+        R.filter(cur => R.gt(R.path(['nextVersionsCount', 'minor'], cur), 0) && R.equals(R.path(['nextVersionsCount', 'major'], cur), 0))
+    )(listOfModules);
+}
+
+function count(list) {
+    return R.reduce((prev, cur) => prev + cur.length, 0, list);
+}
+
+function countVersionsForModule(mod) {
+    return R.reduce((prev, cur) => R.cond([
+            [version => versionToNumber(version.name) <= versionToNumber(prev.latestVersion), () => prev],
+            [version => isNextMajor(prev.latestVersion, version.name), version => R.evolve({ major: R.inc, minor: R.always(0), patch: R.always(0), latestVersion: R.always(version.name) }, prev)],
+            [version => isNextMinor(prev.latestVersion, version.name), version => R.evolve({ minor: R.inc, patch: R.always(0), latestVersion: R.always(version.name) }, prev)],
+            [version => isNextPatched(prev.latestVersion, version.name), version => R.evolve({ patch: R.inc, latestVersion: R.always(version.name) }, prev)],
+            [R.T, () => prev]
+        ])(cur), { major: 0, minor: 0, patch: 0, latestVersion: mod.installedVersion },
+        R.reverse(mod.package.module_versions)
+    );
+}
+
+function templateForEachGroupOfMigration(listOfModules) {
+    function textForBoxTitle(isMajor, count, mod) {
+        if (isMajor) {
+            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${mod.nextVersionsCount.major}</span> major version(s).`;
+        } else {
+            return `Those <span class="badge badge-dark">${count}</span> module(s) are behind <span class="badge badge-primary">${mod.nextVersionsCount.minor}</span> minor version(s).`;
+        }
+    }
+
+    const isMajor = listOfModules[0].nextVersionsCount.major > 0;
+
+    return `<div class="card margin-bottom">
+                <div class="card-header">
+                    <b>${textForBoxTitle(isMajor, listOfModules.length, listOfModules[0])}</b>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        ${R.join('', R.map(cur => `<li><a href=#${R.path(['package', 'identifier'], cur)}><code>${cur.module}</code></a></li>`, listOfModules))}
+                    <ul>
+                </div>
+            </div>`;
+}
+
+function logicForNoFeatures(data) {
+    return `<div class="margin-top-2">
+                <div class="accordion" id="summary-table">
+                    ${templateForSummaryElement(data.modulesWithTheirCount)}
+                </div>
+            </div>
+            <h3>The following modules are outdated</h3>
+            <div>${templateToDisplayDetailsOfEachModule(data.myComposerJSON, data.myComposerLOCK, data.releaseModules)}</div>`;
 }
 
 function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
@@ -190,4 +319,8 @@ function templateForPackage(data) {
                 <a href="#spryker-jarvis">Get back to the summary ☝️</a>
               </div>
             </div>`;
+}
+
+function templateUpToDate(content) {
+    return `<div class="alert alert-primary" role="alert">${content}</div>`;
 }
