@@ -242,7 +242,7 @@ function templateMajorOrMinorAvailable(data) {
 
                 return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', ['name'], cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', ['name'], cur)}-tab">
                           <div class="links">
-                            ${migrationGuideAvailable(R.path(['dependencies', 'guide_url'], cur))}
+                            ${migrationGuideAvailable(R.prop('guide_url', cur))}
                             <a
                               rel="noopener"
                               href="https://github.com/${packageName}/releases/tag/${R.prop('name', cur)}"

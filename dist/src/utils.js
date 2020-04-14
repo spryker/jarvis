@@ -266,8 +266,9 @@ const keepOnlyVersionsInMajor = version => listOfVersion => {
 };
 
 function conditionsForGuideURL(version) {
+    log(version);
     return R.cond([
-        [R.isNil, R.always('')],
+        [p => R.isNil(R.prop('guide_url', p)), R.always('')],
         [p => 'n/a' === p.guide_url, R.always('<div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>')],
         [R.T, p => `<a rel="noopener" href="${p.guide_url}" target="_blank" class="btn btn-warning">Migration guide for version ${p.name || R.tail(p.requiredVersion)}</a>`]
     ])(version);
