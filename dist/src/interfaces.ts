@@ -39,7 +39,7 @@ interface ModuleInArchitectureChange {
 export interface ComposerJson {
 	name: orgPackage;
     description: string;
-    "require": {
+    require: {
        [propName: string]: semVer;
     };
     [propName: string]: any;
@@ -47,7 +47,29 @@ export interface ComposerJson {
 
 export interface ComposerLock {
 	'content-hash': string;
+	package: Array<Package>;
 	[propName: string]: any;
+}
+
+interface Package {
+    name: orgPackage;
+    version: semVer;
+    source: {
+        [propName: string]: any;
+    };
+    dist: {
+        [propName: string]: any;
+    };
+    require: {
+        [propName: string]: semVer;
+    };
+    'require-dev': {
+        [propName: string]: semVer;
+    };
+    'suggest': {
+        [propName: string]: semVer;
+    };
+    [propName: string]: any;
 }
 
 export interface ProductRelease {
@@ -198,3 +220,4 @@ export type moduleId = number;
 export type featureVersionId = number;
 export type productReleaseId = string;
 type versionType = "minor" | "patch" | "major";
+export type DOM = string;

@@ -1,7 +1,10 @@
 import {
     addIndex,
+    append,
     complement,
     compose,
+    contains,
+    filter,
     find,
     isEmpty,
     isNil,
@@ -13,6 +16,7 @@ import {
     path,
     prop,
     propEq,
+    sortBy,
     split,
     sum,
     toPairs,
@@ -21,6 +25,8 @@ import {
 } from 'ramda';
 import showdown from 'showdown';
 import {
+    ComposerJson,
+    ComposerLock,
     Module,
     orgPackage,
     semVer
@@ -178,23 +184,36 @@ function onlyModulesForOrgs(): Array<string> {
     return ['spryker', 'spryker-shop'];
 }
 
-function keepOnlyModulesFromOrgs(composer) {
-    return R.compose(
-        R.sortBy(R.prop(0)),
-        R.filter(cur => R.contains(R.compose(
-            R.head,
-            R.split('/'),
-            R.nth(0)
-        )(cur), modulesForOrgs()) ? true : false),
-        R.toPairs,
-        R.prop('require')
+export function keepOnlyModulesFromOrgs(composer: ComposerJson): Array<[orgPackage, semVer]> {
+    return compose(
+        sortBy(prop(0)),
+        filter((cur: [orgPackage, semVer]) => contains(
+            compose(
+                head,
+                split('/'),
+                nth(0)
+            )(cur),
+            modulesForOrgs()
+        ) ? true : false),
+        toPairs,
+        prop('require')
     )(composer);
 }
 
-const getNameAndVersionFromInstalledModules = R.compose(
-    R.map(R.pick(['name', 'version', 'require'])),
-    R.prop('packages')
-);
+interface packagesInstalled {
+    name: orgPackage;
+    version: semVer;
+    require: {
+        [propName: string]: semVer;
+    }
+}
+
+function getNameAndVersionFromInstalledModules(composerLock: ComposerLock): Array<packagesInstalled> {
+    return compose(
+        map(pick(['name', 'version', 'require'])),
+        prop('packages')
+    )(composerLock);
+}
 
 const getModuleOrg = R.compose(
     R.head,
@@ -208,16 +227,16 @@ const findPackageForModule = currentList => mod => R.find(R.propEq('package', mo
 
 const reconstruct = (keys: Array<string>) => (values: Array<any>) => zipObj(keys, values);
 
-function findInstalledVersion(composerLock) {
-    const namesAndVersions = getNameAndVersionFromInstalledModules(composerLock);
+export function findInstalledVersion(composerLock: ComposerLock) {
+    const namesAndVersions: Array<packagesInstalled> = getNameAndVersionFromInstalledModules(composerLock);
 
     return function(moduleList) {
         function propToAppend(prop, cur) {
-            return R.append(R.prop(prop, R.find(R.propEq('name', cur[0]), namesAndVersions)), cur);
+            return append(prop(prop, find(propEq('name', cur[0]), namesAndVersions)), cur);
         }
 
-        return R.map(
-            R.compose(
+        return map(
+            compose(
                 cur => propToAppend('require', cur),
                 cur => propToAppend('version', cur)
             ),

@@ -1,4 +1,4 @@
-/* globals
+import {
     cleanDescription,
     converter,
     findInstalledVersion,
@@ -21,33 +21,56 @@
     shouldBeCollapsed,
     specificTypeOfModules,
     versionToNumber
-*/
-
-/* exported
-    logicForNoFeatures,
-    prepareDataNoFeatures
-*/
-
+} from './utils';
+import {
+    ComposerJson,
+    ComposerLock,
+    DOM, 
+    JarvisData,
+    Module
+} from './interfaces';
+import {
+    assoc,
+    compose,
+    equals,
+    evolve,
+    filter,
+    join,
+    map,
+    path,
+    pick,
+    prop,
+} from 'ramda';
 
 //////////////////////////////////////////////////////////////
 // Migration Analysis for Modules outside Spryker Features //
 ////////////////////////////////////////////////////////////
 
-function prepareDataNoFeatures(data) {
-    return R.compose(
-        data => R.assoc('modulesWithTheirCount', R.compose(
-            d => R.filter(isNotEmpty, [groupingByMajor(d), groupingByMinor(d)]),
-            R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur)),
+export function prepareDataNoFeatures(data: JarvisData) {
+    return compose(
+        data => assoc('modulesWithTheirCount', compose(
+            d => filter(isNotEmpty, [groupingByMajor(d), groupingByMinor(d)]),
+            map(cur => assoc('nextVersionsCount', countVersionsForModule(cur), cur)),
             d => migrateModuleToLastVersionInMajor(d.myComposerJSON, d.myComposerLOCK, d.releaseModules)
         )(data), data),
-        R.evolve({
-            releaseModules: R.map(cur => R.assoc('identifier', r(), cur))
+        evolve({
+            releaseModules: map(cur => assoc('identifier', r(), cur))
         }),
-        R.pick(['myComposerJSON', 'myComposerLOCK', 'releaseModules'])
+        pick(['myComposerJSON', 'myComposerLOCK', 'releaseModules'])
     )(data);
 }
 
-function templateForSummaryElement(listOfElements) {
+export function logicForNoFeatures(data): DOM {
+    return `<div class="margin-top-2">
+                <div class="accordion" id="summary-table">
+                    ${templateForSummaryElement(data.modulesWithTheirCount)}
+                </div>
+            </div>
+            <h3>The following modules are outdated</h3>
+            <div>${templateToDisplayDetailsOfEachModule(data.myComposerJSON, data.myComposerLOCK, data.releaseModules)}</div>`;
+}
+
+function templateForSummaryElement(listOfElements): DOM {
     function textForBoxTitle(isMajor, listOfElements) {
         if (isMajor) {
             return `Major versions are available for the following <span class="badge badge-dark">${count(listOfElements)}</span> module(s)`;
@@ -56,8 +79,8 @@ function templateForSummaryElement(listOfElements) {
         }
     }
 
-    return R.compose(
-        R.join(''),
+    return compose(
+        join(''),
         mapIndexed((cur, index) => {
             const isMajor = R.compose(
                 n => n > 0,
@@ -151,16 +174,6 @@ function templateForEachGroupOfMigration(listOfModules) {
             </div>`;
 }
 
-function logicForNoFeatures(data) {
-    return `<div class="margin-top-2">
-                <div class="accordion" id="summary-table">
-                    ${templateForSummaryElement(data.modulesWithTheirCount)}
-                </div>
-            </div>
-            <h3>The following modules are outdated</h3>
-            <div>${templateToDisplayDetailsOfEachModule(data.myComposerJSON, data.myComposerLOCK, data.releaseModules)}</div>`;
-}
-
 function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
     return R.compose(
         R.join(''),
@@ -181,12 +194,12 @@ function migrateModuleToLastVersionInMajor(currentComposer, currentComposerLock,
     )(currentComposer);
 }
 
-function prepareModules(currentComposer, currentComposerLock, currentModules) {
-    return R.compose(
-        R.map(R.compose(
-            R.assoc('identifier', r()),
-            cur => R.assoc('upToDate', R.equals(R.prop('installedVersion', cur), R.path(['package', 'version'], cur)), cur),
-            cur => R.assoc('package', findPackageForModule(currentModules)(cur), cur),
+function prepareModules(currentComposer: ComposerJson, currentComposerLock: ComposerLock, currentModules: Array<Module>) {
+    return compose(
+        map(compose(
+            assoc('identifier', r()),
+            cur => assoc('upToDate', equals(prop('installedVersion', cur), path(['package', 'version'], cur)), cur),
+            cur => assoc('package', findPackageForModule(currentModules)(cur), cur),
             reconstruct(['module', 'requiredVersion', 'installedVersion']))),
         findInstalledVersion(currentComposerLock),
         specificTypeOfModules(['spryker', 'spryker-eco', 'spryker-shop']),
