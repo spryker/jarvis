@@ -1,16 +1,14 @@
 /* globals
     cleanDescription,
     converter,
-    findInstalledVersion,
-    findPackageForModule,
     isActive,
-    isActiveBool,
     isNextMajor,
     isNextMinor,
     isNextPatched,
     isNotEmpty,
     isNotNil,
     isShow,
+    isSomething,
     keepOnlyModulesFromOrgs,
     majorAvailable,
     mapIndexed,
@@ -18,7 +16,6 @@
     properName,
     r,
     reconstruct,
-    shouldBeCollapsed,
     specificTypeOfModules,
     versionToNumber
 */
@@ -55,6 +52,10 @@ function templateForSummaryElement(listOfElements) {
             return `Minor versions are available for the following <span class="badge badge-dark">${count(listOfElements)}</span> module(s)`;
         }
     }
+
+    const isActiveBool = index => isSomething('true', 'false', index);
+
+    const shouldBeCollapsed = index => isSomething('', 'collapsed', index);
 
     return R.compose(
         R.join(''),
@@ -192,6 +193,37 @@ function prepareModules(currentComposer, currentComposerLock, currentModules) {
         specificTypeOfModules(['spryker', 'spryker-eco', 'spryker-shop']),
         keepOnlyModulesFromOrgs
     )(currentComposer);
+}
+
+function findPackageForModule(currentList) {
+    return function(mod) {
+        return R.find(R.propEq('package', mod.module), currentList);
+    };
+}
+
+function getNameAndVersionFromInstalledModules(composerLock) {
+    return R.compose(
+        R.map(R.pick(['name', 'version', 'require'])),
+        R.prop('packages')
+    )(composerLock);
+}
+
+function findInstalledVersion(composerLock) {
+    const namesAndVersions = getNameAndVersionFromInstalledModules(composerLock);
+
+    return function(moduleList) {
+        function propToAppend(prop, cur) {
+            return R.append(R.prop(prop, R.find(R.propEq('name', cur[0]), namesAndVersions)), cur);
+        }
+
+        return R.map(
+            R.compose(
+                cur => propToAppend('require', cur),
+                cur => propToAppend('version', cur)
+            ),
+            moduleList
+        );
+    };
 }
 
 function onlyLastVersionInAMajor(listOfPreviousVersions, newVersion) {
