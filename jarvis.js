@@ -38,6 +38,7 @@ const {
     getConfig,
     getCurrentVersion,
     updateConfigFile,
+    updateLibraryFile,
     updateLastApiCall,
     updateMissingFeaturesFile,
     updateOnlyModuleFile,
@@ -188,19 +189,28 @@ function application(args) {
     // Define if user will use the Features view or Only Modules view or Missing Features view
     compose(
         cond([
+            [equals('--library'), () => {
+                updateOnlyModuleFile(false);
+                updateMissingFeaturesFile(false);
+                updateLibraryFile(true);
+                return;
+            }],
             [equals('--no-features'), () => {
                 updateOnlyModuleFile(true);
                 updateMissingFeaturesFile(false);
+                updateLibraryFile(false);
                 return;
             }],
             [equals('--missing-features'), () => {
                 updateOnlyModuleFile(false);
                 updateMissingFeaturesFile(true);
+                updateLibraryFile(false);
                 return;
             }],
             [T, () => {
                 updateOnlyModuleFile(false);
                 updateMissingFeaturesFile(false);
+                updateLibraryFile(false);
                 return;
             }]
         ]),

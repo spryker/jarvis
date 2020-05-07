@@ -36,6 +36,19 @@ function updateOnlyModuleFile(bool) {
     return bool;
 }
 
+function updateLibraryFile(bool) {
+    const newData = ifElse(
+        equals(false),
+        () => `const library = false;`,
+        () => `const library = true;`
+    )(bool);
+
+    fs.writeFileSync('dist/release-app-data/library.js', newData, 'utf8');
+
+    return bool;
+
+}
+
 function updateMissingFeaturesFile(bool) {
     const newData = ifElse(
         equals(false),
@@ -161,6 +174,7 @@ exports.getConfig = getConfig;
 exports.getCurrentVersion = getCurrentVersion;
 exports.getComposerFilesFromPath = getComposerFilesFromPath;
 exports.updateConfigFile = updateConfigFile;
+exports.updateLibraryFile = updateLibraryFile;
 exports.updateLastApiCall = updateLastApiCall;
 exports.updateMissingFeaturesFile = updateMissingFeaturesFile;
 exports.updateOnlyModuleFile = updateOnlyModuleFile;

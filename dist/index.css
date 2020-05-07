@@ -32,6 +32,10 @@
     margin-bottom: 0.5rem;
 }
 
+.hidden {
+    display: none;
+}
+
 h1 {
     padding-top: 3rem;
     padding-bottom: 2rem;

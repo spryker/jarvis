@@ -16,8 +16,14 @@
 
 function nextTarget(el, data) {
     return R.compose(
+        R.ifElse(
+            d => data.library === true,
+            d => searchEvents(data.releaseModules),
+            R.identity
+        ),
         d => render(el, d),
         R.cond([
+            [d => d.library === true, R.compose(logicForLibrary, prepareDataLibrary)],
             [d => d.noFeatures === true, R.compose(logicForNoFeatures, prepareDataNoFeatures)],
             [d => d.missingFeatures === true, R.compose(logicForMissingFeatures, prepareDataMissingFeatures)],
             [R.T, R.compose(logicForProductReleases, prepareData)]

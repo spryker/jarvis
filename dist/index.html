@@ -57,17 +57,20 @@
         <script type="text/javascript" src="release-app-data/product-releases.js"></script> <!-- Expose productReleases property -->
         <script type="text/javascript" src="release-app-data/no-features.js"></script> <!-- Expose noFeatures property -->
         <script type="text/javascript" src="release-app-data/missing-features.js"></script> <!-- Expose missingFeatures property -->
+        <script type="text/javascript" src="release-app-data/library.js"></script> <!-- Expose library property -->
         <!-- Where the magic happen -->
         <script type="text/javascript" src="src/utils.js"></script>
         <script type="text/javascript" src="src/no-features.js"></script>
         <script type="text/javascript" src="src/missing-features.js"></script>
         <script type="text/javascript" src="src/product-releases.js"></script>
+        <script type="text/javascript" src="src/library.js"></script>
         <script type="text/javascript" src="index.js"></script>
         <script type="text/javascript">
         nextTarget('next-target', {
             architectureChanges,
             currentVersion,
             detectedFeatures,
+            library,
             missingFeatures,
             myComposerJSON,
             myComposerLOCK,
