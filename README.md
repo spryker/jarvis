@@ -19,6 +19,7 @@ Spryker Jarvis comes with 3 views:
 * `node jarvis.js <path to your spryker project folder>` allows you to migrate your project from Product Release to Product Release
 * `node jarvis.js <path to your spryker project folder> --no-features` allows you to see for each module how outdated you are
 * `node jarvis.js <path to your spryker project folder> --missing-features` allows you to migrate your project to the Spryker feature repository	
+* `node jarvis.js <path to your spryker project folder> --library` allows you to see all Spryker modules and their versions, use this view if you need more information about a module release	
 
 ## Disclaimer
 
