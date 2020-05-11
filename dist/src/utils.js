@@ -121,7 +121,12 @@ function r() {
 const cleanDescription = description => R.compose(
     R.join('.<br>'),
     R.split('.'),
-    R.trim
+    R.trim,
+    R.ifElse(
+        R.isNil,
+        R.always('-'),
+        R.identity
+    )
 )(description);
 
 function versionFromStringToArrayOfNumber(version) {

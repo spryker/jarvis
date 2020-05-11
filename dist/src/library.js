@@ -68,17 +68,23 @@ function templateForModule(mod) {
                 )(mod.deprecated)}
                 <div class="card-body">
                     <h5 class="card-title">${mod.name}</h5>
-                    <p class="card-text">${mod.description}</p>
-                    <dl>
-                        <dt>Latest version</dt>
-                        <dd>${mod.version}</dd>
-                        <dt>Github repository</dt>
-                        <dd><a rel="noopener" href="https://www.github.com/${mod.package}" target="_blank">${mod.package}</a></dd>
-                        <dt>Documentation</dt>
-                        <dd>${documentationLink(mod.doc_url)}</dd>
-                        <dt>Version count</dt>
-                        <dd>${mod.module_versions.length}</dd>
-                    </dl>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            <p class="card-text">${cleanDescription(mod.description)}</p>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <dl>
+                                <dt>Latest version</dt>
+                                <dd>${mod.version}</dd>
+                                <dt>Github repository</dt>
+                                <dd><a rel="noopener" href="https://www.github.com/${mod.package}" target="_blank">${mod.package}</a></dd>
+                                <dt>Documentation</dt>
+                                <dd>${documentationLink(mod.doc_url)}</dd>
+                                <dt>Version count</dt>
+                                <dd>${mod.module_versions.length}</dd>
+                            </dl>
+                        </div>
+                    </div>
                 </div>
                 ${R.ifElse(
                     d => d === true,
