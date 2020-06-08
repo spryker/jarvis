@@ -59,7 +59,7 @@ function whatToDoOnEvent(releaseModules) {
 }
 
 function templateForModule(mod) {
-    //log(mod);
+    log(mod);
     return `<div class="card margin-bottom module-card mod-${mod.name}">
                 ${R.ifElse(
                     d => d === true,
@@ -83,6 +83,20 @@ function templateForModule(mod) {
                                 <dt>Version count</dt>
                                 <dd>${mod.module_versions.length}</dd>
                             </dl>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="accordion lonely-accordion" id="accordion-${mod.identifier}">
+                            <div class="card">
+                                <div class="card-header" id="heading-${mod.identifier}">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse-${mod.identifier}" aria-expanded="false" aria-controls="collapse-${mod.identifier}">Show all versions</button>
+                                </div>
+                            </div>
+                            <div id="collapse-${mod.identifier}" class="collapse" aria-labelledby="heading-${mod.identifier}" data-parent="#accordion-${mod.identifier}">
+                                <div class="card-body">
+                                    ${R.join('',R.map(cur => `<p>${cur.name}</p>`, mod.module_versions))}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
