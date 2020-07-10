@@ -78,7 +78,7 @@ function run(newReleaseData = undefined) {
     // Web server is listening
     app.listen(port, () => {
         log(`I am listening on the URL http://localhost:${port}/`);
-        log('When your migration will be over, could you share your feedback with us about Spryker Jarvis? https://spryker.typeform.com/to/Qzw9lg');
+        log('When your migration will be over, could you share your feedback with us about Spryker Jarvis? https://forms.gle/FeBtHDFyAiFJVotr6');
         log('');
     });
 
