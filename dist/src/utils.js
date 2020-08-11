@@ -77,6 +77,10 @@ function isNextMajor(last, newVersion) {
     }
 }
 
+function isSameMajor(last, newVersion) {
+    return semVerMajor(last) === semVerMajor(newVersion);
+}
+
 function isNextMinor(last, newVersion) {
     if (semVerMajor(newVersion) === 0) {
         return semVerPatched(newVersion) > semVerPatched(last) ? true : false;

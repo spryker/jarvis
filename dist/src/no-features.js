@@ -215,9 +215,19 @@ function migrationGuideAvailable(guideUrl) {
 function onlyRelevantMajorVersions(data) {
     const currentVersion = R.prop('installedVersion', data);
     const allVersions = R.sortBy(R.prop('name'), R.path(['package', 'module_versions'], data));
+    const allMigrationGuides = R.filter(cur => isNotNil(cur.guide_url) && isNextMajor(currentVersion, cur.name), allVersions);
 
     return R.compose(
-        R.map(cur => R.assoc('identifier', r(), cur)),
+        R.map(R.compose(
+            cur => R.reduce((prev, next) => {
+                if(isSameMajor(next.name, cur.name)) {
+                    return R.assoc('guide_url', next.guide_url, cur);
+                } else {
+                    return prev;
+                }
+            }, cur, allMigrationGuides),
+            cur => R.assoc('identifier', r(), cur)
+        )),
         R.tail,
         R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
     )(allVersions);
