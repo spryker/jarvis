@@ -175,7 +175,7 @@ function templateLogicForTarget(data) {
             </section>
             <section>
                 <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
-                ${missingSprykerFeatures(data.releaseFeatures, data.recommendedFeatures)}
+                ${missingSprykerFeatures(data.releaseFeatures, data.myComposerJSON)}
             </section>`;
 }
 

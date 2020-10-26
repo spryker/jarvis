@@ -10,6 +10,7 @@
     isNextPatched,
     isNotEmpty,
     isNotNil,
+    isSameMajor,
     isShow,
     keepOnlyModulesFromOrgs,
     majorAvailable,

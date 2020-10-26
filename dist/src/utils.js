@@ -14,6 +14,7 @@
     isNextMinor,
     isNotEmpty,
     isNotNil,
+    isSameMajor,
     isShow,
     keepOnlyModulesFromOrgs,
     log,
