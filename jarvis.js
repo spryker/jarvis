@@ -231,14 +231,17 @@ function application(args) {
             const project = findPreviousProject(answers.projectName, config);
 
             if (isNil(project)) {
+                const composerLockHash = path(['data', 'content-hash'], last(JSONcomposerFiles));
+                const projectName = answers.projectName || `This project had no name: ${composerLockHash}`;
                 const newConfig = evolve({
                     previousProjects: append(
                         compose(
                             assoc('lastCallToReleaseApp', null),
-                            assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles)))
+                            assoc('composerLockHash', composerLockHash),
+                            assoc('projectName', projectName)
                         )(answers)
                     ),
-                    lastProjectUsed: always(answers.projectName)
+                    lastProjectUsed: always(projectName)
                 }, config);
 
                 updateConfigFile(newConfig);
