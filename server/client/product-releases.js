@@ -1,7 +1,50 @@
-/* globals
+const {
+    __,
+    always,
+    append,
+    assoc,
+    assocPath,
+    compose,
+    concat,
+    cond,
+    descend,
+    differenceWith,
+    evolve,
+    equals,
+    eqBy,
+    filter,
+    find,
+    flatten,
+    head,
+    identity,
+    ifElse,
+    includes,
+    innerJoin,
+    isEmpty,
+    isNil,
+    join,
+    last,
+    length,
+    lensPath,
+    lensProp,
+    map,
+    over,
+    path,
+    prop,
+    propEq,
+    reduce,
+    reverse,
+    sort,
+    sortBy,
+    split,
+    T,
+    tail,
+    toPairs,
+    toUpper
+} = require('ramda');
+const {
     conditionsForGuideURL,
     converter,
-    isNotEmpty,
     isActive,
     isNextMajor,
     isNotEmpty,
@@ -11,7 +54,6 @@
     mapIndexed,
     migrationGuideExist,
     migrationGuideAvailable,
-    missingSprykerFeatures,
     modulesForOrgs,
     onlyModulesForOrgs,
     packageAndCurrentVersion,
@@ -20,89 +62,78 @@
     reconstruct,
     r,
     specificTypeOfModules,
-    templateForProductRelease,
     versionToNumber
-*/
-
-/* exported
-    missingSprykerFeatures,
-    templateForProductRelease,
-    prepareData,
-    logicForProductReleases,
-    logicForOnlyModules,
-    prepareDataNoFeatures,
-    prepareDataMissingFeatures
-*/
+} = require('./utils.js');
 
 /////////////////////////////////////////////
 // Migration Analysis for Product Release //
 ///////////////////////////////////////////
 
 
-function prepareData(data) {
+function prepareDataForProductReleases(data) {
     function prepareRequireForAFeature(feature) {
         const findModulesForFeature = retrieveModulesForAFeature(data.releaseFeatures);
 
-        return R.compose(
-            R.flatten,
-            R.map(R.ifElse(
-                cur => R.head(R.split('/', cur.package)) === 'spryker-feature',
+        return compose(
+            flatten,
+            map(ifElse(
+                cur => head(split('/', cur.package)) === 'spryker-feature',
                 findModulesForFeature,
-                R.identity
+                identity
             )),
             // Keep only modules from Spryker organisations
-            R.filter(cur => R.includes(R.head(R.split('/', cur.package)), modulesForOrgs()) && cur.package !== 'spryker-feature/spryker-core'),
+            filter(cur => includes(head(split('/', cur.package)), modulesForOrgs()) && cur.package !== 'spryker-feature/spryker-core'),
             // Transform required modules from object to an Array of objects
             packageAndRequiredVersion
         )(feature);
     }
 
-    return R.compose(
+    return compose(
         reduceToApplicableTargets,
-        d => R.assoc(
+        d => assoc(
             'targets',
-            R.compose(
-                R.sort(R.descend(R.prop('release_date'))),
-                d => R.concat(d.architectureChanges, d.productReleases)
+            compose(
+                sort(descend(prop('release_date'))),
+                d => concat(d.architectureChanges, d.productReleases)
             )(d),
             d
         ),
-        R.evolve({
-            architectureChanges: R.map(R.compose(
-                a => R.over(
-                    R.lensProp('feature_versions'),
-                    R.compose(
-                        R.filter(cur => isNotEmpty(cur.modules)),
-                        R.map(R.over(
-                            R.lensProp('modules'),
-                            R.compose(
-                                R.filter(cur => cur.type !== 'patch' && isNotNil(cur.installedVersion)),
-                                R.map(R.compose(
-                                    m => R.assoc(
+        evolve({
+            architectureChanges: map(compose(
+                a => over(
+                    lensProp('feature_versions'),
+                    compose(
+                        filter(cur => isNotEmpty(cur.modules)),
+                        map(over(
+                            lensProp('modules'),
+                            compose(
+                                filter(cur => cur.type !== 'patch' && isNotNil(cur.installedVersion)),
+                                map(compose(
+                                    m => assoc(
                                         'installedVersion',
-                                        R.prop('version', R.find(cur => cur.name === m.package, data.myComposerLOCK.packages)),
+                                        prop('version', find(cur => cur.name === m.package, data.myComposerLOCK.packages)),
                                         m
                                     ),
-                                    m => R.assoc('requiredVersion', `^${m.version.after}`, m)
+                                    m => assoc('requiredVersion', `^${m.version.after}`, m)
                                 )),
-                                R.innerJoin(R.eqBy(R.prop('package')), a.modules)
+                                innerJoin(eqBy(prop('package')), a.modules)
                             )
                         ))
                     ), a),
-                a => R.assoc('feature_versions', data.detectedFeatures, a),
-                a => R.assoc('identifier', r(), a),
-                a => R.assoc('release_date', a.created, a),
-                R.assoc('targetType', 'architectureChange')
+                a => assoc('feature_versions', data.detectedFeatures, a),
+                a => assoc('identifier', r(), a),
+                a => assoc('release_date', a.created, a),
+                assoc('targetType', 'architectureChange')
             )),
-            productReleases: R.map(
-                R.compose(
-                    R.over(
-                        R.lensProp('feature_versions'),
-                        R.compose(
-                            R.map(
-                                R.compose(
-                                    f => R.assoc('identifier', r(), f),
-                                    R.evolve({
+            productReleases: map(
+                compose(
+                    over(
+                        lensProp('feature_versions'),
+                        compose(
+                            map(
+                                compose(
+                                    f => assoc('identifier', r(), f),
+                                    evolve({
                                         data: {
                                             composer: {
                                                 require: prepareRequireForAFeature
@@ -112,21 +143,21 @@ function prepareData(data) {
                                 )
                             ),
                             // We remove spryker-core
-                            R.filter(cur => cur.data.composer.name !== 'spryker-feature/spryker-core')
+                            filter(cur => cur.data.composer.name !== 'spryker-feature/spryker-core')
                         )
                     ),
-                    R.assoc('targetType', 'productRelease')
+                    assoc('targetType', 'productRelease')
                 )
             )
         }),
-        R.evolve({
-            detectedFeatures: R.map(R.evolve({
+        evolve({
+            detectedFeatures: map(evolve({
                 modules_included: packageAndCurrentVersion,
                 modules_missing: packageAndCurrentVersion,
-                feature_versions: R.map(R.over(
-                    R.lensPath(['data', 'composer', 'require']),
-                    R.compose(
-                        R.filter(cur => R.includes(R.head(R.split('/', cur.package)), modulesForOrgs()) && cur.package !== 'spryker-feature/spryker-core'),
+                feature_versions: map(over(
+                    lensPath(['data', 'composer', 'require']),
+                    compose(
+                        filter(cur => includes(head(split('/', cur.package)), modulesForOrgs()) && cur.package !== 'spryker-feature/spryker-core'),
                         packageAndRequiredVersion
                     )
                 ))
@@ -137,31 +168,31 @@ function prepareData(data) {
 
 function retrieveModulesForAFeature(listOfFeatures) {
     return function(mod) {
-        return R.compose(
+        return compose(
             // Retrieve the required modules of this version
-            R.filter(cur => R.includes(R.head(R.split('/', cur.package)), onlyModulesForOrgs())),
+            filter(cur => includes(head(split('/', cur.package)), onlyModulesForOrgs())),
             packageAndRequiredVersion,
-            R.path(['data', 'composer', 'require']),
+            path(['data', 'composer', 'require']),
             // Find the right version of this feature
-            feature => R.find(R.propEq('name', R.tail(mod.requiredVersion)), feature.feature_versions),
+            feature => find(propEq('name', tail(mod.requiredVersion)), feature.feature_versions),
             // Find feature inside the Release app data
-            m => R.find(R.propEq('package', m.package), listOfFeatures)
+            m => find(propEq('package', m.package), listOfFeatures)
         )(mod);
     };
 }
 
 function logicForProductReleases(data) {
     return `${summaryHeader(data.targets.length)}
-            ${R.ifElse(
-                d => R.isEmpty(d.targets),
-                R.always(''),
+            ${ifElse(
+                d => isEmpty(d.targets),
+                always(''),
                 templateLogicForTarget
             )(data)}`;
 }
 
 function templateLogicForTarget(data) {
     return `<section id="product-release">
-                ${R.ifElse(
+                ${ifElse(
                     t => t.targetType === 'productRelease',
                     t => `<h2>Your next target is the Product Release: ${t.version}</h2>`,
                     t => `<h2>Your next target is the architecture change: <em>${t.title}</em></h2>
@@ -169,9 +200,9 @@ function templateLogicForTarget(data) {
                                 <p>${converter.makeHtml(t.description)}</p>
                                 ${migrationGuideAvailable(t.guide_url)}
                             </div>`
-                )(R.path(['targets', 0], data))}
+                )(path(['targets', 0], data))}
                 <p>You have the following Spryker Features to migrate.</p>
-                <div id="listOfProductReleases">${templateForProductRelease(R.path(['targets', 0], data))}</div>
+                <div id="listOfProductReleases">${templateForProductRelease(path(['targets', 0], data), data.releaseModules)}</div>
             </section>
             <section>
                 <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
@@ -180,10 +211,10 @@ function templateLogicForTarget(data) {
 }
 
 function summaryHeader(nbTargets) {
-    return R.cond([
+    return cond([
         [nbTargets => nbTargets > 1, templateMoreThanOneTarget],
         [nbTargets => nbTargets === 1, templateOneTarget],
-        [R.T, templateUpToDateWithSpryker]
+        [T, templateUpToDateWithSpryker]
     ])(nbTargets);
 }
 
@@ -213,100 +244,100 @@ function templateUpToDateWithSpryker() {
 
 function hasRequiredVersionForPackage(composerLock) {
     return function(packageAndRequiredVersion) {
-        return R.compose(
-            R.ifElse(
-                R.isNil,
-                R.always([true]),
-                R.compose(
+        return compose(
+            ifElse(
+                isNil,
+                always([true]),
+                compose(
                     pv => [
-                        versionToNumber(pv.installedVersion) >= versionToNumber(R.tail(pv.requiredVersion)),
+                        versionToNumber(pv.installedVersion) >= versionToNumber(tail(pv.requiredVersion)),
                         pv
                     ],
-                    pv => R.assoc('installedVersion', pv.version, packageAndRequiredVersion)
+                    pv => assoc('installedVersion', pv.version, packageAndRequiredVersion)
                 )
             ),
-            R.find(R.propEq('name', packageAndRequiredVersion.package)),
-            R.prop('packages')
+            find(propEq('name', packageAndRequiredVersion.package)),
+            prop('packages')
         )(composerLock);
     };
 }
 
 function findModuleByPackageName(packageName, releaseModules) {
-    return R.find(R.propEq('package', packageName), releaseModules);
+    return find(propEq('package', packageName), releaseModules);
 }
 
 function reduceToApplicableTargets(data) {
     function isProjectOverProductRelease(productRelease) {
-        return R.compose(
+        return compose(
             // If at least one Spryker Feature is not totally covered, then the project must pass over it 
-            R.ifElse(
+            ifElse(
                 pr => pr.length > 0,
                 p => [false, p],
-                R.always([true])
+                always([true])
             ),
-            R.reduce((prev, cur) => R.compose(
+            reduce((prev, cur) => compose(
                 // Keep only the modules that do not match the required versions 
-                R.ifElse(
+                ifElse(
                     p => p.length > 0,
-                    p => R.compose(
-                        p => R.append(p, prev),
-                        R.over(
-                            R.lensPath(['data', 'composer', 'require']),
-                            R.map(cur => R.assoc('guide_url', R.compose(
-                                R.prop('guide_url'),
-                                m => R.find(R.propEq('name', R.tail(cur.requiredVersion)), m.module_versions),
+                    p => compose(
+                        p => append(p, prev),
+                        over(
+                            lensPath(['data', 'composer', 'require']),
+                            map(cur => assoc('guide_url', compose(
+                                prop('guide_url'),
+                                m => find(propEq('name', tail(cur.requiredVersion)), m.module_versions),
                                 p => findModuleByPackageName(p.package, data.releaseModules)
                             )(cur), cur))),
-                        p => R.assocPath(['data', 'composer', 'require'], p, cur),
-                        R.map(R.last)
+                        p => assocPath(['data', 'composer', 'require'], p, cur),
+                        map(last)
                     )(p),
-                    R.always(prev)
+                    always(prev)
                 ),
-                R.filter(cur => R.head(cur) === false && isNextMajor(R.prop('installedVersion', R.last(cur)), R.tail(R.prop('requiredVersion', R.last(cur))))),
+                filter(cur => head(cur) === false && isNextMajor(prop('installedVersion', last(cur)), tail(prop('requiredVersion', last(cur))))),
                 // Check if project has the required version for each of them
-                R.map(doesItRequireThePackage),
+                map(doesItRequireThePackage),
                 // Get required modules for the Spryker Feature
-                R.path(['data', 'composer', 'require'])
+                path(['data', 'composer', 'require'])
             )(cur), []),
-            R.prop('feature_versions')
+            prop('feature_versions')
         )(productRelease);
     }
 
     function isProjectOverArchitectureChange(architectureChange) {
-        return R.compose(
+        return compose(
             // If at least one Spryker module major is not totally covered, then the project must pass over it 
-            R.ifElse(
+            ifElse(
                 ac => ac.length > 0,
                 p => [false, p],
-                R.always([true])
+                always([true])
             ),
-            R.map(R.last),
-            R.filter(cur => R.head(cur) === false),
-            R.map(R.compose(
+            map(last),
+            filter(cur => head(cur) === false),
+            map(compose(
                 doesItRequireThePackage,
-                p => R.assoc('requiredVersion', `^${p.version.after}`, p)
+                p => assoc('requiredVersion', `^${p.version.after}`, p)
             )),
-            R.filter(R.propEq('type', 'major')),
-            R.prop('modules')
+            filter(propEq('type', 'major')),
+            prop('modules')
         )(architectureChange);
     }
 
     const doesItRequireThePackage = hasRequiredVersionForPackage(data.myComposerLOCK);
 
-    return R.evolve({
-        targets: R.compose(
-            R.reverse,
-            R.reduce((prev, cur) => R.compose(
-                R.ifElse(
-                    a => R.head(a) === true,
-                    R.always(prev),
-                    a => R.ifElse(
+    return evolve({
+        targets: compose(
+            reverse,
+            reduce((prev, cur) => compose(
+                ifElse(
+                    a => head(a) === true,
+                    always(prev),
+                    a => ifElse(
                         () => cur.targetType === 'productRelease',
-                        () => R.append(R.assoc('feature_versions', R.last(a), cur), prev),
-                        () => R.append(R.assoc('modules', R.last(a), cur), prev)
+                        () => append(assoc('feature_versions', last(a), cur), prev),
+                        () => append(assoc('modules', last(a), cur), prev)
                     )(a)
                 ),
-                R.ifElse(
+                ifElse(
                     t => t.targetType === 'productRelease',
                     isProjectOverProductRelease,
                     isProjectOverArchitectureChange
@@ -316,64 +347,64 @@ function reduceToApplicableTargets(data) {
 }
 
 function missingSprykerFeatures(currentFeatures, currentComposer) {
-    const diff = (x, y) => R.prop('package', x) === R.prop('feature', y);
+    const diff = (x, y) => prop('package', x) === prop('feature', y);
 
-    return R.compose(
-        R.ifElse(
-            R.isEmpty,
+    return compose(
+        ifElse(
+            isEmpty,
             () => '<div class="alert alert-success" role="alert">Congrats you currently use all Spryker features available!</div>',
-            R.compose(
-                R.concat('<dl>'),
-                cur => R.concat(cur, '</dl>'),
-                R.join(''),
-                R.map(templateForFeaturesNotUsed),
-                R.sortBy(R.prop('name'))
+            compose(
+                concat('<dl>'),
+                cur => concat(cur, '</dl>'),
+                join(''),
+                map(templateForFeaturesNotUsed),
+                sortBy(prop('name'))
             )
         ),
         // Keep only live features and hide draft and deprecated features
-        R.filter(cur => R.prop('status', cur) === 1),
-        R.differenceWith(diff, currentFeatures),
-        R.map(reconstruct(['feature', 'requiredVersion'])),
+        filter(cur => prop('status', cur) === 1),
+        differenceWith(diff, currentFeatures),
+        map(reconstruct(['feature', 'requiredVersion'])),
         specificTypeOfModules(['spryker-feature']),
         keepOnlyModulesFromOrgs
     )(currentComposer);
 }
 
 function templateForFeaturesNotUsed(feature) {
-    const p = R.prop(R.__, feature);
+    const p = prop(__, feature);
 
     return `<dt><a rel="noopener" href="https://github.com/${p('package')}" target="_blank">${p('name')}</a> ${isNewFeature(p('feature_versions'))}</dt>
           <dd>${p('description')}</dd>`;
 }
 
 function isNewFeature(listOfVersions) {
-    return R.ifElse(
-        list => R.equals(1, R.length(list)),
+    return ifElse(
+        list => equals(1, length(list)),
         () => `<span class="badge badge-success">New feature</span>`,
         () => ''
     )(listOfVersions);
 }
 
 function featureName(pkg) {
-    return R.ifElse(
-        cur => R.isNil(R.path(['feature', 'package'], cur)),
+    return ifElse(
+        cur => isNil(path(['feature', 'package'], cur)),
         cur => properName('/', ['package'], cur),
         cur => properName('/', ['feature', 'package'], cur)
     )(pkg);
 }
 
 function moduleName(mod) {
-    return R.ifElse(
-        cur => R.isNil(R.path(['data', 'composer', 'name'], cur)),
+    return ifElse(
+        cur => isNil(path(['data', 'composer', 'name'], cur)),
         cur => properName('/', ['package'], cur),
         cur => properName('/', ['data', 'composer', 'name'], cur)
     )(mod);
 }
 
-function templateForProductRelease(productRelease) {
+function templateForProductRelease(productRelease, releaseModules) {
     function leftPills(listOfMod) {
-        return R.compose(
-            R.join(''),
+        return compose(
+            join(''),
             mapIndexed((cur, index) => `<a
                                             class="nav-link ${isActive(index)}"
                                             id="v-pills-${featureName(cur)}-tab"
@@ -382,18 +413,18 @@ function templateForProductRelease(productRelease) {
                                             role="tab"
                                             aria-controls="v-pills-${featureName(cur)}"
                                             aria-selected="true">
-                                            ${R.ifElse(
-                                                cur => R.isNil(R.path(['feature', 'name'], cur)),
-                                                R.prop('name'),
-                                                R.path(['feature', 'name'])
+                                            ${ifElse(
+                                                cur => isNil(path(['feature', 'name'], cur)),
+                                                prop('name'),
+                                                path(['feature', 'name'])
                                             )(cur)}
                                         </a>`)
         )(listOfMod);
     }
 
     function rightPills(listOfMod) {
-        return R.compose(
-            R.join(''),
+        return compose(
+            join(''),
             mapIndexed((cur, index) => `<div
                                             class="tab-pane fade ${isShow(index)} ${isActive(index)}"
                                             id="v-pills-${moduleName(cur)}"
@@ -404,17 +435,17 @@ function templateForProductRelease(productRelease) {
                                                 <div class="col-12">
                                                     <h4>Upgraded dependencies</h4>
                                                     <div class="row dependencies-upgraded">
-                                                        ${R.ifElse(
-                                                            cur => R.isNil(R.path(['data', 'composer','require'], cur)),
-                                                            cur => dependenciesUpgraded(cur.modules),
-                                                            cur => dependenciesUpgraded(cur.data.composer.require)
+                                                        ${ifElse(
+                                                            cur => isNil(path(['data', 'composer','require'], cur)),
+                                                            cur => dependenciesUpgraded(releaseModules, cur.modules),
+                                                            cur => dependenciesUpgraded(releaseModules, cur.data.composer.require)
                                                         )(cur)}
                                                     </div>
                                                 </div>
                                                 <div class="col-12">
                                                     <h4>Dependencies removed</h4>
                                                     <div class="row dependencies-upgraded">
-                                                        ${dependenciesRemoved(R.path(['data','diff'], cur))}
+                                                        ${dependenciesRemoved(path(['data','diff'], cur))}
                                                     </div>
                                                 </div>
                                             </div>
@@ -422,7 +453,7 @@ function templateForProductRelease(productRelease) {
         )(listOfMod);
     }
 
-    return R.compose(
+    return compose(
         pr => `<div class="row">
                     <div class="col-3">
                         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -435,8 +466,8 @@ function templateForProductRelease(productRelease) {
                         </div>
                     </div>
                 </div>`,
-        R.ifElse(
-            R.propEq('targetType', 'architectureChange'),
+        ifElse(
+            propEq('targetType', 'architectureChange'),
             logicArchitectureChangeBeforeTemplate,
             logicProductReleaseBeforeTemplate
         )
@@ -445,35 +476,35 @@ function templateForProductRelease(productRelease) {
 
 // TODO: See to move this transformation to the prepareData function
 function logicArchitectureChangeBeforeTemplate(target) {
-    return R.compose(
-        R.filter(cur => isNotEmpty(cur.modules)),
-        R.map(R.compose(
-            R.over(
-                R.lensPath(['modules']),
-                R.compose(
-                    R.filter(cur => isNextMajor(cur.installedVersion, R.tail(cur.requiredVersion))),
-                    R.map(cur => R.assoc('identifier', r(), cur))
+    return compose(
+        filter(cur => isNotEmpty(cur.modules)),
+        map(compose(
+            over(
+                lensPath(['modules']),
+                compose(
+                    filter(cur => isNextMajor(cur.installedVersion, tail(cur.requiredVersion))),
+                    map(cur => assoc('identifier', r(), cur))
                 )
             ),
-            fv => R.assoc('identifier', r(), fv)
+            fv => assoc('identifier', r(), fv)
         ))
     )(target.feature_versions);
 }
 
 // TODO: See to move this transformation to the prepareData function
 function logicProductReleaseBeforeTemplate(target) {
-    return R.compose(
-        R.filter(cur => isNotEmpty(cur.data.diff) && isNotEmpty(cur.data.composer.require)),
-        R.map(R.compose(
-            R.evolve({
+    return compose(
+        filter(cur => isNotEmpty(cur.data.diff) && isNotEmpty(cur.data.composer.require)),
+        map(compose(
+            evolve({
                 data: {
                     composer: {
-                        require: R.filter(cur => isNextMajor(cur.installedVersion, R.tail(cur.requiredVersion)))
+                        require: filter(cur => isNextMajor(cur.installedVersion, tail(cur.requiredVersion)))
                     },
-                    diff: R.compose(
-                        R.filter(cur => isNotNil(cur.beforeAfter.before)),
-                        R.map(reconstruct(['package', 'beforeAfter'])),
-                        R.toPairs
+                    diff: compose(
+                        filter(cur => isNotNil(cur.beforeAfter.before)),
+                        map(reconstruct(['package', 'beforeAfter'])),
+                        toPairs
                     )
                 }
             })
@@ -481,13 +512,13 @@ function logicProductReleaseBeforeTemplate(target) {
     )(target.feature_versions);
 }
 
-function dependenciesUpgraded(listOfDependencies = []) {
-    return R.ifElse(
-        R.isEmpty,
+function dependenciesUpgraded(releaseModules, listOfDependencies = []) {
+    return ifElse(
+        isEmpty,
         () => `<p class="empty-result">No dependencies were added in this version.</p>`,
-        R.compose(
-            R.join(''),
-            R.map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+        compose(
+            join(''),
+            map(cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
                                 <div class="card">
                                     <div class="card-header">
                                         <b>${cur.package}</b>
@@ -495,17 +526,17 @@ function dependenciesUpgraded(listOfDependencies = []) {
                                     <div class="card-body">
                                         <dl>
                                             <dt>Version upgraded</dt>
-                                            <dd><span class="badge badge-primary">${cur.installedVersion} -> ${R.tail(cur.requiredVersion)}</span></dd>
+                                            <dd><span class="badge badge-primary">${cur.installedVersion} -> ${tail(cur.requiredVersion)}</span></dd>
                                         </dl>
-                                        ${R.ifElse(
-                                            R.propEq('type','major'),
-                                            cur => migrationGuideExist(R.tail(cur.requiredVersion), cur.package),
+                                        ${ifElse(
+                                            propEq('type','major'),
+                                            cur => migrationGuideExist(releaseModules, tail(cur.requiredVersion), cur.package),
                                             conditionsForGuideURL
                                         )(cur)}
                                         ${githubChangelogLink(cur.package, cur.requiredVersion)}
                                         <a
                                             rel="noopener"
-                                            href="https://github.com/${cur.package}/compare/${cur.installedVersion}...${R.tail(cur.requiredVersion)}"
+                                            href="https://github.com/${cur.package}/compare/${cur.installedVersion}...${tail(cur.requiredVersion)}"
                                             target="_blank"
                                             class="btn btn-info"
                                         >Compare the versions</a>
@@ -519,41 +550,46 @@ function dependenciesUpgraded(listOfDependencies = []) {
 function githubChangelogLink(orgAndRepo, version) {
     return `<a
                 rel="noopener"
-                href="https://github.com/${orgAndRepo}/releases/tag/${R.tail(version)}"
+                href="https://github.com/${orgAndRepo}/releases/tag/${tail(version)}"
                 target="_blank"
                 class="btn btn-secondary"
             >Github changelog</a>`;
 }
 
 function dependenciesRemoved(listOfDependencies = []) {
-    return R.ifElse(
-        list => R.isEmpty(R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)),
+    return ifElse(
+        list => isEmpty(filter(cur => isNil(path(['beforeAfter', 'after'], cur)), list)),
         () => `<p class="empty-result">No dependencies were removed in this version.</p>`,
-        list => R.join('', R.map(
+        list => join('', map(
             cur => `<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
                         <div class="card">
                             <div class="card-header">
-                                <b>${R.prop('package', cur)}</b>
+                                <b>${prop('package', cur)}</b>
                             </div>
                             <div class="card-body">
                                 <dl>
                                     <dt>Version removed</dt>
-                                    <dd><span class="badge badge-primary">${R.tail(cur.beforeAfter.before)}</span></dd>
+                                    <dd><span class="badge badge-primary">${tail(cur.beforeAfter.before)}</span></dd>
                                 </dl>
                                 <p>⚠️ Check in your project code if you use/extend/customize <code>${pascalCase(cur.package)}</code> namespace.</p>
                                 ${githubChangelogLink(cur.package, cur.beforeAfter.before)}
                             </div>
                         </div>
                     </div>`,
-            R.filter(cur => R.isNil(R.path(['beforeAfter', 'after'], cur)), list)))
+            filter(cur => isNil(path(['beforeAfter', 'after'], cur)), list)))
     )(listOfDependencies);
 }
 
 function pascalCase(packageName) {
-    return R.compose(
-        R.reduce((prev, cur) => R.concat(prev, R.concat(R.toUpper(R.head(cur)), R.tail(cur))), ''),
-        R.split('-'),
-        R.last,
-        R.split('/')
+    return compose(
+        reduce((prev, cur) => concat(prev, concat(toUpper(head(cur)), tail(cur))), ''),
+        split('-'),
+        last,
+        split('/')
     )(packageName);
 }
+
+exports.missingSprykerFeatures = missingSprykerFeatures;
+exports.templateForProductRelease = templateForProductRelease;
+exports.prepareDataForProductReleases = prepareDataForProductReleases;
+exports.logicForProductReleases = logicForProductReleases;

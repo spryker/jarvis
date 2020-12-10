@@ -1,4 +1,43 @@
-/* globals
+const {
+    __,
+    always,
+    append,
+    assoc,
+    compose,
+    concat,
+    cond,
+    descend,
+    dropLast,
+    dropWhile,
+    equals,
+    evolve,
+    filter,
+    gt,
+    groupWith,
+    head,
+    ifElse,
+    inc,
+    isEmpty,
+    isNil,
+    join,
+    last,
+    length,
+    lte,
+    map,
+    path,
+    pick,
+    prop,
+    reduce,
+    reverse,
+    sortBy,
+    sortWith,
+    split,
+    T,
+    tail,
+    takeWhile,
+    toPairs
+} = require('ramda');
+const {
     cleanDescription,
     converter,
     findInstalledVersion,
@@ -22,12 +61,7 @@
     shouldBeCollapsed,
     specificTypeOfModules,
     versionToNumber
-*/
-
-/* exported
-    logicForNoFeatures,
-    prepareDataNoFeatures
-*/
+} = require('./utils.js');
 
 
 //////////////////////////////////////////////////////////////
@@ -35,16 +69,16 @@
 ////////////////////////////////////////////////////////////
 
 function prepareDataNoFeatures(data) {
-    return R.compose(
-        data => R.assoc('modulesWithTheirCount', R.compose(
-            d => R.filter(isNotEmpty, [groupingByMajor(d), groupingByMinor(d)]),
-            R.map(cur => R.assoc('nextVersionsCount', countVersionsForModule(cur), cur)),
+    return compose(
+        data => assoc('modulesWithTheirCount', compose(
+            d => filter(isNotEmpty, [groupingByMajor(d), groupingByMinor(d)]),
+            map(cur => assoc('nextVersionsCount', countVersionsForModule(cur), cur)),
             d => migrateModuleToLastVersionInMajor(d.myComposerJSON, d.myComposerLOCK, d.releaseModules)
         )(data), data),
-        R.evolve({
-            releaseModules: R.map(cur => R.assoc('identifier', r(), cur))
+        evolve({
+            releaseModules: map(cur => assoc('identifier', r(), cur))
         }),
-        R.pick(['myComposerJSON', 'myComposerLOCK', 'releaseModules'])
+        pick(['myComposerJSON', 'myComposerLOCK', 'releaseModules'])
     )(data);
 }
 
@@ -57,14 +91,14 @@ function templateForSummaryElement(listOfElements) {
         }
     }
 
-    return R.compose(
-        R.join(''),
+    return compose(
+        join(''),
         mapIndexed((cur, index) => {
-            const isMajor = R.compose(
+            const isMajor = compose(
                 n => n > 0,
-                R.path(['nextVersionsCount', 'major']),
-                R.head,
-                R.head
+                path(['nextVersionsCount', 'major']),
+                head,
+                head
             )(cur);
             const id = r();
 
@@ -77,7 +111,7 @@ function templateForSummaryElement(listOfElements) {
                         <div id="summary-${id}" class="collapse ${isShow(index)}" aria-labelledby="heading-${id}" data-parent="#summary-table">
                             <div class="card-body">
                                 <div class="card-columns">
-                                    ${R.join('',R.map(templateForEachGroupOfMigration, cur))}
+                                    ${join('',map(templateForEachGroupOfMigration, cur))}
                                 </div>
                             </div>
                         </div>
@@ -88,44 +122,44 @@ function templateForSummaryElement(listOfElements) {
 
 function groupWithLevel(level) {
     return function(a, b) {
-        return R.groupWith((a, b) => {
-            const countForA = R.path(['nextVersionsCount', level], a);
-            const countForB = R.path(['nextVersionsCount', level], b);
+        return groupWith((a, b) => {
+            const countForA = path(['nextVersionsCount', level], a);
+            const countForB = path(['nextVersionsCount', level], b);
 
-            return R.equals(countForA, countForB);
+            return equals(countForA, countForB);
         })(a, b);
     };
 }
 
 function groupingByMajor(listOfModules) {
-    return R.compose(
+    return compose(
         groupWithLevel('major'),
-        R.sortWith([R.descend(R.path(['nextVersionsCount', 'major']))]),
-        R.filter(cur => R.gt(R.path(['nextVersionsCount', 'major'], cur), 0))
+        sortWith([descend(path(['nextVersionsCount', 'major']))]),
+        filter(cur => gt(path(['nextVersionsCount', 'major'], cur), 0))
     )(listOfModules);
 }
 
 function groupingByMinor(listOfModules) {
-    return R.compose(
+    return compose(
         groupWithLevel('minor'),
-        R.sortWith([R.descend(R.path(['nextVersionsCount', 'minor']))]),
-        R.filter(cur => R.gt(R.path(['nextVersionsCount', 'minor'], cur), 0) && R.equals(R.path(['nextVersionsCount', 'major'], cur), 0))
+        sortWith([descend(path(['nextVersionsCount', 'minor']))]),
+        filter(cur => gt(path(['nextVersionsCount', 'minor'], cur), 0) && equals(path(['nextVersionsCount', 'major'], cur), 0))
     )(listOfModules);
 }
 
 function count(list) {
-    return R.reduce((prev, cur) => prev + cur.length, 0, list);
+    return reduce((prev, cur) => prev + cur.length, 0, list);
 }
 
 function countVersionsForModule(mod) {
-    return R.reduce((prev, cur) => R.cond([
+    return reduce((prev, cur) => cond([
             [version => versionToNumber(version.name) <= versionToNumber(prev.latestVersion), () => prev],
-            [version => isNextMajor(prev.latestVersion, version.name), version => R.evolve({ major: R.inc, minor: R.always(0), patch: R.always(0), latestVersion: R.always(version.name) }, prev)],
-            [version => isNextMinor(prev.latestVersion, version.name), version => R.evolve({ minor: R.inc, patch: R.always(0), latestVersion: R.always(version.name) }, prev)],
-            [version => isNextPatched(prev.latestVersion, version.name), version => R.evolve({ patch: R.inc, latestVersion: R.always(version.name) }, prev)],
-            [R.T, () => prev]
+            [version => isNextMajor(prev.latestVersion, version.name), version => evolve({ major: inc, minor: always(0), patch: always(0), latestVersion: always(version.name) }, prev)],
+            [version => isNextMinor(prev.latestVersion, version.name), version => evolve({ minor: inc, patch: always(0), latestVersion: always(version.name) }, prev)],
+            [version => isNextPatched(prev.latestVersion, version.name), version => evolve({ patch: inc, latestVersion: always(version.name) }, prev)],
+            [T, () => prev]
         ])(cur), { major: 0, minor: 0, patch: 0, latestVersion: mod.installedVersion },
-        R.reverse(mod.package.module_versions)
+        reverse(mod.package.module_versions)
     );
 }
 
@@ -146,7 +180,7 @@ function templateForEachGroupOfMigration(listOfModules) {
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled">
-                        ${R.join('', R.map(cur => `<li><a href=#${R.path(['package', 'identifier'], cur)}><code>${cur.module}</code></a></li>`, listOfModules))}
+                        ${join('', map(cur => `<li><a href=#${path(['package', 'identifier'], cur)}><code>${cur.module}</code></a></li>`, listOfModules))}
                     <ul>
                 </div>
             </div>`;
@@ -163,31 +197,31 @@ function logicForNoFeatures(data) {
 }
 
 function templateToDisplayDetailsOfEachModule(currentComposer, currentComposerLock, currentModules) {
-    return R.compose(
-        R.join(''),
-        R.ifElse(
-            R.isEmpty,
+    return compose(
+        join(''),
+        ifElse(
+            isEmpty,
             () => ([templateUpToDate('All your Spryker modules are up to date or you do not use any outside of the Spryker features!')]),
-            R.map(templateForPackage)
+            map(templateForPackage)
         ),
         c => migrateModuleToLastVersionInMajor(c, currentComposerLock, currentModules)
     )(currentComposer);
 }
 
 function migrateModuleToLastVersionInMajor(currentComposer, currentComposerLock, currentModules) {
-    return R.compose(
+    return compose(
         // "spryker-eco/loggly" is the only module that is not part of the release app
-        R.filter(cur => isNotNil(R.prop('package', cur)) && R.prop('module', cur) !== 'spryker-eco/loggly' && R.prop('upToDate', cur) === false && (minorAvailable(cur) || majorAvailable(cur)) && R.prop('requiredVersion', cur) !== '*'),
+        filter(cur => isNotNil(prop('package', cur)) && prop('module', cur) !== 'spryker-eco/loggly' && prop('upToDate', cur) === false && (minorAvailable(cur) || majorAvailable(cur)) && prop('requiredVersion', cur) !== '*'),
         c => prepareModules(c, currentComposerLock, currentModules)
     )(currentComposer);
 }
 
 function prepareModules(currentComposer, currentComposerLock, currentModules) {
-    return R.compose(
-        R.map(R.compose(
-            R.assoc('identifier', r()),
-            cur => R.assoc('upToDate', R.equals(R.prop('installedVersion', cur), R.path(['package', 'version'], cur)), cur),
-            cur => R.assoc('package', findPackageForModule(currentModules)(cur), cur),
+    return compose(
+        map(compose(
+            assoc('identifier', r()),
+            cur => assoc('upToDate', equals(prop('installedVersion', cur), path(['package', 'version'], cur)), cur),
+            cur => assoc('package', findPackageForModule(currentModules)(cur), cur),
             reconstruct(['module', 'requiredVersion', 'installedVersion']))),
         findInstalledVersion(currentComposerLock),
         specificTypeOfModules(['spryker', 'spryker-eco', 'spryker-shop']),
@@ -196,115 +230,115 @@ function prepareModules(currentComposer, currentComposerLock, currentModules) {
 }
 
 function onlyLastVersionInAMajor(listOfPreviousVersions, newVersion) {
-    return R.cond([
-        [version => R.lte(versionToNumber(R.prop('name', version)), versionToNumber(R.prop('name', R.last(listOfPreviousVersions)))), () => listOfPreviousVersions],
-        [version => isNextMajor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.append(version, listOfPreviousVersions)],
-        [version => isNextMinor(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.ifElse(list => R.equals(R.length(list), 1), R.append(version), list => R.compose(R.append(version), R.dropLast(1))(list))(listOfPreviousVersions)],
-        [version => isNextPatched(R.prop('name', R.last(listOfPreviousVersions)), R.prop('name', version)), version => R.compose(R.append(version), R.dropLast(1))(listOfPreviousVersions)],
-        [R.T, () => listOfPreviousVersions]
+    return cond([
+        [version => lte(versionToNumber(prop('name', version)), versionToNumber(prop('name', last(listOfPreviousVersions)))), () => listOfPreviousVersions],
+        [version => isNextMajor(prop('name', last(listOfPreviousVersions)), prop('name', version)), version => append(version, listOfPreviousVersions)],
+        [version => isNextMinor(prop('name', last(listOfPreviousVersions)), prop('name', version)), version => ifElse(list => equals(length(list), 1), append(version), list => compose(append(version), dropLast(1))(list))(listOfPreviousVersions)],
+        [version => isNextPatched(prop('name', last(listOfPreviousVersions)), prop('name', version)), version => compose(append(version), dropLast(1))(listOfPreviousVersions)],
+        [T, () => listOfPreviousVersions]
     ])(newVersion);
 }
 
 function migrationGuideAvailable(guideUrl) {
-    return R.ifElse(
-        R.isNil,
-        R.always(''),
+    return ifElse(
+        isNil,
+        always(''),
         url => `<a rel="noopener" href="${url}" target="_blank" class="btn btn-warning">Migration guide</a>`
     )(guideUrl);
 }
 
 function onlyRelevantMajorVersions(data) {
-    const currentVersion = R.prop('installedVersion', data);
-    const allVersions = R.sortBy(R.prop('name'), R.path(['package', 'module_versions'], data));
-    const allMigrationGuides = R.filter(cur => isNotNil(cur.guide_url) && isNextMajor(currentVersion, cur.name), allVersions);
+    const currentVersion = prop('installedVersion', data);
+    const allVersions = sortBy(prop('name'), path(['package', 'module_versions'], data));
+    const allMigrationGuides = filter(cur => isNotNil(cur.guide_url) && isNextMajor(currentVersion, cur.name), allVersions);
 
-    return R.compose(
-        R.map(R.compose(
-            cur => R.reduce((prev, next) => {
+    return compose(
+        map(compose(
+            cur => reduce((prev, next) => {
                 if(isSameMajor(next.name, cur.name)) {
-                    return R.assoc('guide_url', next.guide_url, cur);
+                    return assoc('guide_url', next.guide_url, cur);
                 } else {
                     return prev;
                 }
             }, cur, allMigrationGuides),
-            cur => R.assoc('identifier', r(), cur)
+            cur => assoc('identifier', r(), cur)
         )),
-        R.tail,
-        R.reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
+        tail,
+        reduce(onlyLastVersionInAMajor, [{ name: currentVersion }])
     )(allVersions);
 }
 
 function templateMajorOrMinorAvailable(data) {
     function tabsForModule(majorsAvailable) {
-        return R.compose(
-            R.join(''),
+        return compose(
+            join(''),
             mapIndexed((cur, index) => {
-                const descriptionForAllVersions = R.compose(
-                    R.join('<hr>'),
-                    R.reverse,
-                    R.map(R.compose(
+                const descriptionForAllVersions = compose(
+                    join('<hr>'),
+                    reverse,
+                    map(compose(
                         cur => converter.makeHtml(cur),
-                        R.prop('description')
+                        prop('description')
                     )),
-                    R.dropWhile(mod => R.gt(versionToNumber(R.prop('name', mod)), versionToNumber(R.prop('name', cur)))),
-                    R.takeWhile(mod => R.gt(versionToNumber(R.prop('name', mod)), versionToNumber(currentVersion))),
-                    R.path(['package', 'module_versions'])
+                    dropWhile(mod => gt(versionToNumber(prop('name', mod)), versionToNumber(prop('name', cur)))),
+                    takeWhile(mod => gt(versionToNumber(prop('name', mod)), versionToNumber(currentVersion))),
+                    path(['package', 'module_versions'])
                 )(data);
 
                 return `<div class="tab-pane fade show ${isActive(index)}" id="nav-${properName('.', ['name'], cur)}" role="tabpanel" aria-labelledby="nav-${properName('.', ['name'], cur)}-tab">
                           <div class="links">
-                            ${migrationGuideAvailable(R.prop('guide_url', cur))}
+                            ${migrationGuideAvailable(prop('guide_url', cur))}
                             <a
                               rel="noopener"
-                              href="https://github.com/${packageName}/releases/tag/${R.prop('name', cur)}"
+                              href="https://github.com/${packageName}/releases/tag/${prop('name', cur)}"
                               target="_blank"
                               class="btn btn-secondary"
                             >Github changelog</a>
                             <a
                               rel="noopener"
-                              href="https://github.com/${packageName}/compare/${currentVersion}...${R.prop('name', cur)}"
+                              href="https://github.com/${packageName}/compare/${currentVersion}...${prop('name', cur)}"
                               target="_blank"
                               class="btn btn-info"
                             >Compare the versions</a>
                           </div>
                           <div class="alert alert-warning" role="alert">⚠️ The information below are only useful if you use/extend/customize the <code>${moduleName}</code> namespace.</div>
-                            <h2>Changes between <em>v${currentVersion}</em> and <em>v${R.prop('name', cur)}</em></h2>
+                            <h2>Changes between <em>v${currentVersion}</em> and <em>v${prop('name', cur)}</em></h2>
                             <section>${descriptionForAllVersions}</section>
-                            ${isThereSuggestedModules(R.path(['dependencies', 'suggest'], cur))}
+                            ${isThereSuggestedModules(path(['dependencies', 'suggest'], cur))}
                         </div>`;
             }))(majorsAvailable);
     }
 
     function isThereSuggestedModules(objectWithModules) {
-        return R.ifElse(
-            o => R.gt(R.length(R.toPairs(o)), 0),
-            o => R.compose(
-                s => R.concat(s, '</ul></dd>'),
-                s => R.concat('<h2>You might also be interested in the following modules</h2><dd><ul>', s),
-                R.join(''),
-                R.map(mod => `<li><a rel="noopener" href="https://github.com/${mod[0]}" target="_blank">${R.last(R.split('/', R.head(mod)))}</a> ${R.last(mod)}</li>`),
-                R.toPairs
+        return ifElse(
+            o => gt(length(toPairs(o)), 0),
+            o => compose(
+                s => concat(s, '</ul></dd>'),
+                s => concat('<h2>You might also be interested in the following modules</h2><dd><ul>', s),
+                join(''),
+                map(mod => `<li><a rel="noopener" href="https://github.com/${mod[0]}" target="_blank">${last(split('/', head(mod)))}</a> ${last(mod)}</li>`),
+                toPairs
             )(o),
             () => ''
         )(objectWithModules);
     }
 
     function navigationForTabs(listOfVersions) {
-        return R.compose(
-            R.join(''),
+        return compose(
+            join(''),
             mapIndexed((cur, index) => `<a
                                           class="nav-item nav-link ${isActive(index)}"
                                           id="nav-${properName('.', ['name'], cur)}-tab"
                                           data-toggle="tab" href="#nav-${properName('.', ['name'], cur)}"
                                           role="tab" aria-controls="nav-home"
-                                          aria-selected="true">Version: ${R.prop('name', cur)}
+                                          aria-selected="true">Version: ${prop('name', cur)}
                                         </a>`)
         )(listOfVersions);
     }
 
-    const p = R.prop(R.__, data);
+    const p = prop(__, data);
     const packageName = p('module');
-    const moduleName = R.path(['package', 'name'], data);
+    const moduleName = path(['package', 'name'], data);
     const currentVersion = p('installedVersion');
     const relevantMajorVersions = onlyRelevantMajorVersions(data);
 
@@ -320,10 +354,10 @@ function templateMajorOrMinorAvailable(data) {
 
 function templateForPackage(data) {
     return `<div class="card margin-bottom">
-              <div class="card-body" id="${R.path(['package', 'identifier'], data)}">
-                <h3 class="card-title">${R.path(['package', 'name'], data)}</h3>
-                <h6 class="card-subtitle text-muted">${R.isNil(R.path(['package', 'description'], data)) ? '' : cleanDescription(R.path(['package', 'description'], data))}</h6>
-                <p class="card-text">Installed version <span class="badge badge-secondary">${R.prop('installedVersion', data)}</span></p>
+              <div class="card-body" id="${path(['package', 'identifier'], data)}">
+                <h3 class="card-title">${path(['package', 'name'], data)}</h3>
+                <h6 class="card-subtitle text-muted">${isNil(path(['package', 'description'], data)) ? '' : cleanDescription(path(['package', 'description'], data))}</h6>
+                <p class="card-text">Installed version <span class="badge badge-secondary">${prop('installedVersion', data)}</span></p>
                 ${templateMajorOrMinorAvailable(data)}
               </div>
               <div class="card-footer">
@@ -335,3 +369,6 @@ function templateForPackage(data) {
 function templateUpToDate(content) {
     return `<div class="alert alert-primary" role="alert">${content}</div>`;
 }
+
+exports.logicForNoFeatures = logicForNoFeatures;
+exports.prepareDataNoFeatures = prepareDataNoFeatures;

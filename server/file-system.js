@@ -24,6 +24,10 @@ function updateConfigFile(data) {
     return newData;
 }
 
+function getTmpFile(projectName) {
+    return JSON.parse(fs.readFileSync(concat('./tmp/', `${projectName}.json`), 'utf8'));
+}
+
 function updateOnlyModuleFile(bool) {
     const newData = ifElse(
         equals(false),
@@ -73,18 +77,20 @@ function updateLastApiCall(config) {
 }
 
 // This function does some IO
-// getComposerData :: string -> [object]
-function getComposerData(path) {
+// getComposerDataFromDisc :: string -> [object]
+function getComposerDataFromDisc(path) {
     return [{
         path: './dist/my-composer-files/composerJSON.js',
         data: fs.readFileSync(concat(path, '/composer.json'), 'utf8'),
         stringStart: 'const myComposerJSON = ',
-        stringEnd: ';'
+        stringEnd: ';',
+        name: 'composerJSON'
     }, {
         path: './dist/my-composer-files/composerLOCK.js',
         data: fs.readFileSync(concat(path, '/composer.lock'), 'utf8'),
         stringStart: 'const myComposerLOCK = ',
-        stringEnd: ';'
+        stringEnd: ';',
+        name: 'composerLOCK'
     }];
 }
 
@@ -142,6 +148,12 @@ function writeReleaseAppData(currentProject, data = undefined) {
 
 }
 
+function writeFile(path, content) {
+    fs.writeFileSync(path, content, 'utf8');
+
+    return content;
+}
+
 // This function does some IO
 // writeFiles :: [object] -> [object]
 function writeFiles(listOfFiles) {
@@ -152,16 +164,17 @@ function writeFiles(listOfFiles) {
 
 function getComposerFilesFromPath(path) {
     return compose(
-        writeFiles,
-        getComposerData
+        getComposerDataFromDisc
     )(path);
 }
 
 exports.getConfig = getConfig;
 exports.getCurrentVersion = getCurrentVersion;
 exports.getComposerFilesFromPath = getComposerFilesFromPath;
+exports.getTmpFile = getTmpFile;
 exports.updateConfigFile = updateConfigFile;
 exports.updateLastApiCall = updateLastApiCall;
 exports.updateMissingFeaturesFile = updateMissingFeaturesFile;
 exports.updateOnlyModuleFile = updateOnlyModuleFile;
+exports.writeFile = writeFile;
 exports.writeReleaseAppData = writeReleaseAppData;

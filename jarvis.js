@@ -37,13 +37,31 @@ const {
     getComposerFilesFromPath,
     getConfig,
     getCurrentVersion,
+    getTmpFile,
     updateConfigFile,
     updateLastApiCall,
-    updateMissingFeaturesFile,
-    updateOnlyModuleFile,
+    writeFile,
     writeReleaseAppData
 } = require('./server/file-system.js');
 const { getReleaseAppData } = require('./server/api-call.js');
+const { jarvisTemplate } = require('./server/client/index.js');
+
+const clientData = {
+    architectureChanges: [],
+    currentVersion: getCurrentVersion(),
+    detectedFeatures: [],
+    missingFeaturesMode: false,
+    noFeaturesMode: false,
+    productReleasesMode: false,
+    myComposerJSON: {},
+    myComposerLOCK: {},
+    onboarding: [],
+    productReleases: [],
+    releaseFeatures: [],
+    releaseModules: [],
+    recommendedFeatures: [],
+    targets: null
+};
 
 
 function run(newReleaseData = undefined) {
@@ -51,12 +69,12 @@ function run(newReleaseData = undefined) {
     const port = 7777;
 
     const config = getConfig();
-    const currentVersion = getCurrentVersion();
+
 
     if (isNotNil(newReleaseData)) {
-        if (versionToNumber(currentVersion) !== versionToNumber(newReleaseData.currentVersion)) {
+        if (versionToNumber(clientData.currentVersion) !== versionToNumber(newReleaseData.currentVersion)) {
             log('It looks like you do not use the latest version of Spryker Jarvis...');
-            log(`You are currently using version ${currentVersion}. The latest version available is version ${newReleaseData.currentVersion}.`);
+            log(`You are currently using version ${clientData.currentVersion}. The latest version available is version ${newReleaseData.currentVersion}.`);
             return;
 
         } else {
@@ -64,8 +82,19 @@ function run(newReleaseData = undefined) {
             writeReleaseAppData(config.lastProjectUsed, newReleaseData);
         }
     } else {
+        newReleaseData = getTmpFile(config.lastProjectUsed);
         writeReleaseAppData(config.lastProjectUsed);
     }
+
+    clientData.architectureChanges = newReleaseData.architectureChanges;
+    clientData.detectedFeatures = newReleaseData.detectedFeatures;
+    clientData.onboarding = newReleaseData.onboarding;
+    clientData.productReleases = newReleaseData.productReleases;
+    clientData.releaseFeatures = newReleaseData.features;
+    clientData.releaseModules = newReleaseData.modules;
+    clientData.recommendedFeatures = newReleaseData.recommendedFeatures;
+
+    writeFile('./dist/index.html', jarvisTemplate(clientData));
 
     // Static files css/html/js
     app.use(express.static('dist'));
@@ -86,7 +115,7 @@ function run(newReleaseData = undefined) {
 }
 
 function runWithApiCall(projectName, composerJson, composerLock) {
-    return getReleaseAppData({ projectName, composerJson, composerLock, currentVersion: getCurrentVersion() }, failedToRetrieveReleaseAppData, run);
+    return getReleaseAppData({ projectName, composerJson, composerLock, currentVersion: clientData.currentVersion }, failedToRetrieveReleaseAppData, run);
 }
 
 function failedToRetrieveReleaseAppData(data) {
@@ -185,22 +214,22 @@ function application(args) {
         head,
         cleanNodeInput
     )(args);
+    clientData.myComposerJSON = getComposerData('composerJSON', composerFiles);
+    clientData.myComposerLOCK = getComposerData('composerLOCK', composerFiles);
+
     // Define if user will use the Features view or Only Modules view or Missing Features view
     compose(
         cond([
             [equals('--no-features'), () => {
-                updateOnlyModuleFile(true);
-                updateMissingFeaturesFile(false);
+                clientData.noFeaturesMode = true;
                 return;
             }],
             [equals('--missing-features'), () => {
-                updateOnlyModuleFile(false);
-                updateMissingFeaturesFile(true);
+                clientData.missingFeaturesMode = true;
                 return;
             }],
             [T, () => {
-                updateOnlyModuleFile(false);
-                updateMissingFeaturesFile(false);
+                clientData.productReleasesMode = true;
                 return;
             }]
         ]),
@@ -271,6 +300,14 @@ function application(args) {
             }
         });
     }
+}
+
+function getComposerData(typeOfFile, files) {
+    return compose(
+        d => JSON.parse(d),
+        prop('data'),
+        find(cur => cur.name === typeOfFile)
+    )(files);
 }
 
 function findPreviousProject(projectName, config) {
