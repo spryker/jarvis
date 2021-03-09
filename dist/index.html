@@ -1,1 +1,1027 @@
-<!-- The HTM wil be generated -->
+<!DOCTYPE html>
+            <html lang="en" dir="ltr">
+
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="Description" content="Spryker tool that helps you migrate your project to the last available versions.">
+                    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                    <title>Spryker Jarvis</title>
+                    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+                    <link rel="stylesheet" type="text/css" href="index.css">
+                    <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+                </head>
+
+                <body class="container">
+                    <section>
+                        <h1 id="spryker-jarvis">Spryker Jarvis <span class="badge badge-secondary">Beta</span></h1>
+                        <div class="accordion" id="explain-jarvis">
+                            <div class="card">
+                                <div class="card-header" id="explain-jarvis-1-header">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#explain-jarvis-1" aria-expanded="false" aria-controls="explain-jarvis-1">
+                                        What is Jarvis? 🤔
+                                    </button>
+                                </div>
+                                <div id="explain-jarvis-1" class="collapse" aria-labelledby="explain-jarvis-1-header" data-parent="#explain-jarvis">
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>What is the mission of Spryker Jarvis?</dt>
+                                            <dd>To help you understand what is needed to keep your Spryker project up to date with our Product releases.</dd>
+                                            <dt>To who Spryker Jarvis is useful?</dt>
+                                            <dd>Developer, IT Manager, Product Owner/Manager that wants to understand the migration path for their Spryker project.</dd>
+                                        </dl>
+                                        <div class="alert alert-warning" role="alert">
+                                            ⚠️ I am merely a tool to help you migrate your Spryker project, you are still responsible of your Spryker project when using my services.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="next-target"><div class="margin-top-2 alert alert-primary" role="alert">
+                <h4 class="alert-heading">Be brave! The journey is not over yet!</h4>
+                <p>You still have <span class="badge badge-light">2</span> milestones to cover. When the last milestone will be covered, your Spryker project will be up to date.</p>
+                <hr>
+                <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
+            </div>
+            <section id="product-release">
+                <h2>Your next target is the Product Release: 202001.0</h2>
+                <p>You have the following Spryker Features to migrate.</p>
+                <div id="listOfProductReleases"><div class="row">
+                    <div class="col-3">
+                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                            <a
+                                            class="nav-link active"
+                                            id="v-pills-spryker-featurewcyaocart-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featurewcyaocart"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featurewcyaocart"
+                                            aria-selected="true">
+                                            Cart
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featuremnv5lcart-notes-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featuremnv5lcart-notes"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featuremnv5lcart-notes"
+                                            aria-selected="true">
+                                            Cart Notes
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featureyj56ccheckout-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featureyj56ccheckout"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featureyj56ccheckout"
+                                            aria-selected="true">
+                                            Checkout
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featurewx2cbjcms-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featurewx2cbjcms"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featurewx2cbjcms"
+                                            aria-selected="true">
+                                            CMS
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featurey5patecustomer-account-management-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featurey5patecustomer-account-management"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featurey5patecustomer-account-management"
+                                            aria-selected="true">
+                                            Customer Account Management
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featurete8alainventory-management-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featurete8alainventory-management"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featurete8alainventory-management"
+                                            aria-selected="true">
+                                            Inventory Management
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featurezw8v1sorder-management-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featurezw8v1sorder-management"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featurezw8v1sorder-management"
+                                            aria-selected="true">
+                                            Order Management
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featureywlzzpayments-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featureywlzzpayments"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featureywlzzpayments"
+                                            aria-selected="true">
+                                            Payments
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featuree0mv6cproduct-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featuree0mv6cproduct"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featuree0mv6cproduct"
+                                            aria-selected="true">
+                                            Product
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featuret2n5gqproduct-bundles-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featuret2n5gqproduct-bundles"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featuret2n5gqproduct-bundles"
+                                            aria-selected="true">
+                                            Product Bundles
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-feature9w45ilpromotions-discounts-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-feature9w45ilpromotions-discounts"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-feature9w45ilpromotions-discounts"
+                                            aria-selected="true">
+                                            Promotions & Discounts
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featureewxvpscheduled-prices-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featureewxvpscheduled-prices"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featureewxvpscheduled-prices"
+                                            aria-selected="true">
+                                            Scheduled Prices
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featureecqtcysearch-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featureecqtcysearch"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featureecqtcysearch"
+                                            aria-selected="true">
+                                            Search
+                                        </a><a
+                                            class="nav-link "
+                                            id="v-pills-spryker-featureptgm1nshipment-tab"
+                                            data-toggle="pill"
+                                            href="#v-pills-spryker-featureptgm1nshipment"
+                                            role="tab"
+                                            aria-controls="v-pills-spryker-featureptgm1nshipment"
+                                            aria-selected="true">
+                                            Shipment
+                                        </a>
+                        </div>
+                    </div>
+                    <div class="col-9">
+                        <div class="tab-content" id="v-pills-tabContent">
+                            <div
+                                            class="tab-pane fade show active"
+                                            id="v-pills-spryker-featurewcyaocart"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featurewcyaocart-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/cart-variant</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">1.0.6 -> 2.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-cart-variant#upgrading-from-version-1---to-version-2-0-0" target="_blank" class="btn btn-warning">Migration guide for version 2.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/cart-variant/releases/tag/2.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/cart-variant/compare/1.0.6...2.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featuremnv5lcart-notes"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featuremnv5lcart-notes-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/cart-note</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">0.1.3 -> 1.0.0</span></dd>
+                                        </dl>
+                                        <div class="alert alert-warning" role="alert">⚠️ No migration needed ⚠️</div>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/cart-note/releases/tag/1.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/cart-note/compare/0.1.3...1.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featureyj56ccheckout"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featureyj56ccheckout-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker-shop/checkout-page</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">2.1.1 -> 3.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/migration-guide-checkoutpage#upgrading-from-version-2---to-version-3--" target="_blank" class="btn btn-warning">Migration guide for version 3.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker-shop/checkout-page/releases/tag/3.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker-shop/checkout-page/compare/2.1.1...3.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featurewx2cbjcms"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featurewx2cbjcms-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker-shop/cms-block-widget</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">1.3.0 -> 2.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/migration-guide-cmsblockwidget#upgrading-from-version-1---to-version-2--" target="_blank" class="btn btn-warning">Migration guide for version 2.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker-shop/cms-block-widget/releases/tag/2.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker-shop/cms-block-widget/compare/1.3.0...2.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div><div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/cms-block</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">2.3.0 -> 3.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-cms-block#upgrading-from-version-2---to-version-3--" target="_blank" class="btn btn-warning">Migration guide for version 3.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/cms-block/releases/tag/3.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/cms-block/compare/2.3.0...3.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div><div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/cms-block-storage</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">1.2.2 -> 2.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/migration-guide-cmsblockstorage#upgrading-from-version-1---to-version-2--" target="_blank" class="btn btn-warning">Migration guide for version 2.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/cms-block-storage/releases/tag/2.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/cms-block-storage/compare/1.2.2...2.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featurey5patecustomer-account-management"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featurey5patecustomer-account-management-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker-shop/customer-page</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">1.23.2 -> 2.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-customerpage#upgrading-from-version-1---to-version-2-0-0" target="_blank" class="btn btn-warning">Migration guide for version 2.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker-shop/customer-page/releases/tag/2.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker-shop/customer-page/compare/1.23.2...2.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featurete8alainventory-management"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featurete8alainventory-management-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/availability</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">8.0.0 -> 9.0.0</span></dd>
+                                        </dl>
+                                        
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/availability/releases/tag/9.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/availability/compare/8.0.0...9.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div><div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/availability-gui</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">5.0.0 -> 6.0.0</span></dd>
+                                        </dl>
+                                        
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/availability-gui/releases/tag/6.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/availability-gui/compare/5.0.0...6.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div><div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/availability-storage</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">1.5.0 -> 2.0.0</span></dd>
+                                        </dl>
+                                        
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/availability-storage/releases/tag/2.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/availability-storage/compare/1.5.0...2.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div><div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/stock</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">7.0.0 -> 8.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-stock#upgrading-from-version-7---to-version-8-0-0" target="_blank" class="btn btn-warning">Migration guide for version 8.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/stock/releases/tag/8.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/stock/compare/7.0.0...8.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featurezw8v1sorder-management"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featurezw8v1sorder-management-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/oms</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">10.1.1 -> 11.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-oms#upgrading-from-version-10---to-version-11-0-0" target="_blank" class="btn btn-warning">Migration guide for version 11.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/oms/releases/tag/11.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/oms/compare/10.1.1...11.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div><div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/sales</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">10.2.3 -> 11.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-sales#upgrading-from-version-10---to-version-11-0-0" target="_blank" class="btn btn-warning">Migration guide for version 11.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/sales/releases/tag/11.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/sales/compare/10.2.3...11.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featureywlzzpayments"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featureywlzzpayments-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/payment</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">4.6.0 -> 5.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-payment#upgrading-from-version-4---to-version-5-0-0" target="_blank" class="btn btn-warning">Migration guide for version 5.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/payment/releases/tag/5.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/payment/compare/4.6.0...5.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featuree0mv6cproduct"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featuree0mv6cproduct-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/product-management</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">0.18.5 -> 0.19.0</span></dd>
+                                        </dl>
+                                        
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/product-management/releases/tag/0.19.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/product-management/compare/0.18.5...0.19.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featuret2n5gqproduct-bundles"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featuret2n5gqproduct-bundles-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/product-bundle</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">6.0.1 -> 7.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-product-bundle#upgrading-from-version-6---to-version-7-0-0" target="_blank" class="btn btn-warning">Migration guide for version 7.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/product-bundle/releases/tag/7.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/product-bundle/compare/6.0.1...7.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-feature9w45ilpromotions-discounts"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-feature9w45ilpromotions-discounts-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/discount-promotion</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">3.1.0 -> 4.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-discount-promotion#upgrading-from-version-3---to-version-4-0-0" target="_blank" class="btn btn-warning">Migration guide for version 4.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/discount-promotion/releases/tag/4.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/discount-promotion/compare/3.1.0...4.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featureewxvpscheduled-prices"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featureewxvpscheduled-prices-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/price-product-schedule</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">1.0.1 -> 2.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-price-product-schedule#upgrading-from-version-1---to-version-2-0-0" target="_blank" class="btn btn-warning">Migration guide for version 2.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/price-product-schedule/releases/tag/2.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/price-product-schedule/compare/1.0.1...2.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div><div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/price-product-schedule-gui</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">1.0.2 -> 2.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-price-product-schedule-gui#upgrading-from-version-1---to-version-2-0-0" target="_blank" class="btn btn-warning">Migration guide for version 2.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/price-product-schedule-gui/releases/tag/2.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/price-product-schedule-gui/compare/1.0.2...2.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featureecqtcysearch"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featureecqtcysearch-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/elastica</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">4.0.0 -> 5.0.0</span></dd>
+                                        </dl>
+                                        
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/elastica/releases/tag/5.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/elastica/compare/4.0.0...5.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div
+                                            class="tab-pane fade  "
+                                            id="v-pills-spryker-featureptgm1nshipment"
+                                            role="tabpanel"
+                                            aria-labelledby="v-pills-spryker-featureptgm1nshipment-tab"
+                                            >
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4>Upgraded dependencies</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <b>spryker/shipment</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt>Version upgraded</dt>
+                                            <dd><span class="badge badge-primary">6.9.1 -> 8.0.0</span></dd>
+                                        </dl>
+                                        <a rel="noopener" href="https://documentation.spryker.com/docs/mg-shipment#upgrading-from-version-7---to-8-0-0" target="_blank" class="btn btn-warning">Migration guide for version 8.0.0</a>
+                                        <a
+                rel="noopener"
+                href="https://github.com/spryker/shipment/releases/tag/8.0.0"
+                target="_blank"
+                class="btn btn-secondary"
+            >Github changelog</a>
+                                        <a
+                                            rel="noopener"
+                                            href="https://github.com/spryker/shipment/compare/6.9.1...8.0.0"
+                                            target="_blank"
+                                            class="btn btn-info"
+                                        >Compare the versions</a>
+                                    </div>
+                                </div>
+                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <h4>Dependencies removed</h4>
+                                                    <div class="row dependencies-upgraded">
+                                                        <p class="empty-result">No dependencies were removed in this version.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                        </div>
+                    </div>
+                </div></div>
+            </section>
+            <section>
+                <h2>Spryker Features you are currently not using that might interest you 🍬🍭</h2>
+                <dl><dt><a rel="noopener" href="https://github.com/spryker-feature/approval-process" target="_blank">Approval process</a> </dt>
+          <dd>The Approval Process feature enables managers to control purchases requested by their employees. A customer can choose to have an order approved by a responsible person before allowing the checkout. The company administrator can limit some roles with flexible permissions and define a threshold on the Cart Total value so a buyer would need to ask for approval when the Cat Total limit is exceeded.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/comments" target="_blank">Comments</a> </dt>
+          <dd>With Comments, you can add multiple comments to any entity. The feature has been released as a global widget and can be integrated to any page or entity of your online store. By default, the Comments widget is integrated to the Cart page. This allows you to add multiple comments with tags, so these comments will be linked to order and appear not only in Zed Order Details page but in Yves Order Details page as well. Even better - conversation about the order can continue after the order had been placed, without losing any useful information.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/company-account" target="_blank">Company Account</a> </dt>
+          <dd>The Company Account feature allows you to control user access to the system within an organization by configuring different permissions and roles for company's entities (units) and users. You can set up an own company structure of business units and users with various levels of permissions. This feature also enables you to create own permission rules and assign them to specific users.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/configurable-bundle" target="_blank">Configurable Bundle</a> <span class="badge badge-success">New feature</span></dt>
+          <dd>Configurable Bundle is a self-explaining feature that allows you to create a configurable list of items. With this list, Customer can easily choose what products to add to the cart as Bundles. Configurable bundle is a guiding tool that simplifies purchasing of complex products requiring expertise or specific knowledge.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/development-tools" target="_blank">Development tools</a> </dt>
+          <dd>Development tools provide a convenient way of building a project in development environment with Spryker OS</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/measurement-units" target="_blank">Measurement units</a> </dt>
+          <dd>Allows selling products by any unit of measure defined by the shop administrator.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/merchant" target="_blank">Merchant</a> </dt>
+          <dd>In the B2B partnership, the selling company is a Merchant and the buyer is often represented by a business unit of a buying company. In non-marketplace setup there is always one Merchant.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/merchant-contracts" target="_blank">Merchant B2B Contracts</a> </dt>
+          <dd>A contract is set up between Merchant and B2B customer</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/merchant-custom-prices" target="_blank">Merchant Custom Prices</a> </dt>
+          <dd>With the Merchant Custom Prices, a merchant can define custom prices for B2B customers</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/merchant-order-threshold" target="_blank">Merchant Order Threshold</a> </dt>
+          <dd>With the Merchant Order Threshold, a merchant can define an order threshold per B2B customer</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/merchant-product-restrictions" target="_blank">Merchant Product restrictions</a> </dt>
+          <dd>The Merchant Product Restrictions feature allows the merchants to define the products that are available to each of their B2B customers.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/multiple-carts" target="_blank">Multiple carts</a> </dt>
+          <dd>The Multiple Carts feature allows you to create and manage one or multiple shopping carts in one customer account.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/packaging-units" target="_blank">Packaging units</a> </dt>
+          <dd>Defines if a packaging unit holds a fixed amount of products, or if customer can buy any amount of products in this packaging unit. Also, allows to apply amount restrictions to products.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/persistent-cart-sharing" target="_blank">Persistent Cart Sharing</a> </dt>
+          <dd>With the Persistent Cart Sharing feature, you can quickly and easily share cart through any communication channel like WhatsApp, Slack, or any other messenger, email, or social network. You can share the cart via a link in two different modes: "internal" and "external".  For Internal users, you can share with "Read Only" or "Full Access" permissions, and for External - in the Preview mode. In the first case, you provide users with the necessary level of access rights to the Cart. In the Preview mode, even users who have no access to the shop can view the cart - but cannot perform any actions. Cart in preview mode can also be shared with users in your company because it's not limited in usage to external users only.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/product-customer-restrictions" target="_blank">Product Customer Restrictions</a> </dt>
+          <dd>Define which of your customers gets to see what items, details, and prices. Any item in your product catalog can be added to blacklists per customer. The lists can be uploaded or imported to make handling easier.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/product-lists" target="_blank">Product Lists</a> </dt>
+          <dd>Product lists are used to configure product availability for specific customers. You can either whitelist or backlist them</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/quick-add-to-cart" target="_blank">Quick add to cart</a> </dt>
+          <dd>The Quick Add to Cart feature allows the shop customers to add multiple products to cart at once.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/quotation-process" target="_blank">Quotation Process</a> </dt>
+          <dd>Request for Quote is an Yves functionality that allows an Agent to check quotes, have a list of them, create notification after a Request for Quote was created. In Request for Quote, Agent can change prices, add discount for a specific products or for the whole RfQ.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/resource-sharing" target="_blank">Resource Sharing</a> </dt>
+          <dd>Resource Sharing is a generic feature, that allows you to create Unique URL for any entity in the Spyker Commerce OS. For each entity, you should use additional connector-module. For example, to share Cart through URL, Resource Sharing feature should be combined with Persistent Cart Sharing.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/return-management" target="_blank">Return Management</a> <span class="badge badge-success">New feature</span></dt>
+          <dd>Return Management enables not only to manage the reverse product flow efficiently but to identify opportunities to reduce unwanted returns.
+Return Management allows Customers and Back-office users to select items that should be returned, create returns itself and add return reasons for these items. 
+Return Management also includes a Global return policy that defines Return days during what purchased product can be returned.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/shared-carts" target="_blank">Shared carts</a> </dt>
+          <dd>The Shared Carts features allows to share carts between company users.</dd><dt><a rel="noopener" href="https://github.com/spryker-feature/shopping-lists" target="_blank">Shopping Lists</a> </dt>
+          <dd>The Shopping Lists feature allows customers to create and share multiple lists of products between company business units or single users.Shopping lists can be shared between users with different sets of permissions.</dd></dl>
+            </section></section>
+                    <!-- Libraries -->
+                    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js"></script>
+                    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+                    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+                </body>
+
+            </html>

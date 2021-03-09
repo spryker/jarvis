@@ -46,6 +46,8 @@ const {
 const { getReleaseAppData } = require('./server/api-call.js');
 const { jarvisTemplate } = require('./server/client/index.js');
 
+// Application state //
+
 const clientData = {
     architectureChanges: [],
     currentVersion: getCurrentVersion(),
@@ -63,6 +65,137 @@ const clientData = {
     targets: null
 };
 
+// Run the application //
+
+main(process.argv);
+
+// Source code //
+
+function main(args) {
+    log('Welcome, my name is Spryker Jarvis. Today I will help you to migrate your Spryker project!');
+    log('');
+    log('As part of my services, I will store your composer.json and composer.lock files.');
+    log('Those will allow my colleagues at Spryker to provide better tooling and support in the future.');
+    log('If you do not agree with this, please hit Cmd + c or Ctr + c to cancel my services.');
+    log('');
+
+    // Jarvis configuration //
+
+    const config = getConfig();
+
+    // Terminal questions //
+
+    const NOT_IN_THIS_LIST = 'Not in this list';
+    const projectNameQuestionList = {
+        type: "list",
+        name: "projectName",
+        choices: concat(
+            map(prop('projectName'), config.previousProjects),
+            [NOT_IN_THIS_LIST]
+        ),
+        message: "Is the project name your are migrating inside this list?",
+        when: () => config.previousProjects.length > 0
+    };
+    const projectNameQuestionInput = {
+        type: "input",
+        name: "projectName",
+        message: "What is the project name you are migrating today?",
+        when: (previousAnswers) => isEmpty(previousAnswers) ? true : previousAnswers.projectName === NOT_IN_THIS_LIST
+    };
+
+    /*
+    0. Retrieve composer.json and composer.lock
+      write them locally
+      if hash from composer.lock equals to 1 on the previous project used -> 3
+      if new hash -> 1
+    1. check against customer input for project name or previous
+        if same -> 3
+        if different -> 2
+    2. Run with API call
+    3. Check last API is less than 1 day
+      if true -> 4
+      if false -> 2
+    4. Run locally
+    */
+
+    const composerFiles = compose(
+        getComposerFilesFromPath,
+        head,
+        cleanNodeInput
+    )(args);
+    clientData.myComposerJSON = getComposerData('composerJSON', composerFiles);
+    clientData.myComposerLOCK = getComposerData('composerLOCK', composerFiles);
+
+    // Define if user will use the Features view or Only Modules view or Missing Features view
+    compose(
+        cond([
+            [equals('--no-features'), () => clientData.noFeaturesMode = true],
+            [equals('--missing-features'), () => clientData.missingFeaturesMode = true],
+            [T, () => clientData.productReleasesMode = true]
+        ]),
+        last,
+        cleanNodeInput
+    )(args);
+
+    const JSONcomposerFiles = map(cur => evolve({ data: a => JSON.parse(a) }, cur), composerFiles);
+    const previousProjectIsBack = find(
+        propEq('composerLockHash', path(['data', 'content-hash'], clientData.myComposerLOCK)),
+        config.previousProjects
+    );
+
+
+    if (isNotNil(previousProjectIsBack)) {
+
+        return checkLastApiCallAndRunApp(previousProjectIsBack.projectName, config, composerFiles);
+
+    } else {
+
+        return inquirer.prompt([projectNameQuestionList, projectNameQuestionInput]).then(answers => {
+            // Take the folder path and read/write the composer files
+            const project = findPreviousProject(answers.projectName, config);
+
+            if (isNil(project)) {
+                const composerLockHash = path(['data', 'content-hash'], last(JSONcomposerFiles));
+                const projectName = answers.projectName || `This project had no name: ${composerLockHash}`;
+                const newConfig = evolve({
+                    previousProjects: append(
+                        compose(
+                            assoc('lastCallToReleaseApp', null),
+                            assoc('composerLockHash', composerLockHash),
+                            assoc('projectName', projectName)
+                        )(answers)
+                    ),
+                    lastProjectUsed: always(projectName)
+                }, config);
+
+                updateConfigFile(newConfig);
+
+                return runWithApiCall(newConfig.lastProjectUsed, ...map(prop('data'), composerFiles));
+
+            } else {
+                const projectIndex = findPreviousProjectIndex(project.projectName, config);
+                const newConfig = over(
+                    lensPath(['previousProjects', projectIndex]),
+                    assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles))),
+                    config
+                );
+
+                updateConfigFile(newConfig);
+
+                if (path(['data', 'content-hash'], last(JSONcomposerFiles)) === project.composerLockHash) {
+
+                    return checkLastApiCallAndRunApp(newConfig.lastProjectUsed, newConfig, composerFiles);
+
+                } else {
+
+                    return runWithApiCall(newConfig.lastProjectUsed, ...map(prop('data'), composerFiles));
+
+                }
+
+            }
+        });
+    }
+}
 
 function run(newReleaseData = undefined) {
     const app = express();
@@ -158,150 +291,6 @@ function lastApiCallLessThanADay(date) {
     )(date);
 }
 
-function application(args) {
-    log('Welcome, my name is Spryker Jarvis. Today I will help you to migrate your Spryker project!');
-    log('');
-    log('As part of my services, I will store your composer.json and composer.lock files.');
-    log('Those will allow my colleagues at Spryker to provide better tooling and support in the future.');
-    log('If you do not agree with this, please hit Cmd + c or Ctr + c to cancel my services.');
-    log('');
-
-    const config = getConfig();
-    const NOT_IN_THIS_LIST = 'Not in this list';
-    const projectNameQuestionList = {
-        type: "list",
-        name: "projectName",
-        choices: concat(
-            map(prop('projectName'), config.previousProjects),
-            [NOT_IN_THIS_LIST]
-        ),
-        message: "Is the project name your are migrating inside this list?",
-        when() {
-            // Only ask the question if projects were used
-            return config.previousProjects.length > 0;
-        }
-    };
-    const projectNameQuestionInput = {
-        type: "input",
-        name: "projectName",
-        message: "What is the project name you are migrating today?",
-        when(previousAnswers) {
-            if (isEmpty(previousAnswers)) {
-                return true;
-            } else {
-                return previousAnswers.projectName === NOT_IN_THIS_LIST;
-            }
-        }
-    };
-
-    /*
-    0. Retrieve composer.json and composer.lock
-      write them locally
-      if hash from composer.lock equals to 1 on the previous project used -> 3
-      if new hash -> 1
-    1. check against customer input for project name or previous
-        if same -> 3
-        if different -> 2
-    2. Run with API call
-    3. Check last API is less than 1 day
-      if true -> 4
-      if false -> 2
-    4. Run locally
-    */
-
-    const composerFiles = compose(
-        getComposerFilesFromPath,
-        head,
-        cleanNodeInput
-    )(args);
-    clientData.myComposerJSON = getComposerData('composerJSON', composerFiles);
-    clientData.myComposerLOCK = getComposerData('composerLOCK', composerFiles);
-
-    // Define if user will use the Features view or Only Modules view or Missing Features view
-    compose(
-        cond([
-            [equals('--no-features'), () => {
-                clientData.noFeaturesMode = true;
-                return;
-            }],
-            [equals('--missing-features'), () => {
-                clientData.missingFeaturesMode = true;
-                return;
-            }],
-            [T, () => {
-                clientData.productReleasesMode = true;
-                return;
-            }]
-        ]),
-        last,
-        cleanNodeInput
-    )(args);
-
-    const JSONcomposerFiles = map(cur => {
-        const transformations = {
-            data: a => JSON.parse(a)
-        };
-        return evolve(transformations, cur);
-    }, composerFiles);
-    const previousProjectIsBack = find(
-        propEq('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles))),
-        config.previousProjects
-    );
-
-
-    if (isNotNil(previousProjectIsBack)) {
-
-        return checkLastApiCallAndRunApp(previousProjectIsBack.projectName, config, composerFiles);
-
-    } else {
-
-        return inquirer.prompt([projectNameQuestionList, projectNameQuestionInput]).then(answers => {
-            // Take the folder path and read/write the composer files
-            const project = findPreviousProject(answers.projectName, config);
-
-            if (isNil(project)) {
-                const composerLockHash = path(['data', 'content-hash'], last(JSONcomposerFiles));
-                const projectName = answers.projectName || `This project had no name: ${composerLockHash}`;
-                const newConfig = evolve({
-                    previousProjects: append(
-                        compose(
-                            assoc('lastCallToReleaseApp', null),
-                            assoc('composerLockHash', composerLockHash),
-                            assoc('projectName', projectName)
-                        )(answers)
-                    ),
-                    lastProjectUsed: always(projectName)
-                }, config);
-
-                updateConfigFile(newConfig);
-
-                return runWithApiCall(newConfig.lastProjectUsed, ...map(prop('data'), composerFiles));
-
-            } else {
-                const projectIndex = findPreviousProjectIndex(project.projectName, config);
-                const newConfig = over(
-                    lensPath(['previousProjects', projectIndex]),
-                    assoc('composerLockHash', path(['data', 'content-hash'], last(JSONcomposerFiles))),
-                    config
-                );
-
-                updateConfigFile(newConfig);
-
-                if (path(['data', 'content-hash'], last(JSONcomposerFiles)) === project.composerLockHash) {
-
-                    return checkLastApiCallAndRunApp(newConfig.lastProjectUsed, newConfig, composerFiles);
-
-                } else {
-
-                    return runWithApiCall(newConfig.lastProjectUsed, ...map(prop('data'), composerFiles));
-
-                }
-
-            }
-        });
-    }
-}
-
 function getComposerData(typeOfFile, files) {
     return compose(
         d => JSON.parse(d),
@@ -323,5 +312,3 @@ function findPreviousProjectIndex(projectName, config) {
         config.previousProjects
     );
 }
-
-application(process.argv);

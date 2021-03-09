@@ -96,48 +96,7 @@ function getComposerDataFromDisc(path) {
 
 function writeReleaseAppData(currentProject, data = undefined) {
     const newData = isNil(data) ? JSON.parse(fs.readFileSync(`./tmp/${currentProject}.json`, 'utf8')) : data;
-    const p = prop(__, newData);
     const files = [{
-        path: './dist/release-app-data/release-feature.js',
-        data: JSON.stringify(p('features')),
-        stringStart: 'const releaseFeatures = ',
-        stringEnd: ';'
-    }, {
-        path: './dist/release-app-data/release-module.js',
-        data: JSON.stringify(p('modules')),
-        stringStart: 'const releaseModules = ',
-        stringEnd: ';'
-    }, {
-        path: './dist/release-app-data/architecture-changes.js',
-        data: JSON.stringify(p('architectureChanges')),
-        stringStart: 'const architectureChanges = ',
-        stringEnd: ';'
-    }, {
-        path: './dist/release-app-data/recommended-features.js',
-        data: JSON.stringify(p('recommendedFeatures')),
-        stringStart: 'const recommendedFeatures = ',
-        stringEnd: ';'
-    }, {
-        path: './dist/release-app-data/detected-features.js',
-        data: JSON.stringify(p('detectedFeatures')),
-        stringStart: 'const detectedFeatures = ',
-        stringEnd: ';'
-    }, {
-        path: './dist/release-app-data/onboarding.js',
-        data: JSON.stringify(p('onboarding')),
-        stringStart: 'const onboarding = ',
-        stringEnd: ';'
-    }, {
-        path: './dist/release-app-data/current-version.js',
-        data: JSON.stringify(p('currentVersion')),
-        stringStart: 'const currentVersion = ',
-        stringEnd: ';'
-    }, {
-        path: './dist/release-app-data/product-releases.js',
-        data: JSON.stringify(p('productReleases')),
-        stringStart: 'const productReleases = ',
-        stringEnd: ';'
-    }, {
         path: `./tmp/${currentProject}.json`,
         data: JSON.stringify(newData),
         stringStart: '',
@@ -157,15 +116,19 @@ function writeFile(path, content) {
 // This function does some IO
 // writeFiles :: [object] -> [object]
 function writeFiles(listOfFiles) {
-    forEach(cur => fs.writeFileSync(cur.path, `${cur.stringStart}${cur.data}${cur.stringEnd}`, 'utf8'), listOfFiles);
+    forEach(cur => writeFile(cur.path, `${cur.stringStart}${cur.data}${cur.stringEnd}`), listOfFiles);
 
     return listOfFiles;
 }
 
 function getComposerFilesFromPath(path) {
-    return compose(
-        getComposerDataFromDisc
-    )(path);
+    return [{
+        data: fs.readFileSync(concat(path, '/composer.json'), 'utf8'),
+        name: 'composerJSON'
+    }, {
+        data: fs.readFileSync(concat(path, '/composer.lock'), 'utf8'),
+        name: 'composerLOCK'
+    }];
 }
 
 exports.getConfig = getConfig;
