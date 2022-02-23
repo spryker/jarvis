@@ -16,7 +16,6 @@ function getReleaseAppData(data, errorCallback, callback) {
             return errorCallback(error);
 
         } else {
-
             return callback(body.result);
 
         }
