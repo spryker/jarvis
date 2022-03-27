@@ -1,0 +1,71 @@
+:root {
+    font-size: 100%;
+}
+
+.margin-bottom {
+    margin-bottom: 1rem;
+}
+
+.margin-top-2 {
+    margin-top: 2rem;
+}
+
+.margin-bottom-2 {
+    margin-bottom: 2rem;
+}
+
+.section-in-release,
+.features-not-used {
+    margin: 2rem 0rem;
+}
+
+.dependencies-upgraded .card,
+.dependencies-removed .card {
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    padding-top: 3rem;
+    padding-bottom: 2rem;
+    font-size: 4rem;
+}
+
+h2 {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+}
+
+h3 {
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+}
+
+h4 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.empty-result {
+    padding-left: 1rem;
+}
+
+.links {
+    margin-bottom: 2rem;
+}
+
+.module-new-changes {
+    margin-top: 2rem;
+}
+
+.card-body>a {
+    margin-bottom: 0.5rem;
+}
+
+.card-columns {
+    column-count: 2;
+}
+
+#product-release {
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+}
