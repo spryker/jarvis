@@ -2,7 +2,7 @@ const request = require('request');
 
 function getReleaseAppData(data, errorCallback, callback) {
     const options = {
-        url: 'https://api.release.spryker.com/migration-analysis.json',
+        url: 'https://release.spryker.com/migration-analysis.json',
         method: 'POST',
         body: data,
         json: true
