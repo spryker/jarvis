@@ -1,1 +1,1 @@
-const noFeatures = false;
+const noFeatures = true;
