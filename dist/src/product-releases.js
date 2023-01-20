@@ -24,6 +24,8 @@
     versionToNumber
 */
 
+const e = require("express");
+
 /* exported
     missingSprykerFeatures,
     templateForProductRelease,
@@ -151,7 +153,7 @@ function retrieveModulesForAFeature(listOfFeatures) {
 }
 
 function logicForProductReleases(data) {
-    return `${summaryHeader(data.targets.length)}
+    return `${summaryHeader(data.targets.length, R.map(R.pick(['version', 'targetType']), data.targets))}
             ${R.ifElse(
                 d => R.isEmpty(d.targets),
                 R.always(''),
@@ -179,27 +181,39 @@ function templateLogicForTarget(data) {
             </section>`;
 }
 
-function summaryHeader(nbTargets) {
+function summaryHeader(nbTargets, targets) {
     return R.cond([
-        [nbTargets => nbTargets > 1, templateMoreThanOneTarget],
+        [nbTargets => nbTargets > 1, nbTargets => templateMoreThanOneTarget(nbTargets, targets)],
         [nbTargets => nbTargets === 1, templateOneTarget],
         [R.T, templateUpToDateWithSpryker]
     ])(nbTargets);
 }
 
-function templateMoreThanOneTarget(nbTargets) {
+function templateMoreThanOneTarget(nbTargets, targets) {
+    const progressBarLength = Math.round(1 / nbTargets * 100);
     return `<div class="margin-top-2 alert alert-primary" role="alert">
                 <h4 class="alert-heading">Be brave! The journey is not over yet!</h4>
                 <p>You still have <span class="badge badge-light big-number">${nbTargets}</span> milestones to cover. When the last milestone will be covered, your Spryker project will be up to date.</p>
+                <div class="progress">
+                    ${R.join('', mapIndexed((val, index) => {
+                        if (index === 0) {
+                            return `<div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" style="width: ${progressBarLength}%" aria-valuenow="${progressBarLength}" aria-valuemin="0" aria-valuemax="100">👉 ${val.version} 🏗️</div>`
+                        } else if (index === nbTargets - 1) {
+                            return `<div class="progress-bar progress-bar-white" role="progressbar" style="width: ${progressBarLength}%" aria-valuenow="${progressBarLength}" aria-valuemin="0" aria-valuemax="100">🏁 ${val.version} 🚀</div>`
+                        } else {
+                            return `<div class="progress-bar progress-bar-white" role="progressbar" style="width: ${progressBarLength}%" aria-valuenow="${progressBarLength}" aria-valuemin="0" aria-valuemax="100">${val.version}</div>`
+                        }
+                    },targets))}
+                </div>
                 <hr>
                 <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
             </div>`;
 }
 
-function templateOneTarget(nbTargets) {
+function templateOneTarget() {
     return `<div class="margin-top-2 alert alert-primary" role="alert">
                 <h4 class="alert-heading">You are almose there!</h4>
-                <p>You only have <span class="badge badge-light">${nbTargets}</span> milestone to cover. When this milestone will be covered, your Spryker project will be up to date.</p>
+                <p>You only have <span class="badge badge-light big-number">1</span> milestone to cover. When this milestone will be covered, your Spryker project will be up to date.</p>
                 <hr>
                 <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
             </div>`;

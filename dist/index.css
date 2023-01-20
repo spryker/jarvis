@@ -81,3 +81,13 @@ h4 {
 .big-number {
     font-size: 1.5rem;
 }
+
+.progress {
+    height: 3rem;
+    font-size: 1rem;
+}
+
+.progress-bar-white {
+    background-color: #ffffff;
+    color: #000000;
+}
