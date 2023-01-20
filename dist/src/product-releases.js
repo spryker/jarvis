@@ -190,7 +190,7 @@ function summaryHeader(nbTargets) {
 function templateMoreThanOneTarget(nbTargets) {
     return `<div class="margin-top-2 alert alert-primary" role="alert">
                 <h4 class="alert-heading">Be brave! The journey is not over yet!</h4>
-                <p>You still have <span class="badge badge-light">${nbTargets}</span> milestones to cover. When the last milestone will be covered, your Spryker project will be up to date.</p>
+                <p>You still have <span class="badge badge-light big-number">${nbTargets}</span> milestones to cover. When the last milestone will be covered, your Spryker project will be up to date.</p>
                 <hr>
                 <p>A milestone represent either a Spryker product release or an architecture change that improve the way Spryker works.</p>
             </div>`;

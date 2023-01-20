@@ -12,7 +12,7 @@ function getReleaseAppData(data, errorCallback, callback) {
         const errorCode = body.code;
 
         if (error || errorCode === 404 || errorCode === 500) {
-
+    
             return errorCallback(error);
 
         } else {
