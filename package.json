@@ -5,7 +5,7 @@
   "main": "jarvis.js",
   "scripts": {
     "jarvis-reset": "node server/reset.js",
-    "clean-browser": "npx jshint dist/src/*.js",
+    "clean-browser": "npx eslint dist/src/*.js --fix",
     "clean-node": "npx eslint *.js server/*.js --fix"
   },
   "repository": {
@@ -23,7 +23,7 @@
     "express": "^4.16.4",
     "inquirer": "^6.3.1",
     "moment": "^2.29.4",
-    "ramda": "^0.27.0",
+    "ramda": "^0.28.0",
     "request": "^2.88.0"
   },
   "devDependencies": {
