@@ -1,19 +1,15 @@
 {
     "env": {
         "browser": true,
-        "commonjs": true,
-        "es6": true
+        "es2021": true
     },
-    "extends": "eslint:recommended",
-    "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly",
-        "process": "readonly"
-    },
+    "extends": "standard",
+    "overrides": [
+    ],
     "parserOptions": {
-        "ecmaVersion": 2018
+        "ecmaVersion": "latest",
+        "sourceType": "module"
     },
     "rules": {
-        "no-console": 0
     }
 }

@@ -1,12 +1,12 @@
 {
   "name": "jarvis",
-  "version": "0.4.13",
+  "version": "0.4.14",
   "description": "Spryker Jarvis",
   "main": "jarvis.js",
   "scripts": {
     "jarvis-reset": "node server/reset.js",
     "clean-browser": "npx jshint dist/src/*.js",
-    "clean-node": "npx eslint *.js"
+    "clean-node": "npx eslint *.js server/*.js --fix"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,11 @@
     "request": "^2.88.0"
   },
   "devDependencies": {
-    "eslint": "^8.9.0"
-  }
+    "eslint": "^8.32.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1"
+  },
+  "type": "module"
 }
