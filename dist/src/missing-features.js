@@ -35,15 +35,32 @@ function logicForMissingFeatures(data) {
             ${R.ifElse(
                 d => R.isEmpty(d.detectedFeatures),
                 () => '<div class="alert alert-primary" role="alert">We did not detect any Spryker features that your project could use.</div>',
-                templateForMissingFeatures
+                d => `<div class="container">
+                        <div class="row">
+                            <div class="col-4">
+                                <ul class="list-unstyled">
+                                    ${templateForTableOfContents(data.detectedFeatures)}
+                                </ul>
+                            </div>
+                            <div class="col-8">
+                                ${templateForMissingFeatures(d)}
+                            </div>
+                        </div>
+                    </div>`
             )(data)}`;
+}
+
+function templateForTableOfContents(data) {
+    return R.join('', R.map(cur => {
+        return `<li><a href="#${cur.name}">${cur.name}</a></li>`
+    }, data));
 }
 
 function templateForMissingFeatures(data) {
     return R.join('', R.map(cur => {
         return `<div class="card margin-bottom">
                     <div class="card-body">
-                        <h3 class="card-title">${cur.name}</h3>
+                        <h3 id="${cur.name}" class="card-title">${cur.name}</h3>
                         <h6 class="card-subtitle margin-bottom text-muted">${R.isNil(cur.description) ? '' : cleanDescription(cur.description)}</h6>
                         ${R.ifElse(
                             R.isNil,

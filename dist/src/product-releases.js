@@ -24,8 +24,6 @@
     versionToNumber
 */
 
-const e = require("express");
-
 /* exported
     missingSprykerFeatures,
     templateForProductRelease,
