@@ -51,7 +51,7 @@ function runWithApiCall (projectName, composerJson, composerLock) {
 
 function failedToRetrieveReleaseAppData (data) {
   log('I am sorry to announce that something went wrong, I could not retrieve any information from Spryker...')
-  log('Please verify that you are connected to the Internet. If yes, please send an email to support@spryker.com to notify them that you could not use my services today.')
+  log('Please verify that you are connected to the Internet. If yes, please send a message in https://commerceverse.space/ to notify them that you could not use my services today.')
   log('')
 
   return data
