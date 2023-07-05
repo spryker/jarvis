@@ -1,6 +1,6 @@
 {
   "name": "jarvis",
-  "version": "0.4.14",
+  "version": "0.4.15",
   "description": "Spryker Jarvis",
   "main": "jarvis.js",
   "scripts": {
